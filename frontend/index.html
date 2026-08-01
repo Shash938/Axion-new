@@ -1,0 +1,2836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Investment Advisor - Fundamental Analysis</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* HSL harmonies for sleek dark theme */
+            --bg-color: #0b0f19;
+            --panel-bg: rgba(22, 30, 46, 0.7);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            
+            --color-emerald: #10b981;
+            --color-emerald-glow: rgba(16, 185, 129, 0.15);
+            --color-amber: #f59e0b;
+            --color-amber-glow: rgba(245, 158, 11, 0.15);
+            --color-crimson: #ef4444;
+            --color-crimson-glow: rgba(239, 68, 68, 0.15);
+            --color-blue: #3b82f6;
+            
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --shadow-premium: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Light theme overrides */
+        [data-theme="light"] {
+            --bg-color: #f8fafc;
+            --panel-bg: rgba(255, 255, 255, 0.85);
+            --panel-border: rgba(15, 23, 42, 0.08);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --shadow-premium: 0 20px 40px -15px rgba(15, 23, 42, 0.1);
+            --color-emerald-glow: rgba(16, 185, 129, 0.08);
+            --color-amber-glow: rgba(245, 158, 11, 0.08);
+            --color-crimson-glow: rgba(239, 68, 68, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* Dynamic Grid Background */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, var(--color-emerald-glow) 0px, transparent 50%);
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        /* Glassmorphic Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: rgba(var(--bg-color), 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--panel-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 2.2rem;
+            height: 2.2rem;
+            background: linear-gradient(135deg, var(--color-blue), var(--color-emerald));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .logo-text h1 {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--panel-border);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 2.2rem;
+            height: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .theme-toggle-btn:hover {
+            background: var(--panel-border);
+            transform: scale(1.05);
+        }
+
+        /* Container & Main Layout */
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* Search Section */
+        .search-area {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .search-area h2 {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-area p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: stretch;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 0.35rem;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: var(--transition-smooth);
+        }
+
+        .search-container:focus-within {
+            border-color: var(--color-blue);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .search-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 1.05rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .exchange-selector {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            padding: 0.25rem 0.75rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            margin: 0.2rem;
+            transition: var(--transition-smooth);
+        }
+
+        .exchange-selector:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, var(--color-blue), #2563eb);
+            border: none;
+            color: white;
+            padding: 0 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition-smooth);
+        }
+
+        .search-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Quick suggestions */
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+        }
+
+        .suggestion-tag {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            padding: 0.35rem 0.9rem;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .suggestion-tag:hover {
+            background: var(--panel-border);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        /* Loading / Shimmer State */
+        .loading-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 3rem auto;
+        }
+
+        .spinner {
+            width: 3.5rem;
+            height: 3.5rem;
+            border: 4px solid var(--panel-border);
+            border-top: 4px solid var(--color-blue);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            animation: pulse-text 1.5s ease-in-out infinite;
+        }
+
+        /* Results Screen */
+        .results-container {
+            display: none;
+            flex-direction: column;
+            gap: 2rem;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Hero Stock Info Card */
+        .stock-hero-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .stock-meta-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .company-name {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .ticker-details {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .ticker-badge {
+            background: var(--panel-border);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.5px;
+        }
+
+        .exchange-badge {
+            color: var(--color-blue);
+            font-weight: 600;
+        }
+
+        .sector-badge {
+            color: var(--text-muted);
+        }
+
+        .stock-price-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+            gap: 0.25rem;
+        }
+
+        .current-price {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .market-cap {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Main Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        /* Side Card: Overall Score */
+        .overall-score-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 2.2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            text-align: center;
+        }
+
+        .overall-score-card h3 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Radial Progress SVG */
+        .radial-progress-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .radial-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .radial-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.03);
+            stroke-width: 12px;
+        }
+
+        .radial-fill {
+            fill: none;
+            stroke: var(--color-emerald);
+            stroke-width: 12px;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 1s ease-out;
+        }
+
+        .radial-text-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .radial-score-val {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .radial-score-max {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.15rem;
+        }
+
+        .radial-score-label {
+            margin-top: 0.35rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        /* Grade & Recommendation Badges */
+        .grade-rec-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .badge-box {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .badge-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-value {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .badge-value.buy-glow {
+            color: var(--color-emerald);
+            text-shadow: 0 0 10px var(--color-emerald-glow);
+        }
+        .badge-value.hold-glow {
+            color: var(--color-amber);
+            text-shadow: 0 0 10px var(--color-amber-glow);
+        }
+        .badge-value.sell-glow {
+            color: var(--color-crimson);
+            text-shadow: 0 0 10px var(--color-crimson-glow);
+        }
+
+        /* Info card: coverage */
+        .coverage-info {
+            width: 100%;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+
+        .coverage-label-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .coverage-track {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .coverage-bar {
+            height: 100%;
+            background: var(--color-blue);
+            width: 0%;
+            border-radius: 3px;
+            transition: width 1s ease-out;
+        }
+
+        /* Center Column: Summary & Explanation */
+        .summary-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 2.2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .summary-card h3 {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 0.75rem;
+        }
+
+        .summary-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .summary-subtitle {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin-top: 0.35rem;
+        }
+
+        .summary-recommendation-pill {
+            border-radius: 999px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border: 1px solid var(--panel-border);
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .summary-recommendation-pill.buy { color: var(--color-emerald); background: var(--color-emerald-glow); }
+        .summary-recommendation-pill.hold { color: var(--color-amber); background: var(--color-amber-glow); }
+        .summary-recommendation-pill.sell { color: var(--color-crimson); background: var(--color-crimson-glow); }
+
+        .hero-eyebrow {
+            font-size: 0.72rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 0.45rem;
+        }
+
+        .snapshot-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+            width: 100%;
+            margin-top: 1.25rem;
+        }
+
+        .snapshot-tile {
+            padding: 0.8rem 0.9rem;
+            border-radius: 10px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .snapshot-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .snapshot-tile strong {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .snapshot-tile small {
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+        }
+
+        .score-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+        }
+
+        .score-tile {
+            padding: 1rem 1.05rem;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .score-tile-primary {
+            border-color: rgba(59,130,246,0.25);
+            background: rgba(59,130,246,0.08);
+        }
+
+        .score-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .score-value {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-caption {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .thesis-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .thesis-paragraph {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            padding: 0.8rem 0.9rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.9rem;
+        }
+
+        @media (min-width: 800px) {
+            .history-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .history-card {
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .history-card h5 {
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .history-card p, .history-card li {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .history-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .metric-trend-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.45rem;
+            border-radius: 999px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .data-quality-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .data-quality-details {
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 0.75rem 0.9rem;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .data-quality-details summary {
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .data-quality-details div {
+            margin-top: 0.6rem;
+            color: var(--text-secondary);
+            font-size: 0.84rem;
+            line-height: 1.6;
+        }
+
+        .summary-paragraph {
+            line-height: 1.7;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            white-space: pre-line;
+        }
+
+        .summary-quote {
+            margin-top: 0.25rem;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 0.9rem 1rem;
+            border-left: 3px solid var(--color-blue);
+            background: rgba(59,130,246,0.08);
+            border-radius: 10px;
+        }
+
+        .summary-focus-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.7rem;
+            margin: 0.8rem 0 0.9rem;
+        }
+
+        @media (min-width: 700px) {
+            .summary-focus-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .focus-card {
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 0.8rem 0.9rem;
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .focus-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .focus-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .focus-meta {
+            font-size: 0.8rem;
+            line-height: 1.45;
+            color: var(--text-secondary);
+        }
+
+        .business-breakdown-card {
+            margin-top: 0.5rem;
+            padding: 0.8rem 0.9rem;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .breakdown-title {
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 0.55rem;
+        }
+
+        .breakdown-list {
+            display: grid;
+            gap: 0.4rem;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .breakdown-value {
+            color: var(--text-primary);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .breakdown-total {
+            margin-top: 0.55rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--panel-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .verdict-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 1rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .verdict-title {
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .verdict-stars {
+            font-size: 1rem;
+            letter-spacing: 0.2em;
+            color: var(--color-amber);
+        }
+
+        .verdict-headline {
+            font-size: 1.02rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .verdict-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.7rem;
+        }
+
+        @media (min-width: 700px) {
+            .verdict-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        .verdict-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.6rem 0.7rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+        }
+
+        .verdict-item span {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .verdict-item strong {
+            font-size: 0.86rem;
+            line-height: 1.45;
+            color: var(--text-secondary);
+        }
+
+        .data-quality-state {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding: 0.8rem 0.9rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--panel-border);
+        }
+
+        .summary-brief-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 700px) {
+            .summary-brief-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .brief-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .brief-card h4 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .brief-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .brief-card li {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .brief-card li strong {
+            color: var(--text-primary);
+        }
+
+        /* Bullet lists for Strengths and Weaknesses */
+        .sw-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 600px) {
+            .sw-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .sw-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .sw-header {
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sw-header.strengths {
+            color: var(--color-emerald);
+        }
+
+        .sw-header.weaknesses {
+            color: var(--color-crimson);
+        }
+
+        .sw-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sw-item {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--panel-border);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sw-icon {
+            font-size: 1rem;
+        }
+
+        /* Warnings alert box */
+        .warnings-alert-box {
+            display: none; /* hidden if no warnings */
+            background: var(--color-amber-glow);
+            border: 1px solid var(--color-amber);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            color: var(--text-primary);
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .warnings-title {
+            color: var(--color-amber);
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .warnings-list {
+            padding-left: 1.25rem;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        /* Metrics Ratios Grid Section */
+        .ratios-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .ratios-section h3 {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-top: 1rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 600px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 900px) {
+            .metrics-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Metric Card styling */
+        .metric-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.3);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--color-blue);
+        }
+
+        .metric-card.score-high::before { background: var(--color-emerald); }
+        .metric-card.score-mid::before { background: var(--color-amber); }
+        .metric-card.score-low::before { background: var(--color-crimson); }
+        .metric-card.score-unavailable::before { background: var(--text-muted); }
+
+        .metric-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .metric-name {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        .metric-score-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--panel-border);
+            flex-shrink: 0;
+        }
+
+        .metric-card.score-high .metric-score-badge {
+            background: var(--color-emerald-glow);
+            color: var(--color-emerald);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        .metric-card.score-mid .metric-score-badge {
+            background: var(--color-amber-glow);
+            color: var(--color-amber);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+        .metric-card.score-low .metric-score-badge {
+            background: var(--color-crimson-glow);
+            color: var(--color-crimson);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .metric-primary-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .metric-value-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.35rem;
+        }
+
+        .metric-raw-val {
+            font-family: var(--font-display);
+            font-size: 1.7rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .metric-unit {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Mini progress bar on cards */
+        .metric-bar-track {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 2px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            background: var(--color-blue);
+            width: 0%;
+            transition: width 1s ease-out;
+        }
+
+        .metric-card.score-high .metric-bar-fill { background: var(--color-emerald); }
+        .metric-card.score-mid .metric-bar-fill { background: var(--color-amber); }
+        .metric-card.score-low .metric-bar-fill { background: var(--color-crimson); }
+        .metric-card.score-unavailable .metric-bar-fill { background: var(--text-muted); }
+
+        .metric-desc-collapsed {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .metric-summary {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.6rem;
+        }
+
+        .metric-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            padding: 0.55rem 0.65rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+        }
+
+        .metric-field span {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .metric-field strong {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        .metric-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
+        .metric-card.expanded .metric-desc-collapsed {
+            display: block;
+            -webkit-line-clamp: none;
+            overflow: visible;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--panel-border);
+            padding-top: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .expand-indicator {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            align-self: center;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.25rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-card.expanded .expand-indicator {
+            transform: rotate(180deg);
+        }
+
+        /* Research Dashboard */
+        .research-dashboard {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .research-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 1.25rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .research-panel h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .research-panel p, .research-panel li {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .research-panel ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .research-panel li {
+            padding: 0.25rem 0;
+        }
+
+        .research-panel.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .research-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .research-pill {
+            border-radius: 999px;
+            padding: 0.35rem 0.7rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--color-blue);
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.2);
+        }
+
+        .dimension-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.9rem;
+        }
+
+        @media (min-width: 700px) {
+            .dimension-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .dimension-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        .dimension-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            min-height: 100%;
+        }
+
+        .dimension-card::before {
+            content: '';
+            width: 100%;
+            height: 3px;
+            border-radius: 999px;
+            background: var(--panel-border);
+        }
+
+        .dimension-card.score-high::before { background: var(--color-emerald); }
+        .dimension-card.score-mid::before { background: var(--color-amber); }
+        .dimension-card.score-low::before { background: var(--color-crimson); }
+        .dimension-card.score-unavailable::before { background: var(--text-muted); }
+
+        .dimension-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .dimension-card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .dimension-card-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            line-height: 1.45;
+        }
+
+        .dimension-card-score {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .dimension-card-rating {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .dimension-card p {
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .dimension-section-title {
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-top: 0.1rem;
+        }
+
+        .dimension-contributions {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-top: 0.35rem;
+        }
+
+        .dimension-contributions li {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 0.35rem 0.45rem;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+        }
+
+        .dimension-evidence {
+            font-size: 0.82rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        /* Metric expanded details */
+        .metric-expanded-details {
+            display: none;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--panel-border);
+        }
+
+        .metric-card.expanded .metric-expanded-details {
+            display: block;
+        }
+
+        .metric-stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .metric-stat-chip {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+
+        .metric-stat-chip span {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .metric-history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .metric-history-table th,
+        .metric-history-table td {
+            padding: 0.4rem 0.5rem;
+            text-align: right;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .metric-history-table th:first-child,
+        .metric-history-table td:first-child {
+            text-align: left;
+        }
+
+        .metric-history-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .metric-benchmark {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-score-reason {
+            font-size: 0.78rem;
+            color: var(--color-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .grade-s { color: #a855f7 !important; text-shadow: 0 0 12px rgba(168,85,247,0.4); }
+
+        /* Error Banner */
+        .error-banner {
+            display: none;
+            background: var(--color-crimson-glow);
+            border: 1px solid var(--color-crimson);
+            border-radius: 12px;
+            padding: 1.25rem;
+            color: var(--text-primary);
+            gap: 0.75rem;
+            align-items: flex-start;
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            animation: shake 0.4s ease-out;
+        }
+
+        .error-title {
+            color: var(--color-crimson);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .error-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Animations */
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-text {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            border-top: 1px solid var(--panel-border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: auto;
+        }
+
+        footer a {
+            color: var(--color-blue);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">AG</div>
+            <div class="logo-text">
+                <h1>Axion</h1>
+                <p></p>
+            </div>
+        </div>
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
+            <!-- SVG Moon Icon -->
+            <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </header>
+
+    <div class="container">
+        <!-- Search Section -->
+        <section class="search-area">
+            <h2>Analyze Indian Stocks</h2>
+            <p>Enter a ticker symbol to get a comprehensive, AI-graded fundamental evaluation report.</p>
+            <div class="search-container">
+                <input type="text" id="tickerInput" class="search-input" placeholder="Search stock (e.g. TCS, RELIANCE, INFY, HDFCBANK)" autocomplete="off">
+                <select id="exchangeSelect" class="exchange-selector">
+                    <option value="NSE">NSE</option>
+                    <option value="BSE">BSE</option>
+                </select>
+                <button id="searchBtn" class="search-btn">
+                    <!-- Search Icon SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    Analyze
+                </button>
+            </div>
+            <div class="suggestions">
+                <span class="suggestion-tag" data-ticker="TCS" data-exchange="NSE">TCS</span>
+                <span class="suggestion-tag" data-ticker="RELIANCE" data-exchange="NSE">RELIANCE</span>
+                <span class="suggestion-tag" data-ticker="INFY" data-exchange="NSE">INFY</span>
+                <span class="suggestion-tag" data-ticker="HDFCBANK" data-exchange="NSE">HDFC Bank</span>
+                <span class="suggestion-tag" data-ticker="ICICIBANK" data-exchange="NSE">ICICI Bank</span>
+            </div>
+        </section>
+
+        <!-- Error Banner -->
+        <div class="error-banner" id="errorBanner">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-crimson)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div>
+                <div class="error-title" id="errorTitle">Analysis Failed</div>
+                <div class="error-desc" id="errorDesc">Connection timed out while fetching financial statement data. Please try again.</div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-container" id="loadingState">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">Fetching financial statements...</div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-container" id="resultsSection">
+            <!-- Hero Card -->
+            <div class="stock-hero-card">
+                <div class="stock-meta-info">
+                    <div class="hero-eyebrow">Investment Snapshot</div>
+                    <h2 class="company-name" id="heroCompanyName">Tata Consultancy Services</h2>
+                    <div class="ticker-details">
+                        <span class="ticker-badge" id="heroTicker">TCS</span>
+                        <span class="exchange-badge" id="heroExchange">NSE</span>
+                        <span class="sector-badge" id="heroSector">Technology / IT Services</span>
+                    </div>
+                </div>
+                <div class="stock-price-info">
+                    <div class="current-price" id="heroPrice">₹3,920.00</div>
+                    <div class="market-cap" id="heroMarketCap">Market Cap: ₹14,24,677 Cr</div>
+                </div>
+                <div class="snapshot-grid">
+                    <div class="snapshot-tile">
+                        <span class="snapshot-label">Business Quality</span>
+                        <strong id="snapshotBusinessQualityValue">—</strong>
+                        <small id="snapshotBusinessQualityLabel">—</small>
+                    </div>
+                    <div class="snapshot-tile">
+                        <span class="snapshot-label">Investment Attractiveness</span>
+                        <strong id="snapshotAttractivenessValue">—</strong>
+                        <small id="snapshotAttractivenessLabel">—</small>
+                    </div>
+                    <div class="snapshot-tile">
+                        <span class="snapshot-label">Current Valuation</span>
+                        <strong id="snapshotValuation">—</strong>
+                        <small>Relative to quality and risk</small>
+                    </div>
+                    <div class="snapshot-tile">
+                        <span class="snapshot-label">Investment Verdict</span>
+                        <strong id="snapshotVerdict">—</strong>
+                        <small id="snapshotConviction">—</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Score Grid -->
+            <div class="dashboard-grid">
+                <div class="overall-score-card">
+                    <div class="summary-card-header" style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:0.5rem; width:100%;">
+                        <div>
+                            <h3>Business Quality & Investment Attractiveness</h3>
+                            <p class="summary-subtitle">Independent views on the franchise and the entry point.</p>
+                        </div>
+                    </div>
+                    <div class="radial-progress-container">
+                        <svg class="radial-svg" viewBox="0 0 160 160" aria-hidden="true">
+                            <circle class="radial-bg" cx="80" cy="80" r="70"></circle>
+                            <circle class="radial-fill" id="recommendationRing" cx="80" cy="80" r="70"></circle>
+                        </svg>
+                        <div class="radial-text-content">
+                            <div class="radial-score-val" id="recommendationRingScore">8.4</div>
+                            <div class="radial-score-max">/10</div>
+                            <div class="radial-score-label" id="recommendationRingLabel">BUY</div>
+                        </div>
+                    </div>
+
+                    <div class="score-stack">
+                        <div class="score-tile score-tile-primary">
+                            <div class="score-label">Business Quality</div>
+                            <div class="score-value" id="businessQualityScore">9.3</div>
+                            <div class="score-caption" id="businessQualityCaption">Exceptional business</div>
+                        </div>
+                        <div class="score-tile">
+                            <div class="score-label">Investment Attractiveness</div>
+                            <div class="score-value" id="investmentAttractivenessScore">6.8</div>
+                            <div class="score-caption" id="investmentAttractivenessCaption">Fairly valued</div>
+                        </div>
+                    </div>
+
+                    <div class="coverage-info">
+                        <div class="coverage-label-bar">
+                            <span>Data Coverage</span>
+                            <span id="coverageText">100% (14/14)</span>
+                        </div>
+                        <div class="coverage-track">
+                            <div class="coverage-bar" id="coverageBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="business-breakdown-card">
+                        <div class="breakdown-title">Business Quality Breakdown</div>
+                        <div class="breakdown-list" id="businessQualityBreakdown"></div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-card-header">
+                        <div>
+                            <h3>Investment Verdict</h3>
+                            <p class="summary-subtitle">The decision is based on quality, valuation, risk and confidence.</p>
+                        </div>
+                        <div class="summary-recommendation-pill buy" id="recommendationPill">BUY</div>
+                    </div>
+                    <div class="verdict-card">
+                        <div class="verdict-title">Recommendation</div>
+                        <div class="verdict-headline" id="verdictHeadline">Exceptional business at a premium valuation</div>
+                        <div class="verdict-grid">
+                            <div class="verdict-item">
+                                <span>Why now</span>
+                                <strong id="verdictStrength">High-quality franchise with durable returns</strong>
+                            </div>
+                            <div class="verdict-item">
+                                <span>Primary risk</span>
+                                <strong id="verdictRisk">Valuation discipline and execution consistency</strong>
+                            </div>
+                            <div class="verdict-item">
+                                <span>Holding period</span>
+                                <strong id="verdictInvestor">Long-term quality investor</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thesis-body" id="overallExplanation"></div>
+                    <div class="summary-quote" id="summaryQuote">Recommendation rationale will appear here.</div>
+
+                    <div class="sw-container">
+                        <div class="sw-column">
+                            <div class="sw-header strengths">
+                                <span class="sw-icon">✓</span> Business Strengths
+                            </div>
+                            <ul class="sw-list" id="strengthsList">
+                                <li class="sw-item">Return on Equity</li>
+                            </ul>
+                        </div>
+                        <div class="sw-column">
+                            <div class="sw-header weaknesses">
+                                <span class="sw-icon">!</span> Business Risks
+                            </div>
+                            <ul class="sw-list" id="weaknessesList">
+                                <li class="sw-item">Revenue Growth</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="research-dashboard" id="researchDashboard">
+                <div class="research-panel full-width">
+                    <div class="research-panel-header">
+                        <div>
+                            <h4>Institutional Scorecard</h4>
+                            <p>Concise dimensions that explain the investment view without repeating the thesis.</p>
+                        </div>
+                        <div class="research-pill">Research View</div>
+                    </div>
+                    <div class="dimension-grid" id="dimensionGrid"></div>
+                </div>
+            </div>
+
+            <div class="ratios-section">
+                <h3>Detailed Metric Analysis</h3>
+                <div class="metrics-grid" id="metricsGrid"></div>
+            </div>
+
+            <div class="research-dashboard">
+                <div class="research-panel full-width">
+                    <div class="research-panel-header">
+                        <div>
+                            <h4>Historical Analysis</h4>
+                            <p>What changed over the last several years.</p>
+                        </div>
+                    </div>
+                    <div class="history-grid" id="historicalAnalysisGrid"></div>
+                </div>
+            </div>
+
+            <div class="research-dashboard">
+                <div class="research-panel full-width">
+                    <div class="research-panel-header">
+                        <div>
+                            <h4>Data Quality</h4>
+                            <p>Coverage and confidence behind the report.</p>
+                        </div>
+                    </div>
+                    <div class="data-quality-card">
+                        <div class="data-quality-state" id="dataQualityState">No data quality issues detected.</div>
+                        <details class="data-quality-details" id="dataQualityDetails">
+                            <summary>Technical details</summary>
+                            <div id="dataQualityDetailsBody"></div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // DOM Elements
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        const tickerInput = document.getElementById('tickerInput');
+        const exchangeSelect = document.getElementById('exchangeSelect');
+        const searchBtn = document.getElementById('searchBtn');
+        const errorBanner = document.getElementById('errorBanner');
+        const errorTitle = document.getElementById('errorTitle');
+        const errorDesc = document.getElementById('errorDesc');
+        const loadingState = document.getElementById('loadingState');
+        const loadingText = document.getElementById('loadingText');
+        const resultsSection = document.getElementById('resultsSection');
+        
+        // Results Elements
+        const heroCompanyName = document.getElementById('heroCompanyName');
+        const heroTicker = document.getElementById('heroTicker');
+        const heroExchange = document.getElementById('heroExchange');
+        const heroSector = document.getElementById('heroSector');
+        const heroPrice = document.getElementById('heroPrice');
+        const heroMarketCap = document.getElementById('heroMarketCap');
+        const snapshotBusinessQualityValue = document.getElementById('snapshotBusinessQualityValue');
+        const snapshotBusinessQualityLabel = document.getElementById('snapshotBusinessQualityLabel');
+        const snapshotAttractivenessValue = document.getElementById('snapshotAttractivenessValue');
+        const snapshotAttractivenessLabel = document.getElementById('snapshotAttractivenessLabel');
+        const snapshotValuation = document.getElementById('snapshotValuation');
+        const snapshotVerdict = document.getElementById('snapshotVerdict');
+        const snapshotConviction = document.getElementById('snapshotConviction');
+        
+        const businessQualityScore = document.getElementById('businessQualityScore');
+        const businessQualityCaption = document.getElementById('businessQualityCaption');
+        const investmentAttractivenessScore = document.getElementById('investmentAttractivenessScore');
+        const investmentAttractivenessCaption = document.getElementById('investmentAttractivenessCaption');
+        const coverageText = document.getElementById('coverageText');
+        const coverageBar = document.getElementById('coverageBar');
+        
+        const overallExplanation = document.getElementById('overallExplanation');
+        const summaryQuote = document.getElementById('summaryQuote');
+        const recommendationPill = document.getElementById('recommendationPill');
+        const recommendationRing = document.getElementById('recommendationRing');
+        const recommendationRingScore = document.getElementById('recommendationRingScore');
+        const recommendationRingLabel = document.getElementById('recommendationRingLabel');
+        const businessQualityBreakdown = document.getElementById('businessQualityBreakdown');
+        const verdictHeadline = document.getElementById('verdictHeadline');
+        const verdictStrength = document.getElementById('verdictStrength');
+        const verdictRisk = document.getElementById('verdictRisk');
+        const verdictInvestor = document.getElementById('verdictInvestor');
+        const strengthsList = document.getElementById('strengthsList');
+        const weaknessesList = document.getElementById('weaknessesList');
+        const dataQualityState = document.getElementById('dataQualityState');
+        const dataQualityDetailsBody = document.getElementById('dataQualityDetailsBody');
+        const metricsGrid = document.getElementById('metricsGrid');
+        const dimensionGrid = document.getElementById('dimensionGrid');
+        const historicalAnalysisGrid = document.getElementById('historicalAnalysisGrid');
+
+        // Score color tiers (aligned with backend grade boundaries)
+        const SCORE_HIGH = 7.0;
+        const SCORE_MID = 5.5;
+
+        function scoreColorClass(score, available) {
+            if (!available) return 'score-unavailable';
+            if (score >= SCORE_HIGH) return 'score-high';
+            if (score >= SCORE_MID) return 'score-mid';
+            return 'score-low';
+        }
+
+        function scoreStrokeColor(score) {
+            if (score >= 8.3) return 'var(--color-emerald)';
+            if (score >= SCORE_MID) return 'var(--color-amber)';
+            return 'var(--color-crimson)';
+        }
+
+        function updateRecommendationRing(score, recommendation) {
+            const value = Number(score ?? 0);
+            const progress = Math.max(0, Math.min(100, value * 10));
+            const offset = CIRCLE_CIRCUMFERENCE - (progress / 100) * CIRCLE_CIRCUMFERENCE;
+            recommendationRing.style.strokeDasharray = CIRCLE_CIRCUMFERENCE;
+            recommendationRing.style.strokeDashoffset = offset;
+
+            if (recommendation === 'SELL') {
+                recommendationRing.style.stroke = 'var(--color-crimson)';
+            } else if (recommendation === 'HOLD' || recommendation === 'ACCUMULATE') {
+                recommendationRing.style.stroke = 'var(--color-amber)';
+            } else {
+                recommendationRing.style.stroke = 'var(--color-emerald)';
+            }
+
+            recommendationRingScore.textContent = value.toFixed(1);
+            recommendationRingLabel.textContent = recommendation || 'HOLD';
+        }
+
+        // Circular progress parameters
+        const CIRCLE_RADIUS = 70;
+        const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * CIRCLE_RADIUS; // 439.82
+
+        // Setup theme (dark by default)
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeUI();
+
+        themeToggleBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            updateThemeUI();
+        });
+
+        function updateThemeUI() {
+            if (currentTheme === 'light') {
+                themeIcon.innerHTML = `
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.22" x2="19.78" y2="4.22"></line>
+                `;
+            } else {
+                themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+            }
+        }
+
+        // Ticker suggestion tags
+        document.querySelectorAll('.suggestion-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                tickerInput.value = tag.getAttribute('data-ticker');
+                exchangeSelect.value = tag.getAttribute('data-exchange');
+                performSearch();
+            });
+        });
+
+        // Search trigger
+        searchBtn.addEventListener('click', performSearch);
+        tickerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Loading message rotation
+        const loadingMessages = [
+            "Connecting to Yahoo Finance...",
+            "Downloading balance sheets and income statements...",
+            "Parsing financial statements...",
+            "Calculating growth rates and margins...",
+            "Scoring company financial health...",
+            "Assembling AI recommendations..."
+        ];
+        let messageTimer = null;
+
+        function startLoadingIndicator() {
+            errorBanner.style.display = 'none';
+            resultsSection.style.display = 'none';
+            loadingState.style.display = 'flex';
+            
+            let index = 0;
+            loadingText.textContent = loadingMessages[0];
+            messageTimer = setInterval(() => {
+                index = (index + 1) % loadingMessages.length;
+                loadingText.textContent = loadingMessages[index];
+            }, 2000);
+        }
+
+        function stopLoadingIndicator() {
+            loadingState.style.display = 'none';
+            if (messageTimer) {
+                clearInterval(messageTimer);
+                messageTimer = null;
+            }
+        }
+
+        // Fetch and Analyse API call
+        async function performSearch() {
+            const ticker = tickerInput.value.trim().toUpperCase();
+            const exchange = exchangeSelect.value;
+
+            if (!ticker) {
+                showError("Invalid Input", "Please enter a valid stock ticker symbol.");
+                return;
+            }
+
+            startLoadingIndicator();
+
+            try {
+                // We use relative path so it hits the correct server origin
+                const response = await fetch(`/api/v1/analyze/${ticker}?exchange=${exchange}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Extract error details returned by API
+                    const errorDetail = data.detail || {};
+                    const msg = errorDetail.detail || "An unexpected error occurred.";
+                    const title = errorDetail.title || "Analysis Failed";
+                    showError(title, msg);
+                    return;
+                }
+
+                // Success! Display results
+                renderResults(data);
+            } catch (error) {
+                console.error("Fetch error:", error);
+                showError("Network Connection Error", "Failed to connect to the backend server. Make sure the server is running on port 8000.");
+            } finally {
+                stopLoadingIndicator();
+            }
+        }
+
+        function showError(title, msg) {
+            errorTitle.textContent = title;
+            errorDesc.textContent = msg;
+            errorBanner.style.display = 'flex';
+            tickerInput.focus();
+        }
+
+        function formatCurrency(val, currency = "INR") {
+            if (val === null || val === undefined) return "N/A";
+            
+            let symbol = currency === "INR" ? "₹" : "$";
+            
+            if (val >= 100000) {
+                return `${symbol}${(val / 100000).toLocaleString('en-IN', {maximumFractionDigits: 1})} Lk`;
+            } else if (val >= 1000) {
+                return `${symbol}${(val / 1000).toLocaleString('en-IN', {maximumFractionDigits: 1})} K`;
+            }
+            return `${symbol}${val.toLocaleString('en-IN', {maximumFractionDigits: 2})}`;
+        }
+
+        function formatCategory(cat) {
+            if (!cat) return '—';
+            if (typeof cat === 'string') return cat;
+            const scorePart = cat.score != null ? `${cat.score.toFixed(1)}/10` : 'N/A';
+            const gradePart = cat.grade || 'N/A';
+            const explanation = cat.explanation || '';
+            return `${gradePart} (${scorePart}) — ${explanation}`;
+        }
+
+        function formatMarketCap(val, currency = "INR") {
+            if (val === null || val === undefined || val === 0) return "Market Cap: N/A";
+            let symbol = currency === "INR" ? "₹" : "$";
+            // API returns market cap already in INR Crores
+            if (val >= 100000) {
+                return `Market Cap: ${symbol}${(val / 100000).toLocaleString('en-IN', {maximumFractionDigits: 2})} L Cr`;
+            }
+            return `Market Cap: ${symbol}${val.toLocaleString('en-IN', {maximumFractionDigits: 0})} Cr`;
+        }
+
+        function renderListItems(listEl, items, emptyText) {
+            listEl.innerHTML = '';
+            if (items && items.length > 0) {
+                items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    listEl.appendChild(li);
+                });
+            } else {
+                listEl.innerHTML = `<li style="color:var(--text-muted)">${emptyText}</li>`;
+            }
+        }
+
+        function isGrowthMetric(metric) {
+            return ['revenue_growth', 'profit_growth', 'eps_growth', 'cash_flow_growth', 'book_value_growth', 'dividend_growth'].includes(metric.metric_key);
+        }
+
+        function buildHistoryTable(metric) {
+            if (!metric.history || metric.history.length === 0) {
+                return '<p class="metric-benchmark">No historical data available.</p>';
+            }
+            const title = isGrowthMetric(metric) ? 'YoY Growth' : 'Value';
+            let rows = metric.history.map(h =>
+                `<tr><td>${h.year}</td><td>${formatMetricValue(h.value, metric.raw_value_unit)}</td></tr>`
+            ).join('');
+            return `<table class="metric-history-table"><thead><tr><th>Year</th><th>${title}</th></tr></thead><tbody>${rows}</tbody></table>`;
+        }
+
+        function buildBusinessQualityContributions(fs) {
+            const weights = {
+                financial_quality: 0.40,
+                consistency: 0.15,
+                risk: 0.10,
+                earnings_quality: 0.10,
+                capital_allocation: 0.10,
+                moat: 0.05,
+            };
+            const totalWeight = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
+            return Object.entries(weights).map(([key, weight]) => {
+                const score = Number(fs[`${key}_score`] ?? fs[key] ?? 0);
+                return {
+                    label: formatContributionLabel(key),
+                    contribution: score * weight / totalWeight,
+                };
+            });
+        }
+
+        function formatContributionLabel(key) {
+            const labels = {
+                financial_quality: 'Financial Quality',
+                consistency: 'Historical Consistency',
+                risk: 'Risk',
+                earnings_quality: 'Earnings Quality',
+                capital_allocation: 'Capital Allocation',
+                moat: 'Moat',
+            };
+            return labels[key] || key;
+        }
+
+        function getBusinessQualityLabel(score) {
+            if (score >= 8.5) return 'Exceptional business';
+            if (score >= 7.5) return 'Very strong business';
+            if (score >= 6.5) return 'Solid business';
+            if (score >= 5.5) return 'Average business';
+            return 'Weak business';
+        }
+
+        function getAttractivenessLabel(score, recommendation) {
+            if (recommendation === 'SELL') return 'Demanding valuation';
+            if (score >= 7.0) return 'Attractive valuation';
+            if (score >= 6.0) return 'Fairly valued';
+            return 'Premium valuation';
+        }
+
+        function getVerdictMeta(rec, businessScore, valuationScore, riskScore, confidenceScore) {
+            const quality = businessScore >= 8.0;
+            const attractive = valuationScore >= 6.2 && riskScore <= 6.5;
+            const strongConfidence = confidenceScore >= 70;
+
+            if (rec === 'BUY' && quality && attractive && strongConfidence) {
+                return {
+                    headline: 'Exceptional business at an attractive entry point',
+                    strength: 'Exceptional returns on capital and durable cash generation',
+                    risk: 'Valuation can remain elevated if growth slows',
+                    investor: 'Long-term investors seeking quality compounders'
+                };
+            }
+            if (rec === 'BUY' && quality) {
+                return {
+                    headline: 'Exceptional business with a premium valuation',
+                    strength: 'High-quality franchise with durable earnings power',
+                    risk: 'Price discipline matters more than business quality',
+                    investor: 'Investors comfortable with a premium multiple'
+                };
+            }
+            if (rec === 'HOLD' || rec === 'ACCUMULATE') {
+                return {
+                    headline: 'High-quality business, but the entry point is not yet compelling',
+                    strength: 'Competitive position and balance-sheet strength remain intact',
+                    risk: 'The current price leaves limited margin of safety',
+                    investor: 'Selective investors with a medium-term horizon'
+                };
+            }
+            return {
+                headline: 'Business quality is not sufficient to justify ownership at the current price',
+                strength: 'The franchise lacks enough support from valuation and risk',
+                risk: 'The downside is not adequately compensated',
+                investor: 'Investors focused on downside protection'
+            };
+        }
+
+        function renderBusinessQualityBreakdown(fs) {
+            const contributions = buildBusinessQualityContributions(fs);
+            const total = Number(fs.business_quality_score ?? fs.total_score ?? 0);
+            const rows = contributions.map(item => `
+                <div class="breakdown-item">
+                    <span>${item.label}</span>
+                    <span class="breakdown-value">+${item.contribution.toFixed(1)}</span>
+                </div>
+            `).join('');
+            businessQualityBreakdown.innerHTML = `${rows}<div class="breakdown-total"><span>Total</span><span>${total.toFixed(1)}</span></div>`;
+        }
+
+        function getBenchmarkText(metric, sector) {
+            const rawLabel = metric.benchmark_label || metric.benchmark_summary || '';
+            const text = rawLabel.toLowerCase();
+            if (!text) return '';
+            if (/good|healthy|strong/i.test(text)) {
+                if (/it|technology/i.test(sector)) return 'Above sector expectations for IT Services';
+                if (/bank|financial/i.test(sector)) return 'Typical for private sector banks';
+                return 'Above sector expectations';
+            }
+            if (/excellent/i.test(text)) return 'Excellent versus the peer group';
+            if (/below/i.test(text)) return 'Below historical average';
+            return rawLabel;
+        }
+
+        function buildMetricNarrative(metric, metrics) {
+            const map = Object.fromEntries((metrics || []).map(item => [item.metric_key, item]));
+            if (metric.metric_key === 'roe') {
+                const value = map.roe?.raw_value;
+                return value !== null && value !== undefined ? `ROE of ${value.toFixed(1)}% is a core driver of the quality assessment.` : 'Return on equity remains relevant to the quality view.';
+            }
+            if (metric.metric_key === 'roce') {
+                const value = map.roce?.raw_value;
+                return value !== null && value !== undefined ? `ROCE of ${value.toFixed(1)}% indicates how efficiently capital is being deployed.` : 'Capital efficiency is relevant to the allocation assessment.';
+            }
+            if (metric.metric_key === 'operating_margin' || metric.metric_key === 'net_margin') {
+                const value = metric.raw_value;
+                return value !== null && value !== undefined ? `Margin is ${value.toFixed(1)}%, which informs profitability quality.` : 'Margin performance is relevant to the operating profile.';
+            }
+            if (metric.metric_key === 'debt_to_equity' || metric.metric_key === 'current_ratio' || metric.metric_key === 'interest_coverage') {
+                const value = metric.raw_value;
+                return value !== null && value !== undefined ? `The balance-sheet metric is ${value.toFixed(2)}${metric.raw_value_unit}, which informs risk.` : 'Balance-sheet strength is relevant to the risk assessment.';
+            }
+            if (metric.metric_key === 'revenue_growth' || metric.metric_key === 'profit_growth' || metric.metric_key === 'eps_growth') {
+                const value = metric.raw_value;
+                return value !== null && value !== undefined ? `Growth of ${value.toFixed(1)}% matters for the trajectory of earnings and cash flow.` : 'Growth trends are relevant to the historical view.';
+            }
+            return metric.explanation || 'The metric remains relevant to the overall conclusion.';
+        }
+
+        function buildDimensionNarrative(key, value, metrics) {
+            const map = Object.fromEntries((metrics || []).map(item => [item.metric_key, item]));
+            if (key === 'financial_quality') {
+                const roe = map.roe?.raw_value;
+                const roce = map.roce?.raw_value;
+                if (roe !== null && roe !== undefined && roce !== null && roce !== undefined) {
+                    return `ROE ${roe.toFixed(1)}% and ROCE ${roce.toFixed(1)}% frame the profitability profile.`;
+                }
+                return value >= 8 ? 'Profitability is well supported by returns and margins.' : 'Profitability is more mixed.';
+            }
+            if (key === 'consistency') {
+                const revenueGrowth = map.revenue_growth?.cagr5 ?? map.revenue_growth?.yoy;
+                if (revenueGrowth !== null && revenueGrowth !== undefined) {
+                    return `Revenue growth has been ${revenueGrowth > 0 ? 'positive' : 'flat or negative'} through the available history.`;
+                }
+                return value >= 7 ? 'Performance has been steady over time.' : 'Performance has been less steady.';
+            }
+            if (key === 'capital_allocation') {
+                const roce = map.roce?.raw_value;
+                const fcf = map.fcf_margin?.raw_value;
+                if (roce !== null && roce !== undefined && fcf !== null && fcf !== undefined) {
+                    return `ROCE ${roce.toFixed(1)}% and FCF margin ${fcf.toFixed(1)}% reflect capital discipline.`;
+                }
+                return value >= 7 ? 'Capital deployment appears disciplined.' : 'Capital deployment has been less consistent.';
+            }
+            if (key === 'earnings_quality') {
+                const ocf = map.fcf_margin?.raw_value;
+                if (ocf !== null && ocf !== undefined) {
+                    return `FCF conversion of ${ocf.toFixed(1)}% supports the earnings profile.`;
+                }
+                return value >= 7 ? 'Reported earnings appear cash-backed.' : 'Earnings quality is less convincing.';
+            }
+            if (key === 'moat') {
+                const roe = map.roe?.raw_value;
+                const margin = map.operating_margin?.raw_value;
+                if (roe !== null && roe !== undefined && margin !== null && margin !== undefined) {
+                    return `ROE ${roe.toFixed(1)}% and operating margin ${margin.toFixed(1)}% suggest durable pricing power.`;
+                }
+                return value >= 7 ? 'Competitive strength appears durable.' : 'Competitive strength is less clear.';
+            }
+            if (key === 'risk') {
+                const debt = map.debt_to_equity?.raw_value;
+                const current = map.current_ratio?.raw_value;
+                if (debt !== null && debt !== undefined && current !== null && current !== undefined) {
+                    return `Debt to equity is ${debt.toFixed(2)}x and current ratio is ${current.toFixed(2)}x.`;
+                }
+                return value >= 7 ? 'Balance-sheet strength reduces downside risk.' : 'Balance-sheet pressure remains a watchpoint.';
+            }
+            if (key === 'valuation') {
+                return value >= 7 ? 'The price appears reasonable relative to the quality profile.' : 'The price appears demanding relative to current fundamentals.';
+            }
+            if (key === 'confidence') {
+                return 'Confidence is tied to the breadth and quality of the underlying financial statement coverage.';
+            }
+            return 'The score is displayed directly below.';
+        }
+
+        function formatMetricValue(val, unit) {
+            if (val === null || val === undefined) return 'N/A';
+            if (unit === '₹ Cr') return val.toLocaleString('en-IN', {maximumFractionDigits: 0});
+            if (unit === 'x') return val.toFixed(2);
+            if (unit === '₹') return '₹' + val.toFixed(2);
+            return val.toFixed(1) + (unit === '%' ? '%' : '');
+        }
+
+        function buildStatChips(metric) {
+            const chips = [];
+            if (isGrowthMetric(metric) && metric.yoy !== null && metric.yoy !== undefined) {
+                chips.push(`Latest YoY: <span>${formatMetricValue(metric.yoy, metric.raw_value_unit)}</span>`);
+            } else if (metric.cagr5 !== null && metric.cagr5 !== undefined) {
+                chips.push(`5Y CAGR: <span>${metric.cagr5.toFixed(1)}%</span>`);
+            }
+            if (metric.history && metric.history.length > 0 && !isGrowthMetric(metric)) {
+                const avg = metric.history.reduce((sum, item) => sum + item.value, 0) / metric.history.length;
+                chips.push(`Historical Avg: <span>${formatMetricValue(avg, metric.raw_value_unit)}</span>`);
+            }
+            if (metric.trend) chips.push(`Trend: <span>${metric.trend}</span>`);
+            return chips.map(c => `<div class="metric-stat-chip">${c}</div>`).join('');
+        }
+
+        function formatScoreValue(score, maxScore = 10) {
+            if (score === null || score === undefined) return '—';
+            return `${score.toFixed(1)}/${maxScore}`;
+        }
+
+        function scoreToneClass(score, maxScore = 10) {
+            if (score === null || score === undefined) return 'score-unavailable';
+            const normalized = maxScore === 100 ? score / 100 : score / 10;
+            if (normalized >= 0.83) return 'score-high';
+            if (normalized >= 0.55) return 'score-mid';
+            return 'score-low';
+        }
+
+        function scoreDescriptor(score, maxScore = 10) {
+            if (score === null || score === undefined) return 'Unavailable';
+            const normalized = maxScore === 100 ? score / 100 : score / 10;
+            if (normalized >= 0.83) return 'High score';
+            if (normalized >= 0.67) return 'Above average';
+            if (normalized >= 0.55) return 'Near average';
+            if (normalized >= 0.35) return 'Below average';
+            return 'Low score';
+        }
+
+        function buildDimensionExplanation(key, value) {
+            const score = value ?? 0;
+            if (key === 'business_quality') {
+                if (score >= 8.5) return 'The score is driven by strong profitability, cash generation and balance-sheet resilience.';
+                if (score >= 7.0) return 'The score reflects solid profitability and a dependable operating profile.';
+                if (score >= 5.5) return 'The score reflects an acceptable business profile, though the evidence is less compelling.';
+                return 'The score reflects weak or inconsistent fundamentals.';
+            }
+            if (key === 'financial_quality') {
+                if (score >= 8.0) return 'Returns, margins and cash conversion are all strong.';
+                if (score >= 6.5) return 'Returns and margins are acceptable, with moderate cash conversion.';
+                if (score >= 5.0) return 'Profitability is mixed and cash conversion is less clear.';
+                return 'Returns and cash flow quality are weak.';
+            }
+            if (key === 'consistency') {
+                if (score >= 8.0) return 'Revenue, earnings and cash flow have remained stable through the cycle.';
+                if (score >= 6.5) return 'Performance has been relatively steady, with moderate variability.';
+                if (score >= 5.0) return 'Historical performance has been uneven.';
+                return 'Historical consistency is weak.';
+            }
+            if (key === 'earnings_quality') {
+                if (score >= 8.0) return 'Reported earnings are broadly cash-backed.';
+                if (score >= 6.5) return 'Earnings are mostly credible, though cash conversion is not fully clean.';
+                if (score >= 5.0) return 'Earnings quality is mixed.';
+                return 'Earnings quality is weaker.';
+            }
+            if (key === 'capital_allocation') {
+                if (score >= 8.0) return 'Capital has been allocated into high-return opportunities.';
+                if (score >= 6.5) return 'Capital allocation is generally sensible.';
+                if (score >= 5.0) return 'Allocation discipline is mixed.';
+                return 'Capital allocation has been inconsistent.';
+            }
+            if (key === 'moat') {
+                if (score >= 8.0) return 'Competitive advantages appear durable.';
+                if (score >= 6.5) return 'The competitive position is credible.';
+                if (score >= 5.0) return 'The competitive position is moderate.';
+                return 'The moat is limited or less durable.';
+            }
+            if (key === 'risk') {
+                if (score >= 8.0) return 'Leverage and liquidity support a lower-risk profile.';
+                if (score >= 6.5) return 'Balance-sheet risk is manageable.';
+                if (score >= 5.0) return 'Balance-sheet risk is moderate.';
+                return 'Leverage or coverage is a concern.';
+            }
+            if (key === 'valuation') {
+                if (score >= 8.0) return 'The price appears reasonable relative to fundamentals.';
+                if (score >= 6.5) return 'The valuation is fair.';
+                if (score >= 5.0) return 'The valuation is not especially compelling.';
+                return 'The valuation is demanding.';
+            }
+            if (key === 'confidence') {
+                if (score >= 80) return 'The analysis is supported by broad financial statement coverage.';
+                if (score >= 60) return 'Confidence is moderate because some inputs are incomplete.';
+                if (score >= 40) return 'Confidence is limited because several inputs are sparse.';
+                return 'Confidence is low because the dataset is incomplete.';
+            }
+            return 'The backend score is shown directly below.';
+        }
+
+        function buildDimensionContributions(key, value, fs = {}) {
+            const score = value ?? 0;
+            if (key === 'business_quality') {
+                return buildBusinessQualityContributions(fs);
+            }
+            if (key === 'financial_quality') {
+                return [
+                    { label: 'ROE and ROCE', contribution: score * 0.35 },
+                    { label: 'Margins', contribution: score * 0.25 },
+                    { label: 'Cash conversion', contribution: score * 0.2 },
+                ];
+            }
+            if (key === 'risk') {
+                return [
+                    { label: 'Leverage', contribution: score * 0.35 },
+                    { label: 'Liquidity', contribution: score * 0.3 },
+                    { label: 'Coverage', contribution: score * 0.35 },
+                ];
+            }
+            return [];
+        }
+
+        function renderResearchDimensions(data) {
+            const fs = data.fundamental_score || {};
+            const metrics = data.metric_scores || [];
+            const dimensions = [
+                { key: 'business_quality', label: 'Business Quality', subtitle: 'Composite view of quality and durability', value: fs.business_quality_score ?? fs.total_score ?? 0, maxScore: 10 },
+                { key: 'financial_quality', label: 'Financial Quality', subtitle: 'Returns, margins, and cash generation', value: fs.financial_quality_score ?? 0, maxScore: 10 },
+                { key: 'consistency', label: 'Historical Consistency', subtitle: 'Stability and trend quality through time', value: fs.consistency_score ?? 0, maxScore: 10 },
+                { key: 'earnings_quality', label: 'Earnings Quality', subtitle: 'Cash-backed profitability and accrual discipline', value: fs.earnings_quality_score ?? 0, maxScore: 10 },
+                { key: 'capital_allocation', label: 'Capital Allocation', subtitle: 'Deployment of capital into attractive returns', value: fs.capital_allocation_score ?? 0, maxScore: 10 },
+                { key: 'moat', label: 'Moat', subtitle: 'Competitive durability and pricing power', value: fs.moat_score ?? 0, maxScore: 10 },
+                { key: 'risk', label: 'Risk', subtitle: 'Balance-sheet strength and liquidity profile', value: fs.risk_score ?? 0, maxScore: 10 },
+                { key: 'valuation', label: 'Valuation', subtitle: 'Independent attractiveness of the price', value: fs.valuation_score ?? 0, maxScore: 10 },
+                { key: 'confidence', label: 'Confidence', subtitle: 'Quality and completeness of the dataset', value: fs.confidence_score ?? 0, maxScore: 100 },
+            ];
+
+            dimensionGrid.innerHTML = dimensions.map((dimension) => {
+                const contributions = buildDimensionContributions(dimension.key, dimension.value, fs);
+                const rating = buildDimensionNarrative(dimension.key, dimension.value, metrics);
+                return `
+                    <div class="dimension-card ${scoreToneClass(dimension.value, dimension.maxScore)}">
+                        <div class="dimension-card-top">
+                            <div>
+                                <div class="dimension-card-title">${dimension.label}</div>
+                                <div class="dimension-card-subtitle">${dimension.subtitle}</div>
+                            </div>
+                            <div class="dimension-card-score">${formatScoreValue(dimension.value, dimension.maxScore)}</div>
+                        </div>
+                        <div class="dimension-card-rating">${rating}</div>
+                        <p>${buildDimensionExplanation(dimension.key, dimension.value)}</p>
+                        ${contributions.length ? `<div class="dimension-section-title">What drives the score</div><ul class="dimension-contributions">${contributions.map(item => `<li>${item.label} +${item.contribution.toFixed(1)}</li>`).join('')}</ul>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatWatchpointText(text) {
+            if (!text) return '';
+            const normalized = String(text).trim();
+            if (/book value growth/i.test(normalized)) {
+                return 'Book value growth is currently the weakest relative financial metric.';
+            }
+            if (/revenue growth/i.test(normalized)) {
+                return 'Revenue growth remains the most significant relative weakness.';
+            }
+            return normalized
+                .replace(/weakness/gi, 'relative weakness')
+                .replace(/is in a moderate weakness/gi, 'has lagged the company\'s otherwise strong financial performance')
+                .replace(/\s+/g, ' ')
+                .replace(/^./, (char) => char.toUpperCase());
+        }
+
+        function buildHistoricalNarrative(metrics, sector) {
+            const growthMetric = metrics.find(metric => metric.metric_key === 'revenue_growth') || metrics.find(metric => metric.metric_key === 'profit_growth');
+            const marginMetric = metrics.find(metric => metric.metric_key === 'operating_margin') || metrics.find(metric => metric.metric_key === 'net_margin');
+            const qualityMetric = metrics.find(metric => metric.metric_key === 'roe') || metrics.find(metric => metric.metric_key === 'roce');
+
+            const growthText = growthMetric && growthMetric.raw_value !== null && growthMetric.raw_value !== undefined
+                ? `growth of ${growthMetric.raw_value.toFixed(1)}%`
+                : 'steady operating momentum';
+            const marginText = marginMetric && marginMetric.raw_value !== null && marginMetric.raw_value !== undefined
+                ? `margin of ${marginMetric.raw_value.toFixed(1)}%`
+                : 'strong cash conversion';
+            const qualityText = qualityMetric && qualityMetric.raw_value !== null && qualityMetric.raw_value !== undefined
+                ? `returns of ${qualityMetric.raw_value.toFixed(1)}%`
+                : 'solid operating discipline';
+
+            return `${sector ? `${sector} dynamics` : 'The business'} are being shaped by ${growthText}, ${marginText} and ${qualityText}.`;
+        }
+
+        function renderResults(data) {
+            heroCompanyName.textContent = data.company.company_name;
+            heroTicker.textContent = data.company.ticker;
+            heroExchange.textContent = data.company.exchange;
+            heroSector.textContent = `${data.company.sector || 'N/A'} • ${data.company.industry || 'N/A'}`;
+            heroPrice.textContent = formatCurrency(data.company.current_price, data.company.currency);
+            heroMarketCap.textContent = formatMarketCap(data.company.market_cap, data.company.currency);
+
+            const fs = data.fundamental_score || {};
+            const rec = (fs.recommendation || 'HOLD').toUpperCase();
+            const businessScore = fs.business_quality_score ?? fs.total_score ?? 0;
+            const valuationScore = fs.valuation_score ?? 0;
+            const riskScore = fs.risk_score ?? 0;
+            const confidenceScore = fs.confidence_score ?? 0;
+            const qualityLabel = getBusinessQualityLabel(businessScore);
+            const attractivenessLabel = getAttractivenessLabel(valuationScore, rec);
+            const verdict = getVerdictMeta(rec, businessScore, valuationScore, riskScore, confidenceScore);
+
+            snapshotBusinessQualityValue.textContent = `${businessScore.toFixed(1)}/10`;
+            snapshotBusinessQualityLabel.textContent = qualityLabel;
+            snapshotAttractivenessValue.textContent = `${valuationScore.toFixed(1)}/10`;
+            snapshotAttractivenessLabel.textContent = attractivenessLabel;
+            snapshotValuation.textContent = valuationScore >= 7.0 ? 'Attractive' : valuationScore >= 6.0 ? 'Fair' : 'Premium';
+            snapshotVerdict.textContent = rec;
+            snapshotConviction.textContent = confidenceScore >= 70 ? 'High conviction' : 'Moderate conviction';
+
+            businessQualityScore.textContent = businessScore.toFixed(1);
+            businessQualityCaption.textContent = qualityLabel;
+            investmentAttractivenessScore.textContent = valuationScore.toFixed(1);
+            investmentAttractivenessCaption.textContent = attractivenessLabel;
+
+            const coverage = data.fundamental_score.coverage_pct;
+            const evalCount = data.fundamental_score.metrics_evaluated;
+            const totalCount = data.fundamental_score.metrics_total;
+            coverageText.textContent = `${coverage.toFixed(0)}% (${evalCount}/${totalCount})`;
+            coverageBar.style.width = `${coverage}%`;
+
+            renderBusinessQualityBreakdown(fs);
+
+            recommendationPill.textContent = rec;
+            recommendationPill.className = 'summary-recommendation-pill';
+            if (rec === 'BUY') {
+                recommendationPill.classList.add('buy');
+            } else if (rec === 'HOLD' || rec === 'ACCUMULATE') {
+                recommendationPill.classList.add('hold');
+            } else {
+                recommendationPill.classList.add('sell');
+            }
+            updateRecommendationRing(businessScore, rec);
+
+            const quoteText = (data.overall_explanation || '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            const thesisParagraphs = [
+                `<div class="thesis-paragraph"><strong>Business quality:</strong> ${qualityLabel.toLowerCase()} with ${businessScore.toFixed(1)}/10 on the underlying franchise score; returns, cash generation and balance-sheet resilience are the main drivers.</div>`,
+                `<div class="thesis-paragraph"><strong>Investment attractiveness:</strong> ${attractivenessLabel.toLowerCase()} at ${valuationScore.toFixed(1)}/10, which is the central determinant of whether the stock is attractive at the current price.</div>`,
+                `<div class="thesis-paragraph"><strong>Risk posture:</strong> ${riskScore >= 6.5 ? 'The balance sheet and liquidity profile look manageable.' : 'Balance-sheet pressure remains the primary monitoring point.'}</div>`,
+                `<div class="thesis-paragraph"><strong>Primary strengths:</strong> ${data.strengths && data.strengths.length ? data.strengths.slice(0, 2).join(' · ') : 'Financial quality and cash conversion remain the key positives.'}</div>`,
+                `<div class="thesis-paragraph"><strong>Primary risks:</strong> ${data.weaknesses && data.weaknesses.length ? data.weaknesses.slice(0, 2).map(item => item.replace(/\s+/g, ' ')).join(' · ') : 'The risk is mainly valuation and execution sensitivity.'}</div>`
+            ];
+            overallExplanation.innerHTML = thesisParagraphs.join('');
+            summaryQuote.innerHTML = `<strong>Recommendation:</strong> ${rec === 'BUY' ? 'Business quality is compelling and the entry point is acceptable.' : rec === 'SELL' ? 'The business is not compelling enough at the current price.' : 'The investment case depends on whether the valuation is justified.'}`;
+
+            verdictHeadline.textContent = verdict.headline;
+            verdictStrength.textContent = verdict.strength;
+            verdictRisk.textContent = verdict.risk;
+            verdictInvestor.textContent = verdict.investor;
+
+            const dataQualityNotes = (fs.data_quality_notes && fs.data_quality_notes.length > 0)
+                ? fs.data_quality_notes
+                : (data.warnings && data.warnings.length > 0 ? data.warnings : []);
+
+            if (dataQualityNotes.length > 0) {
+                dataQualityState.textContent = dataQualityNotes[0];
+                dataQualityDetailsBody.innerHTML = dataQualityNotes.map(note => `<div>• ${note}</div>`).join('');
+                document.getElementById('dataQualityDetails').style.display = 'block';
+            } else {
+                dataQualityState.textContent = 'No data quality issues detected.';
+                dataQualityDetailsBody.innerHTML = '';
+                document.getElementById('dataQualityDetails').style.display = 'none';
+            }
+
+            strengthsList.innerHTML = '';
+            if (data.strengths && data.strengths.length > 0) {
+                data.strengths.slice(0, 4).forEach(str => {
+                    const li = document.createElement('li');
+                    li.className = 'sw-item';
+                    li.innerHTML = `<span class="sw-icon">✓</span> ${str}`;
+                    strengthsList.appendChild(li);
+                });
+            } else {
+                strengthsList.innerHTML = '<li class="sw-item" style="color:var(--text-muted)">No material strengths identified</li>';
+            }
+
+            weaknessesList.innerHTML = '';
+            if (data.weaknesses && data.weaknesses.length > 0) {
+                data.weaknesses.slice(0, 4).forEach(wk => {
+                    const li = document.createElement('li');
+                    li.className = 'sw-item';
+                    li.innerHTML = `<span class="sw-icon">!</span> ${formatWatchpointText(wk)}`;
+                    weaknessesList.appendChild(li);
+                });
+            } else {
+                weaknessesList.innerHTML = '<li class="sw-item" style="color:var(--text-muted)">No material watchpoints identified</li>';
+            }
+
+            renderResearchDimensions(data);
+
+            const metricEntries = (data.metric_scores || []).filter(metric => {
+                const sector = (data.company?.sector || '').toLowerCase();
+                if (sector.includes('bank') || sector.includes('financial')) {
+                    return !['roce', 'current_ratio', 'operating_margin', 'interest_coverage', 'capital_employed', 'ebit'].includes(metric.metric_key)
+                        && metric.data_available !== false;
+                }
+                return metric.data_available !== false;
+            });
+
+            historicalAnalysisGrid.innerHTML = '';
+            const historicalCards = [
+                {
+                    title: 'What changed',
+                    body: buildHistoricalNarrative(metricEntries, data.company?.sector || '')
+                },
+                {
+                    title: 'Confidence',
+                    body: `${confidenceScore >= 70 ? 'Confidence is high' : 'Confidence is moderate'} because ${coverage.toFixed(0)}% of the core metrics were evaluated.`
+                }
+            ];
+            historicalAnalysisGrid.innerHTML = historicalCards.map(card => `
+                <div class="history-card">
+                    <h5>${card.title}</h5>
+                    <p>${card.body}</p>
+                </div>
+            `).join('');
+
+            metricsGrid.innerHTML = '';
+            metricEntries.forEach(metric => {
+                const card = document.createElement('div');
+                const scoreClass = scoreColorClass(metric.score, metric.data_available);
+                card.className = 'metric-card ' + scoreClass;
+
+                let rawDisplayVal = 'Unavailable';
+                if (metric.metric_key === 'dividend' && !metric.data_available) {
+                    rawDisplayVal = 'No Dividend History';
+                } else if (metric.raw_value !== null && metric.raw_value !== undefined) {
+                    rawDisplayVal = formatMetricValue(metric.raw_value, metric.raw_value_unit);
+                }
+
+                const isInformational = metric.informational === true;
+                const scoreBadge = !metric.data_available
+                    ? 'Unavailable'
+                    : isInformational
+                        ? 'Info'
+                        : metric.score.toFixed(0) + '/10';
+                const barWidth = metric.data_available && !isInformational ? (metric.score * 10) + '%' : '0%';
+
+                const benchmarkText = getBenchmarkText(metric, data.company?.sector || '');
+                const benchmarkHtml = benchmarkText
+                    ? `<div class="metric-benchmark"><strong>Benchmark:</strong> ${benchmarkText}</div>`
+                    : '';
+
+                const scoreReasonHtml = metric.score_reason
+                    ? `<div class="metric-score-reason">${metric.score_reason}</div>` : '';
+
+                const conciseExplanation = buildMetricNarrative(metric, metricEntries);
+                const primaryLabel = isGrowthMetric(metric) ? 'Current CAGR' : 'Current Value';
+                const yoyLine = isGrowthMetric(metric) && metric.yoy !== null && metric.yoy !== undefined
+                    ? `<div class="metric-secondary-value">Latest YoY: ${formatMetricValue(metric.yoy, metric.raw_value_unit)}</div>`
+                    : '';
+
+                card.innerHTML = `
+                    <div class="metric-card-header">
+                        <div class="metric-name">${metric.metric_name}</div>
+                        <div class="metric-score-badge">${scoreBadge}</div>
+                    </div>
+                    <div class="metric-primary-label">${primaryLabel}</div>
+                    <div class="metric-value-row">
+                        <span class="metric-raw-val">${rawDisplayVal}</span>
+                        <span class="metric-unit">${metric.data_available ? metric.raw_value_unit : ''}</span>
+                    </div>
+                    ${yoyLine}
+                    <div class="metric-bar-track">
+                        <div class="metric-bar-fill" style="width: ${barWidth}"></div>
+                    </div>
+                    <div class="metric-desc-collapsed">${conciseExplanation.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
+                    <div class="metric-expanded-details">
+                        <div class="metric-stats-row">${buildStatChips(metric)}</div>
+                        ${buildHistoryTable(metric)}
+                        ${benchmarkHtml}
+                        ${scoreReasonHtml}
+                    </div>
+                    <div class="expand-indicator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                        <span>Details</span>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => {
+                    card.classList.toggle('expanded');
+                    const label = card.querySelector('.expand-indicator span');
+                    label.textContent = card.classList.contains('expanded') ? 'Collapse' : 'Details';
+                });
+
+                metricsGrid.appendChild(card);
+            });
+
+            resultsSection.style.display = 'flex';
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
