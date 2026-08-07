@@ -24,8 +24,12 @@ Possible improvements:
 """
 
 import logging
+from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Path, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from security.auth import verify_api_key, get_current_user_optional
+from security.rate_limiter import rate_limit_check
+from database.db import record_search_history
 
 from models.fundamental import AnalysisRequest, AnalysisResponse, ErrorDetail, Exchange
 from services.data_fetcher import DataUnavailableError, NetworkError, TickerNotFoundError
@@ -39,6 +43,7 @@ _analyzer = FundamentalAnalyzerService()
 analysis_router = APIRouter(
     prefix="/api/v1",
     tags=["Fundamental Analysis"],
+    dependencies=[Depends(verify_api_key), Depends(rate_limit_check)],
 )
 
 
@@ -64,7 +69,10 @@ analysis_router = APIRouter(
         500: {"model": ErrorDetail, "description": "Unexpected server error."},
     },
 )
-def analyze_stock(request: AnalysisRequest) -> AnalysisResponse:
+def analyze_stock(
+    request: AnalysisRequest,
+    current_user: dict = Depends(get_current_user_optional),
+) -> AnalysisResponse:
     """
     Main analysis endpoint.
 
@@ -74,7 +82,7 @@ def analyze_stock(request: AnalysisRequest) -> AnalysisResponse:
         {"ticker": "RELIANCE", "exchange": "NSE"}
     """
     logger.info("POST /api/v1/analyze — ticker=%s exchange=%s", request.ticker, request.exchange)
-    return _run_analysis(request)
+    return _run_analysis(request, current_user)
 
 
 # ==============================================================================
@@ -104,12 +112,13 @@ def analyze_stock_get(
         min_length=1,
         max_length=20,
         description="NSE/BSE stock ticker (e.g. TCS, INFY, HDFC).",
-        example="TCS",
+        openapi_examples={"default": {"summary": "TCS", "value": "TCS"}},
     ),
     exchange: Exchange = Query(
         default=Exchange.NSE,
         description="Stock exchange (NSE or BSE).",
     ),
+    current_user: dict = Depends(get_current_user_optional),
 ) -> AnalysisResponse:
     """
     Convenience GET endpoint for browser / extension quick lookups.
@@ -117,7 +126,7 @@ def analyze_stock_get(
     """
     logger.info("GET /api/v1/analyze/%s?exchange=%s", ticker, exchange)
     request = AnalysisRequest(ticker=ticker, exchange=exchange)
-    return _run_analysis(request)
+    return _run_analysis(request, current_user)
 
 
 # ==============================================================================
@@ -125,13 +134,30 @@ def analyze_stock_get(
 # ==============================================================================
 
 
-def _run_analysis(request: AnalysisRequest) -> AnalysisResponse:
+def _run_analysis(request: AnalysisRequest, current_user: Optional[dict] = None) -> AnalysisResponse:
     """
     Centralised error handling wrapper for both endpoints.
     Maps domain exceptions to appropriate HTTP status codes.
     """
     try:
-        return _analyzer.analyze(request)
+        response = _analyzer.analyze(request)
+        
+        # Record successful search in history database
+        user_id = current_user["id"] if current_user else None
+        try:
+            record_search_history(
+                user_id=user_id,
+                ticker=response.company.ticker,
+                exchange=response.company.exchange.value,
+                company_name=response.company.company_name,
+                score=response.fundamental_score.total_score,
+                grade=response.fundamental_score.grade.value,
+                recommendation=response.fundamental_score.recommendation.value,
+            )
+        except Exception as hist_err:
+            logger.warning("Failed to record search history: %s", hist_err)
+            
+        return response
 
     except TickerNotFoundError as exc:
         logger.warning("Ticker not found: %s", exc)

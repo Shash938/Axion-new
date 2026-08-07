@@ -1,0 +1,91 @@
+ Core Security Architecture & Features
+1. Strict Input Sanitization & Malicious Input Rejection
+Location: 
+
+fundamental.py
+ (AnalysisRequest)
+Protection: Prevents XSS (<script>), Path Traversal (../etc/passwd), SQL Injection, and Command Injection.
+Mechanism:
+Automatically normalizes input (converts to uppercase, strips whitespace and exchange suffixes like .NS/.BO).
+Enforces strict regex pattern validation (^[A-Z0-9.\-]{1,20}$).
+Immediately rejects invalid or malicious symbols at the API boundary with Pydantic 422 Unprocessable Entity errors before any business logic runs.
+2. API Key & Bearer Token Authentication
+Location: 
+
+auth.py
+ (verify_api_key)
+Protection: Restricts unauthorized access to analysis endpoints.
+Mechanism:
+Attached via FastAPI dependency injection to protected routes (APIRouter(dependencies=[Depends(verify_api_key), ...])).
+Supports multiple credential delivery options:
+Custom HTTP header: X-API-Key: <key>
+HTTP Bearer authorization: Authorization: Bearer <key>
+Query parameter: ?api_key=<key>
+Includes a zero-downtime feature toggle (REQUIRE_API_KEY=true/false) in .env settings.
+Rejects unauthorized requests with standard 401 Unauthorized responses.
+3. Sliding-Window Rate Limiting (Anti-Abuse / Anti-DDoS)
+Location: 
+
+rate_limiter.py
+ (rate_limit_check)
+Protection: Prevents brute-force attacks, scraping, and service starvation.
+Mechanism:
+Tracks incoming requests per client IP address using an in-memory sliding timestamp window.
+Automatically purges stale request logs to maintain low memory usage.
+Enforces configurable limits (RATE_LIMIT_PER_MINUTE, default 60 req/min).
+Triggers HTTP 429 Too Many Requests responses with standard headers:
+Retry-After
+X-RateLimit-Limit
+X-RateLimit-Remaining
+X-RateLimit-Reset
+4. OWASP Standard Security HTTP Headers
+Location: 
+
+headers.py
+ (SecurityHeadersMiddleware)
+Protection: Guards against Clickjacking, MIME-sniffing, XSS, and Referrer leakage.
+Headers Injected:
+X-Content-Type-Options: nosniff — Prevents browsers from guessing asset MIME types.
+X-Frame-Options: DENY — Blocks embedding the app inside <iframe> tags (Clickjacking defense).
+X-XSS-Protection: 1; mode=block — Enables legacy browser XSS filters.
+Referrer-Policy: strict-origin-when-cross-origin — Protects internal URI path details from leaking.
+Permissions-Policy: geolocation=(), camera=(), microphone=() — Disables unnecessary browser capabilities.
+Content-Security-Policy — Restricts script execution to authorized domains.
+5. Payload Size Limiting Middleware
+Location: 
+
+payload_limit.py
+ (PayloadSizeLimitMiddleware)
+Protection: Mitigates Denial-of-Service (DoS) and Out-Of-Memory (OOM) attacks caused by oversized payloads.
+Mechanism:
+Intercepts incoming HTTP requests and inspects Content-Length headers as well as streamed body chunks.
+Automatically aborts requests exceeding MAX_PAYLOAD_SIZE_BYTES (default: 100 KB) with an HTTP 413 Payload Too Large status.
+6. Information Disclosure Prevention (Global Exception Handler)
+Location: 
+
+app.py
+ (global_exception_handler)
+Protection: Prevents sensitive stack traces, file paths, or internal server errors from leaking to callers.
+Mechanism: Catches all unhandled exceptions and returns sanitized RFC 7807 problem detail JSON responses while logging full tracebacks internally.
+7. Schema Hiding in Production & CORS Scoping
+Location: 
+
+app.py
+ & 
+
+settings.py
+Protection: Suppresses API documentation exposure and cross-site requests.
+Mechanism:
+Disables /docs, /redoc, and /openapi.json endpoints automatically when DEBUG=false.
+Configures CORS middleware to restrict allowed web origins to explicit host domains (ALLOWED_ORIGINS).
+🧪 Automated Security Test Coverage
+All security mechanisms are covered by automated unit tests in 
+
+test_security.py
+:
+
+test_security_headers_present — Verifies OWASP security headers on response.
+test_ticker_input_validation_malicious — Verifies rejection of script injection & path traversal attempts.
+test_api_key_authentication_enforced — Verifies 401 response for missing/invalid keys.
+test_rate_limiting_exceeded — Verifies 429 response when request thresholds are breached.
+test_payload_size_limit — Verifies 413 response for payloads > 100 KB.
