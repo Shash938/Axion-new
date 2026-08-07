@@ -36,8 +36,18 @@ from database.db import init_db
 from routers.analysis import analysis_router
 from routers.auth import auth_router
 from routers.history import history_router
-from routers.webauthn import webauthn_router
-from routers.face_auth import face_auth_router
+
+# Optional routers — degrade gracefully if deps missing
+try:
+    from routers.webauthn import webauthn_router
+except Exception:
+    webauthn_router = None
+
+try:
+    from routers.face_auth import face_auth_router
+except Exception:
+    face_auth_router = None
+
 from security.headers import SecurityHeadersMiddleware
 from security.payload_limit import PayloadSizeLimitMiddleware
 
@@ -226,8 +236,10 @@ def serve_ui():
 app.include_router(analysis_router)
 app.include_router(auth_router)
 app.include_router(history_router)
-app.include_router(webauthn_router)
-app.include_router(face_auth_router)
+if webauthn_router is not None:
+    app.include_router(webauthn_router)
+if face_auth_router is not None:
+    app.include_router(face_auth_router)
 
 
 # ==============================================================================
