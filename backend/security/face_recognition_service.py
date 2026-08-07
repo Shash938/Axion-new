@@ -47,10 +47,30 @@ def get_face_cascade():
     if not HAS_OPENCV or cv2 is None:
         return None
     if _face_cascade is None:
-        try:
-            _face_cascade = cv2.CascadeClassifier(_CASCADE_PATH)
-        except Exception as e:
-            logger.warning("Could not load Haar cascade: %s", e)
+        cascade_filename = "haarcascade_frontalface_default.xml"
+        possible_paths = []
+        if hasattr(cv2, "data") and hasattr(cv2.data, "haarcascades"):
+            possible_paths.append(os.path.join(cv2.data.haarcascades, cascade_filename))
+        possible_paths.extend([
+            "/usr/share/opencv4/haarcascades/" + cascade_filename,
+            "/usr/share/opencv/haarcascades/" + cascade_filename,
+            "/usr/local/share/opencv4/haarcascades/" + cascade_filename,
+        ])
+        for p in possible_paths:
+            if p and os.path.exists(p):
+                try:
+                    cascade = cv2.CascadeClassifier(p)
+                    if not cascade.empty():
+                        _face_cascade = cascade
+                        logger.info("Loaded Haar cascade from: %s", p)
+                        break
+                except Exception:
+                    pass
+        if _face_cascade is None or _face_cascade.empty():
+            try:
+                _face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + cascade_filename)
+            except Exception as e:
+                logger.warning("Could not load Haar cascade: %s", e)
     return _face_cascade
 
 
