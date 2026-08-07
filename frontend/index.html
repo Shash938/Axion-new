@@ -3699,6 +3699,18 @@
             }
         });
 
+        function formatErrorMessage(data, fallback) {
+            if (!data || !data.detail) return fallback;
+            if (typeof data.detail === 'string') return data.detail;
+            if (Array.isArray(data.detail)) {
+                return data.detail.map(err => (err.msg || JSON.stringify(err))).join(', ');
+            }
+            if (typeof data.detail === 'object') {
+                return data.detail.detail || data.detail.msg || JSON.stringify(data.detail);
+            }
+            return fallback;
+        }
+
         // Login Handler
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -3725,7 +3737,7 @@
                     }
                 } else {
                     authFeedback.className = 'auth-feedback error';
-                    authFeedback.textContent = data.detail || 'Login failed.';
+                    authFeedback.textContent = formatErrorMessage(data, 'Login failed.');
                     authFeedback.style.display = 'block';
                 }
             } catch (err) {
@@ -3758,7 +3770,7 @@
                     registerForm.reset();
                 } else {
                     authFeedback.className = 'auth-feedback error';
-                    authFeedback.textContent = data.detail || 'Registration failed.';
+                    authFeedback.textContent = formatErrorMessage(data, 'Registration failed.');
                     authFeedback.style.display = 'block';
                 }
             } catch (err) {
