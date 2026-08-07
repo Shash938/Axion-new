@@ -110,9 +110,9 @@ app = FastAPI(
         "Calculates 14 financial ratios, scores each metric, and returns a "
         "structured investment recommendation with beginner-friendly explanations."
     ),
-    docs_url="/docs" if settings.DEBUG else None,       # Hide Swagger in production
-    redoc_url="/redoc" if settings.DEBUG else None,     # Hide ReDoc in production
-    openapi_url="/openapi.json" if settings.DEBUG else None,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
     lifespan=lifespan,
 )
 
