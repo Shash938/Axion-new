@@ -2334,6 +2334,11 @@
 
 
     <script>
+        // Configurable Backend API Base URL
+        const BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? ''
+            : 'https://axion-new-4.onrender.com';
+
         // DOM Elements
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         const themeIcon = document.getElementById('themeIcon');
@@ -2525,7 +2530,7 @@
                 const token = localStorage.getItem('axion_token');
                 if (token) headers['Authorization'] = `Bearer ${token}`;
 
-                const response = await fetch(`/api/v1/analyze/${ticker}?exchange=${exchange}`, { headers });
+                const response = await fetch(`${BASE_URL}/api/v1/analyze/${ticker}?exchange=${exchange}`, { headers });
                 const data = await response.json();
 
                 if (!response.ok) {
@@ -3441,7 +3446,7 @@
                 return;
             }
             try {
-                const res = await fetch('/api/v1/auth/me', {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {
@@ -3637,7 +3642,7 @@
 
         async function triggerMfaSend(userId) {
             try {
-                const res = await fetch('/api/v1/auth/mfa/send', {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/mfa/send`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ pending_user_id: userId })
@@ -3670,7 +3675,7 @@
             }
 
             try {
-                const res = await fetch('/api/v1/auth/mfa/verify', {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/mfa/verify`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ pending_user_id: pendingMFAUserId, otp_code: otpCode })
@@ -3701,7 +3706,7 @@
             const password = document.getElementById('loginPassword').value;
 
             try {
-                const res = await fetch('/api/v1/auth/login', {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username_or_email, password })
@@ -3738,7 +3743,7 @@
             const password = document.getElementById('regPassword').value;
 
             try {
-                const res = await fetch('/api/v1/auth/register', {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, email, password })
@@ -3883,7 +3888,7 @@
                 const imageBase64 = captureFrameBase64(videoEl, canvasEl);
                 const token = localStorage.getItem('axion_token');
 
-                const res = await fetch('/api/v1/auth/face/register', {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/face/register`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -3935,7 +3940,7 @@
                     feedback.style.display = 'block';
 
                     try {
-                        const res = await fetch('/api/v1/auth/face/register', {
+                        const res = await fetch(`${BASE_URL}/api/v1/auth/face/register`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -3966,7 +3971,7 @@
             const token = localStorage.getItem('axion_token');
             if (!token) return;
             try {
-                const res = await fetch('/api/v1/auth/face/reset', {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/face/reset`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -4011,7 +4016,7 @@
 
                 const imageBase64 = captureFrameBase64(videoEl, canvasEl);
 
-                const res = await fetch('/api/v1/auth/face/login', {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/face/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, image: imageBase64 })
@@ -4065,7 +4070,7 @@
                     authFeedback.style.display = 'block';
 
                     try {
-                        const res = await fetch('/api/v1/auth/face/login', {
+                        const res = await fetch(`${BASE_URL}/api/v1/auth/face/login`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ username, image: base64Image })
@@ -4100,7 +4105,7 @@
             if (!token) return;
 
             try {
-                const res = await fetch('/api/v1/auth/face/status', {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/face/status`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {
@@ -4141,7 +4146,7 @@
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
             try {
-                const res = await fetch('/api/v1/history', { headers });
+                const res = await fetch(`${BASE_URL}/api/v1/history`, { headers });
                 if (res.ok) {
                     const data = await res.json();
                     renderHistoryTable(data.history);
@@ -4189,7 +4194,7 @@
             if (token) headers['Authorization'] = `Bearer ${token}`;
 
             try {
-                const res = await fetch('/api/v1/history', { method: 'DELETE', headers });
+                const res = await fetch(`${BASE_URL}/api/v1/history`, { method: 'DELETE', headers });
                 if (res.ok) {
                     renderHistoryTable([]);
                 }
