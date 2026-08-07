@@ -25,12 +25,18 @@ import logging
 import os
 from typing import Optional, Tuple
 
-import cv2
-import numpy as np
+try:
+    import cv2
+    import numpy as np
+    _CASCADE_PATH = os.path.join(getattr(getattr(cv2, "data", None), "haarcascades", ""), "haarcascade_frontalface_default.xml")
+    HAS_OPENCV = True
+except Exception as _cv_err:
+    HAS_OPENCV = False
+    cv2 = None
+    np = None
+    _CASCADE_PATH = ""
 
 logger = logging.getLogger(__name__)
-
-_CASCADE_PATH = os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml")
 _face_cascade = None
 _FACE_SIZE = (128, 128)
 _MATCH_THRESHOLD = 0.55
@@ -38,6 +44,8 @@ _MATCH_THRESHOLD = 0.55
 
 def get_face_cascade():
     global _face_cascade
+    if not HAS_OPENCV or cv2 is None:
+        return None
     if _face_cascade is None:
         try:
             _face_cascade = cv2.CascadeClassifier(_CASCADE_PATH)
@@ -46,8 +54,10 @@ def get_face_cascade():
     return _face_cascade
 
 
-def _decode_image(base64_string: str) -> np.ndarray:
+def _decode_image(base64_string: str):
     """Decode a base64-encoded image (data URI or raw) into an OpenCV BGR frame."""
+    if not HAS_OPENCV or cv2 is None or np is None:
+        raise ValueError("OpenCV image processing is not available on this server environment.")
     if "," in base64_string:
         base64_string = base64_string.split(",", 1)[1]
     img_bytes = base64.b64decode(base64_string)
