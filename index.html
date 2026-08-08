@@ -102,17 +102,11 @@
         .logo-icon {
             width: 2.2rem;
             height: 2.2rem;
-            background: linear-gradient(135deg, var(--color-blue), var(--color-emerald));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 800;
-            font-family: var(--font-display);
-            font-size: 1.25rem;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            display: block;
+            filter: invert(1);
         }
+
+        [data-theme="light"] .logo-icon { filter: none; }
 
         .logo-text h1 {
             font-family: var(--font-display);
@@ -2067,7 +2061,7 @@
 
     <header>
         <div class="logo-container">
-            <div class="logo-icon">AG</div>
+            <img class="logo-icon" src="/assets/axion.svg" alt="Axion" />
             <div class="logo-text">
                 <h1>Axion</h1>
                 <p>AI Investment Advisor</p>

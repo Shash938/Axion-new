@@ -30,6 +30,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from config import get_settings
 from database.db import init_db
@@ -114,6 +115,13 @@ app = FastAPI(
     redoc_url="/redoc",
     openapi_url="/openapi.json",
     lifespan=lifespan,
+)
+
+# Project-owned frontend assets used by the dashboard.
+app.mount(
+    "/assets",
+    StaticFiles(directory=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))),
+    name="assets",
 )
 
 
