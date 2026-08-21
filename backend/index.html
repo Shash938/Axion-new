@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -5015,9 +5015,626 @@
             .comparison-dock {
                 bottom: 60px;
             }
-            .app-main-layout {
-                padding-bottom: 54px;
-            }
+        /* ==========================================================================
+           PHASE 4.1 — AUTHENTICATION, USER IDENTITY & RECENT ANALYSES
+           ========================================================================== */
+
+        /* User Card in Sidebar (Interactive) */
+        .sidebar-user-card {
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+            position: relative;
+            user-select: none;
+        }
+        .sidebar-user-card:hover {
+            background: var(--card);
+            border-color: var(--border-hi);
+        }
+        .sidebar-user-card:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        .sidebar-user-avatar {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--accent);
+            background: var(--accent-soft);
+            border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+            transition: transform 0.15s ease;
+        }
+        .sidebar-user-card:hover .sidebar-user-avatar {
+            transform: scale(1.05);
+        }
+        .sidebar-user-action-pill {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--accent-soft);
+            padding: 0.1rem 0.35rem;
+            border-radius: 3px;
+            border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        /* User Menu Popover */
+        .user-menu-popover {
+            position: fixed;
+            bottom: 64px;
+            left: 12px;
+            width: 220px;
+            background: var(--surface);
+            border: 1px solid var(--border-hi);
+            border-radius: var(--r-md);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+            z-index: 120;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: popoverIn 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes popoverIn {
+            from { opacity: 0; transform: translateY(6px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .user-menu-header {
+            padding: 0.75rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-hi);
+        }
+        .user-menu-title {
+            font-family: var(--font-display);
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-hi);
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-menu-sub {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            color: var(--text-faint);
+            margin-top: 0.15rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-menu-items {
+            padding: 0.35rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .user-menu-item {
+            all: unset;
+            box-sizing: border-box;
+            width: 100%;
+            padding: 0.5rem 0.65rem;
+            border-radius: var(--r-xs);
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text-lo);
+            cursor: pointer;
+            transition: background 0.12s ease, color 0.12s ease;
+        }
+        .user-menu-item:hover {
+            background: var(--card-hi);
+            color: var(--text-hi);
+        }
+        .user-menu-item.danger:hover {
+            background: color-mix(in srgb, var(--down) 12%, transparent);
+            color: var(--down);
+        }
+        .user-menu-item svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            opacity: 0.8;
+        }
+        .user-menu-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.25rem 0.35rem;
+        }
+
+        /* TopBar Quick Buttons */
+        .topbar-auth-btn {
+            all: unset;
+            box-sizing: border-box;
+            height: 2rem;
+            padding: 0 0.65rem;
+            border-radius: var(--r-xs);
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-hi);
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        .topbar-auth-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: var(--accent);
+        }
+        .topbar-auth-btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* ─── Auth Modal Dialog ──────────────────────────────────────────── */
+        .auth-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 250;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .auth-modal {
+            width: 100%;
+            max-width: 400px;
+            background: var(--surface);
+            border: 1px solid var(--border-hi);
+            border-radius: var(--r-lg);
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+            padding: 1.5rem;
+            position: relative;
+            animation: authModalIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes authModalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .auth-modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .auth-brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-bottom: 0.35rem;
+        }
+        .auth-brand-badge .logo-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            font-size: 0.75rem;
+        }
+        .auth-brand-badge span {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-hi);
+        }
+        .auth-modal-title {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-hi);
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+        .auth-modal-subtitle {
+            font-size: 0.74rem;
+            color: var(--text-lo);
+            margin: 0.25rem 0 0;
+            line-height: 1.4;
+        }
+        .auth-modal-close {
+            all: unset;
+            box-sizing: border-box;
+            width: 1.75rem;
+            height: 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--r-xs);
+            color: var(--text-lo);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: color 0.15s ease, border-color 0.15s ease;
+        }
+        .auth-modal-close:hover {
+            color: var(--text-hi);
+            border-color: var(--accent);
+        }
+        .auth-modal-close:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.25rem;
+            gap: 0.5rem;
+        }
+        .auth-tab-btn {
+            all: unset;
+            box-sizing: border-box;
+            padding: 0.5rem 0.75rem;
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-lo);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: color 0.15s ease, border-color 0.15s ease;
+        }
+        .auth-tab-btn:hover {
+            color: var(--text-hi);
+        }
+        .auth-tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        .auth-tab-btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+        .auth-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .auth-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-lo);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .auth-input {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--card-hi);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 0.6rem 0.75rem;
+            color: var(--text-hi);
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-soft);
+        }
+        .auth-input::placeholder {
+            color: var(--text-faint);
+            font-size: 0.76rem;
+        }
+        .auth-error-alert {
+            display: none;
+            padding: 0.55rem 0.75rem;
+            background: color-mix(in srgb, var(--down) 12%, transparent);
+            border: 1px solid color-mix(in srgb, var(--down) 35%, transparent);
+            border-radius: var(--r-xs);
+            color: var(--down);
+            font-size: 0.74rem;
+            line-height: 1.4;
+        }
+        .auth-submit-btn {
+            width: 100%;
+            padding: 0.65rem;
+            margin: 0.4rem 0 0;
+            justify-content: center;
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+        .auth-submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .auth-switch-link {
+            all: unset;
+            font-size: 0.74rem;
+            color: var(--accent);
+            text-align: center;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            display: block;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .auth-switch-link:hover {
+            color: var(--text-hi);
+        }
+
+        /* ─── Recent Analyses Drawer ─────────────────────────────────────── */
+        .recent-drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 200;
+            display: none;
+            justify-content: flex-end;
+        }
+        .recent-drawer {
+            width: 100%;
+            max-width: 380px;
+            height: 100%;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -8px 0 32px rgba(0, 0, 0, 0.35);
+            animation: settingsSlideIn 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .recent-drawer-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .recent-drawer-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .recent-drawer-title-group h3 {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-hi);
+            margin: 0;
+        }
+        .recent-drawer-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .recent-clear-btn {
+            all: unset;
+            box-sizing: border-box;
+            padding: 0.25rem 0.55rem;
+            border: 1px solid var(--border);
+            border-radius: var(--r-xs);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-lo);
+            cursor: pointer;
+            transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+        }
+        .recent-clear-btn:hover:not(:disabled) {
+            color: var(--down);
+            border-color: var(--down);
+            background: color-mix(in srgb, var(--down) 10%, transparent);
+        }
+        .recent-clear-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
+        .recent-drawer-sub {
+            padding: 0.5rem 1.25rem;
+            background: var(--card-hi);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.72rem;
+            color: var(--text-lo);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .recent-filter-input {
+            width: calc(100% - 2.5rem);
+            box-sizing: border-box;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xs);
+            padding: 0.4rem 0.65rem;
+            color: var(--text-hi);
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            margin: 0.6rem 1.25rem 0.2rem;
+        }
+        .recent-filter-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .recent-drawer-body {
+            flex: 1 1 auto;
+            padding: 0.75rem 1.25rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .recent-confirm-banner {
+            display: none;
+            padding: 0.75rem;
+            margin: 0.5rem 1.25rem;
+            background: color-mix(in srgb, var(--down) 10%, var(--card));
+            border: 1px solid var(--down);
+            border-radius: var(--r-sm);
+            font-size: 0.75rem;
+        }
+        .recent-confirm-banner p {
+            margin: 0 0 0.5rem;
+            color: var(--text-hi);
+            font-weight: 600;
+        }
+        .recent-confirm-actions {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        /* Recent Item Card */
+        .recent-item-card {
+            all: unset;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            padding: 0.7rem 0.85rem;
+            background: var(--card-hi);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+        }
+        .recent-item-card:hover {
+            border-color: var(--accent);
+            background: var(--card);
+            transform: translateX(2px);
+        }
+        .recent-item-card:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        .recent-item-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        .recent-item-ticker-group {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .recent-ticker {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-hi);
+        }
+        .recent-exchange {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: var(--text-faint);
+            background: var(--surface);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+        }
+        .recent-item-badge-group {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .recent-verdict-pill {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+        .recent-verdict-pill.buy {
+            background: color-mix(in srgb, var(--up) 15%, transparent);
+            color: var(--up);
+            border: 1px solid color-mix(in srgb, var(--up) 35%, transparent);
+        }
+        .recent-verdict-pill.hold, .recent-verdict-pill.accumulate {
+            background: color-mix(in srgb, var(--warn) 15%, transparent);
+            color: var(--warn);
+            border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent);
+        }
+        .recent-verdict-pill.sell {
+            background: color-mix(in srgb, var(--down) 15%, transparent);
+            color: var(--down);
+            border: 1px solid color-mix(in srgb, var(--down) 35%, transparent);
+        }
+        .recent-score-badge {
+            font-family: var(--font-mono);
+            font-size: 0.64rem;
+            font-weight: 700;
+            color: var(--text-lo);
+            background: var(--surface);
+            padding: 0.1rem 0.35rem;
+            border-radius: 3px;
+            border: 1px solid var(--border);
+        }
+        .recent-company-name {
+            font-size: 0.74rem;
+            color: var(--text-lo);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
+        }
+        .recent-item-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 0.1rem;
+        }
+        .recent-time {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            color: var(--text-faint);
+        }
+        .recent-action-hint {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+        .recent-item-card:hover .recent-action-hint {
+            opacity: 1;
+        }
+
+        .recent-empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 3rem 1.5rem;
+            gap: 0.75rem;
+            color: var(--text-lo);
+        }
+        .recent-empty-state svg {
+            color: var(--text-faint);
+            opacity: 0.6;
+        }
+        .recent-empty-state h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-hi);
+        }
+        .recent-empty-state p {
+            margin: 0;
+            font-size: 0.74rem;
+            line-height: 1.45;
+            max-width: 260px;
         }
     </style>
 </head>
@@ -5088,6 +5705,17 @@
                 <div class="sidebar-divider"></div>
                 <div class="sidebar-section-label">Tools</div>
 
+                <button type="button" class="sidebar-nav-item" id="navRecentAnalyses" aria-label="Open recent search analyses">
+                    <div class="sidebar-nav-label-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>Recent Analyses</span>
+                    </div>
+                    <span class="nav-status-pill live" id="sidebarRecentBadge" style="display: none;">0</span>
+                </button>
+
                 <button type="button" class="sidebar-nav-item disabled" id="navWatchlist" aria-disabled="true" data-soon-msg="Watchlist is coming in a future release.">
                     <div class="sidebar-nav-label-group">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -5110,18 +5738,60 @@
             </nav>
 
             <div class="sidebar-footer">
-                <div class="sidebar-user-card">
-                    <div class="sidebar-user-avatar">GA</div>
+                <div class="sidebar-user-card" id="sidebarUserBtn" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-label="Analyst Account &amp; Session Options">
+                    <div class="sidebar-user-avatar" id="sidebarUserAvatar">GA</div>
                     <div class="sidebar-user-info">
-                        <div class="sidebar-user-name">Guest Analyst</div>
-                        <div class="sidebar-user-role">Research Mode</div>
+                        <div class="sidebar-user-name" id="sidebarUserName">Guest Analyst</div>
+                        <div class="sidebar-user-role" id="sidebarUserRole">Research Mode</div>
                     </div>
+                    <span class="sidebar-user-action-pill" id="sidebarUserActionPill">Sign In</span>
                 </div>
             </div>
         </aside>
 
         <!-- Sidebar Overlay for tablet/mobile off-canvas -->
         <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+        <!-- User Menu Popover -->
+        <div class="user-menu-popover" id="userMenuPopover" role="menu" aria-label="User Account Menu">
+            <div class="user-menu-header">
+                <div class="user-menu-title" id="userMenuTitle">Guest Analyst</div>
+                <div class="user-menu-sub" id="userMenuSub">Research Mode</div>
+            </div>
+            <div class="user-menu-items">
+                <button type="button" class="user-menu-item" id="userMenuAuthBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    <span id="userMenuAuthText">Sign In / Register</span>
+                </button>
+                <button type="button" class="user-menu-item" id="userMenuRecentBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>Recent Analyses</span>
+                </button>
+                <button type="button" class="user-menu-item" id="userMenuSettingsBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>Settings</span>
+                </button>
+                <div class="user-menu-divider" id="userMenuSignOutDivider" style="display: none;"></div>
+                <button type="button" class="user-menu-item danger" id="userMenuSignOutBtn" style="display: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </div>
 
         <!-- 2. Main Layout Area -->
         <div class="app-main-layout">
@@ -5142,6 +5812,20 @@
                 </div>
 
                 <div class="topbar-right">
+                    <button type="button" class="topbar-auth-btn" id="topbarRecentBtn" aria-label="Open recent search analyses" title="Recent Analyses">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>Recents</span>
+                    </button>
+                    <button type="button" class="topbar-auth-btn" id="topbarAuthBtn" aria-label="Account sign in" title="Account">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span id="topbarAuthLabel">Sign In</span>
+                    </button>
                     <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
                         <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -5831,9 +6515,6 @@
             </div>
         </main>
     </div>
-            </main>
-        </div>
-    </div>
 
     <!-- Mobile Bottom Navigation (< 640px) -->
     <nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Mobile Navigation">
@@ -5843,6 +6524,13 @@
                 <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
             </svg>
             <span>Advisor</span>
+        </button>
+        <button type="button" class="mob-nav-item" id="mobNavRecent" aria-label="Recent Analyses">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Recents</span>
         </button>
         <button type="button" class="mob-nav-item disabled" id="mobNavTrading" aria-disabled="true" data-soon-msg="Assisted Trading is in active development.">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -5856,15 +6544,6 @@
             <span>Trading</span>
             <span class="mob-soon-badge">SOON</span>
         </button>
-        <button type="button" class="mob-nav-item disabled" id="mobNavBot" aria-disabled="true" data-soon-msg="Automated Strategy Bot is planned for a future release.">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="10" rx="2"></rect>
-                <circle cx="12" cy="5" r="2"></circle>
-                <path d="M12 7v4"></path>
-            </svg>
-            <span>Bot</span>
-            <span class="mob-soon-badge">SOON</span>
-        </button>
         <button type="button" class="mob-nav-item" id="mobNavSettings">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="3"></circle>
@@ -5873,6 +6552,124 @@
             <span>Settings</span>
         </button>
     </nav>
+
+    <!-- Recent Analyses Drawer / Panel -->
+    <div class="recent-drawer-overlay" id="recentAnalysesOverlay" role="dialog" aria-modal="true" aria-labelledby="recentAnalysesTitle" style="display: none;">
+        <div class="recent-drawer" id="recentAnalysesDrawer">
+            <div class="recent-drawer-header">
+                <div class="recent-drawer-title-group">
+                    <h3 id="recentAnalysesTitle">Recent Analyses</h3>
+                    <span class="nav-status-pill live" id="recentAnalysesCount">0</span>
+                </div>
+                <div class="recent-drawer-actions">
+                    <button type="button" class="recent-clear-btn" id="recentAnalysesClearBtn" title="Clear all recent searches" aria-label="Clear search history">Clear History</button>
+                    <button type="button" class="settings-drawer-close" id="recentAnalysesClose" aria-label="Close recent analyses">✕</button>
+                </div>
+            </div>
+            <div class="recent-drawer-sub">
+                <span>Stored ticker lookups and fundamental verdicts</span>
+            </div>
+
+            <!-- Clear Confirmation Banner -->
+            <div class="recent-confirm-banner" id="recentClearConfirm">
+                <p>Clear all recent search history? This cannot be undone.</p>
+                <div class="recent-confirm-actions">
+                    <button type="button" class="btn-primary" id="recentDoClearBtn" style="padding: 0.25rem 0.65rem; font-size: 0.72rem; background: var(--down); color:#fff;">Clear</button>
+                    <button type="button" class="btn-ghost" id="recentCancelClearBtn" style="padding: 0.25rem 0.65rem; font-size: 0.72rem; width: auto; height: auto;">Cancel</button>
+                </div>
+            </div>
+
+            <input type="text" class="recent-filter-input" id="recentSearchFilter" placeholder="Filter searches (e.g. TCS, RELIANCE)..." autocomplete="off" aria-label="Filter recent searches">
+
+            <div class="recent-drawer-body" id="recentAnalysesList">
+                <div class="recent-empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <h4>No Recent Analyses</h4>
+                    <p>Analyze any NSE or BSE stock ticker to start recording your research history.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal Dialog (Sign In / Register / MFA) -->
+    <div class="auth-modal-overlay" id="authModalOverlay" role="dialog" aria-modal="true" aria-labelledby="authModalTitle" style="display: none;">
+        <div class="auth-modal" id="authModal">
+            <div class="auth-modal-header">
+                <div>
+                    <div class="auth-brand-badge">
+                        <div class="logo-icon">AG</div>
+                        <span>Axion Analyst Account</span>
+                    </div>
+                    <h3 class="auth-modal-title" id="authModalTitle">Sign In</h3>
+                    <p class="auth-modal-subtitle" id="authModalSubtitle">Access persistent equity research history and synchronized analyst workspaces.</p>
+                </div>
+                <button type="button" class="auth-modal-close" id="authModalClose" aria-label="Close authentication dialog">✕</button>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="auth-tabs" id="authTabs">
+                <button type="button" class="auth-tab-btn active" id="authTabLogin">Sign In</button>
+                <button type="button" class="auth-tab-btn" id="authTabRegister">Create Account</button>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form" id="loginForm" autocomplete="on">
+                <div class="auth-error-alert" id="loginErrorAlert" role="alert"></div>
+                <div class="auth-input-group">
+                    <label class="auth-label" for="loginUsernameInput">Username or Email</label>
+                    <input type="text" id="loginUsernameInput" class="auth-input" placeholder="e.g. analyst or name@example.com" autocomplete="username" required>
+                </div>
+                <div class="auth-input-group">
+                    <label class="auth-label" for="loginPasswordInput">Password</label>
+                    <input type="password" id="loginPasswordInput" class="auth-input" placeholder="Enter your password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn-primary auth-submit-btn" id="loginSubmitBtn">
+                    Sign In
+                </button>
+                <button type="button" class="auth-switch-link" id="switchToRegisterLink">Don't have an account? Create one</button>
+            </form>
+
+            <!-- Register Form -->
+            <form class="auth-form" id="registerForm" autocomplete="on" style="display: none;">
+                <div class="auth-error-alert" id="registerErrorAlert" role="alert"></div>
+                <div class="auth-input-group">
+                    <label class="auth-label" for="registerUsernameInput">Username</label>
+                    <input type="text" id="registerUsernameInput" class="auth-input" placeholder="3-30 chars (alphanumeric, -, _)" autocomplete="username" minlength="3" maxlength="30" required>
+                </div>
+                <div class="auth-input-group">
+                    <label class="auth-label" for="registerEmailInput">Email Address</label>
+                    <input type="email" id="registerEmailInput" class="auth-input" placeholder="e.g. analyst@example.com" autocomplete="email" required>
+                </div>
+                <div class="auth-input-group">
+                    <label class="auth-label" for="registerPasswordInput">Password</label>
+                    <input type="password" id="registerPasswordInput" class="auth-input" placeholder="At least 6 characters" autocomplete="new-password" minlength="6" required>
+                </div>
+                <button type="submit" class="btn-primary auth-submit-btn" id="registerSubmitBtn">
+                    Create Account
+                </button>
+                <button type="button" class="auth-switch-link" id="switchToLoginLink">Already have an account? Sign in</button>
+            </form>
+
+            <!-- MFA Verification Form -->
+            <form class="auth-form" id="mfaForm" style="display: none;">
+                <div class="auth-error-alert" id="mfaErrorAlert" role="alert"></div>
+                <div class="auth-input-group">
+                    <label class="auth-label" for="mfaOtpInput">6-Digit Email OTP</label>
+                    <input type="text" id="mfaOtpInput" class="auth-input font-mono" placeholder="123456" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" style="letter-spacing: 0.3em; font-size: 1.1rem; text-align: center;" required>
+                </div>
+                <button type="submit" class="btn-primary auth-submit-btn" id="mfaSubmitBtn">
+                    Verify Code
+                </button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                    <button type="button" class="auth-switch-link" id="mfaBackToLoginBtn">← Back to Sign In</button>
+                    <button type="button" class="btn-quiet" id="mfaResendBtn" style="font-size: 0.72rem;">Resend Code</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Settings Drawer / Modal -->
     <div class="settings-drawer-overlay" id="settingsDrawerOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsDrawerTitle" style="display: none;">
@@ -5909,6 +6706,40 @@
                             <option value="NSE" selected>NSE</option>
                             <option value="BSE">BSE</option>
                         </select>
+                    </div>
+                </div>
+
+                <!-- Account & Identity Section (Phase 4.1) -->
+                <div class="settings-section" id="settingsAccountSection">
+                    <h4 class="settings-section-title">Account &amp; Session</h4>
+                    
+                    <!-- Guest View -->
+                    <div id="settingsAccountGuestView">
+                        <div class="settings-row">
+                            <div>
+                                <span class="settings-label">Guest Analyst</span>
+                                <p class="settings-hint">Local research mode. Sign in to sync your search history.</p>
+                            </div>
+                            <button type="button" class="settings-action-btn" id="settingsSignInBtn">Sign In</button>
+                        </div>
+                    </div>
+
+                    <!-- Authenticated View -->
+                    <div id="settingsAccountAuthView" style="display: none; flex-direction: column; gap: 0.5rem;">
+                        <div class="settings-row">
+                            <div>
+                                <span class="settings-label" id="settingsAuthUsername">Analyst</span>
+                                <p class="settings-hint" id="settingsAuthEmail">user@example.com</p>
+                            </div>
+                            <span class="nav-status-pill live">Authenticated</span>
+                        </div>
+                        <div class="settings-row">
+                            <div>
+                                <span class="settings-label">Member Since</span>
+                                <p class="settings-hint font-mono" id="settingsAuthCreated">-</p>
+                            </div>
+                            <button type="button" class="settings-action-btn" id="settingsSignOutBtn" style="color: var(--down);">Sign Out</button>
+                        </div>
                     </div>
                 </div>
 
@@ -6179,14 +7010,25 @@
             startLoadingIndicator();
 
             try {
+                // Attach Authorization header if authenticated
+                const headers = {};
+                if (typeof AuthEngine !== 'undefined') {
+                    const token = AuthEngine.getToken();
+                    if (token) {
+                        headers['Authorization'] = `Bearer ${token}`;
+                    }
+                }
+
                 // We use relative path so it hits the correct server origin
-                const response = await fetch(`/api/v1/analyze/${ticker}?exchange=${exchange}`);
+                const response = await fetch(`/api/v1/analyze/${ticker}?exchange=${exchange}`, {
+                    headers: headers
+                });
                 const data = await response.json();
 
                 if (!response.ok) {
                     // Extract error details returned by API
                     const errorDetail = data.detail || {};
-                    const msg = errorDetail.detail || "An unexpected error occurred.";
+                    const msg = typeof errorDetail === 'string' ? errorDetail : (errorDetail.detail || "An unexpected error occurred.");
                     const title = errorDetail.title || "Analysis Failed";
                     showError(title, msg);
                     return;
@@ -6195,6 +7037,11 @@
                 // Success! Display results
                 errorBanner.style.display = 'none';
                 renderResults(data);
+
+                // Refresh recent search history in background
+                if (typeof HistoryEngine !== 'undefined') {
+                    HistoryEngine.fetchHistory(false);
+                }
             } catch (error) {
                 console.error("Fetch error:", error);
                 showError("Network Connection Error", "Failed to connect to the backend server. Make sure the server is running on port 8000.");
@@ -8108,14 +8955,42 @@
         }
 
         /* ==========================================================================
-           PHASE 4.0 — PRODUCT SHELL, SIDEBAR & SETTINGS ENGINE
+           PHASE 4.0 & 4.1 — AUTHENTICATION, RECENT ANALYSES & PRODUCT SHELL
            ========================================================================== */
+
+        // Shell & Navigation DOM Elements
         const appSidebar = document.getElementById('appSidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const topbarMenuBtn = document.getElementById('topbarMenuBtn');
         const topbarSettingsBtn = document.getElementById('topbarSettingsBtn');
+        const topbarRecentBtn = document.getElementById('topbarRecentBtn');
+        const topbarAuthBtn = document.getElementById('topbarAuthBtn');
+        const topbarAuthLabel = document.getElementById('topbarAuthLabel');
         const navSettings = document.getElementById('navSettings');
+        const navRecentAnalyses = document.getElementById('navRecentAnalyses');
         const mobNavSettings = document.getElementById('mobNavSettings');
+        const mobNavRecent = document.getElementById('mobNavRecent');
+        const shellToast = document.getElementById('shellToast');
+
+        // Sidebar User & Menu Elements
+        const sidebarUserBtn = document.getElementById('sidebarUserBtn');
+        const sidebarUserAvatar = document.getElementById('sidebarUserAvatar');
+        const sidebarUserName = document.getElementById('sidebarUserName');
+        const sidebarUserRole = document.getElementById('sidebarUserRole');
+        const sidebarUserActionPill = document.getElementById('sidebarUserActionPill');
+        const sidebarRecentBadge = document.getElementById('sidebarRecentBadge');
+
+        const userMenuPopover = document.getElementById('userMenuPopover');
+        const userMenuTitle = document.getElementById('userMenuTitle');
+        const userMenuSub = document.getElementById('userMenuSub');
+        const userMenuAuthBtn = document.getElementById('userMenuAuthBtn');
+        const userMenuAuthText = document.getElementById('userMenuAuthText');
+        const userMenuRecentBtn = document.getElementById('userMenuRecentBtn');
+        const userMenuSettingsBtn = document.getElementById('userMenuSettingsBtn');
+        const userMenuSignOutDivider = document.getElementById('userMenuSignOutDivider');
+        const userMenuSignOutBtn = document.getElementById('userMenuSignOutBtn');
+
+        // Settings Drawer Elements
         const settingsDrawerOverlay = document.getElementById('settingsDrawerOverlay');
         const settingsDrawerClose = document.getElementById('settingsDrawerClose');
         const settingsThemeDark = document.getElementById('settingsThemeDark');
@@ -8123,9 +8998,54 @@
         const settingsDefaultExchange = document.getElementById('settingsDefaultExchange');
         const settingsClearCacheBtn = document.getElementById('settingsClearCacheBtn');
         const settingsApiStatus = document.getElementById('settingsApiStatus');
-        const shellToast = document.getElementById('shellToast');
+        const settingsAccountGuestView = document.getElementById('settingsAccountGuestView');
+        const settingsAccountAuthView = document.getElementById('settingsAccountAuthView');
+        const settingsSignInBtn = document.getElementById('settingsSignInBtn');
+        const settingsSignOutBtn = document.getElementById('settingsSignOutBtn');
+        const settingsAuthUsername = document.getElementById('settingsAuthUsername');
+        const settingsAuthEmail = document.getElementById('settingsAuthEmail');
+        const settingsAuthCreated = document.getElementById('settingsAuthCreated');
+
+        // Recent Analyses Drawer Elements
+        const recentAnalysesOverlay = document.getElementById('recentAnalysesOverlay');
+        const recentAnalysesClose = document.getElementById('recentAnalysesClose');
+        const recentAnalysesCount = document.getElementById('recentAnalysesCount');
+        const recentAnalysesClearBtn = document.getElementById('recentAnalysesClearBtn');
+        const recentClearConfirm = document.getElementById('recentClearConfirm');
+        const recentDoClearBtn = document.getElementById('recentDoClearBtn');
+        const recentCancelClearBtn = document.getElementById('recentCancelClearBtn');
+        const recentSearchFilter = document.getElementById('recentSearchFilter');
+        const recentAnalysesList = document.getElementById('recentAnalysesList');
+
+        // Auth Modal Elements
+        const authModalOverlay = document.getElementById('authModalOverlay');
+        const authModalClose = document.getElementById('authModalClose');
+        const authModalTitle = document.getElementById('authModalTitle');
+        const authModalSubtitle = document.getElementById('authModalSubtitle');
+        const authTabLogin = document.getElementById('authTabLogin');
+        const authTabRegister = document.getElementById('authTabRegister');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const mfaForm = document.getElementById('mfaForm');
+        const loginUsernameInput = document.getElementById('loginUsernameInput');
+        const loginPasswordInput = document.getElementById('loginPasswordInput');
+        const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+        const loginErrorAlert = document.getElementById('loginErrorAlert');
+        const registerUsernameInput = document.getElementById('registerUsernameInput');
+        const registerEmailInput = document.getElementById('registerEmailInput');
+        const registerPasswordInput = document.getElementById('registerPasswordInput');
+        const registerSubmitBtn = document.getElementById('registerSubmitBtn');
+        const registerErrorAlert = document.getElementById('registerErrorAlert');
+        const mfaOtpInput = document.getElementById('mfaOtpInput');
+        const mfaSubmitBtn = document.getElementById('mfaSubmitBtn');
+        const mfaErrorAlert = document.getElementById('mfaErrorAlert');
+        const mfaBackToLoginBtn = document.getElementById('mfaBackToLoginBtn');
+        const mfaResendBtn = document.getElementById('mfaResendBtn');
+        const switchToRegisterLink = document.getElementById('switchToRegisterLink');
+        const switchToLoginLink = document.getElementById('switchToLoginLink');
 
         let toastTimeout = null;
+        let pendingMfaUserId = null;
 
         function showShellToast(message) {
             if (!shellToast) return;
@@ -8134,12 +9054,599 @@
             shellToast.style.display = 'flex';
             toastTimeout = setTimeout(() => {
                 shellToast.style.display = 'none';
-            }, 2600);
+            }, 2800);
+        }
+
+        // ==========================================================================
+        // AUTHENTICATION ENGINE
+        // ==========================================================================
+        const AuthEngine = {
+            state: {
+                status: 'guest', // 'guest' | 'authenticated' | 'loading'
+                user: null,
+                token: null
+            },
+            TOKEN_KEY: 'axion_auth_token',
+
+            getToken() {
+                try {
+                    return localStorage.getItem(this.TOKEN_KEY);
+                } catch (e) {
+                    return null;
+                }
+            },
+
+            setToken(token) {
+                try {
+                    if (token) {
+                        localStorage.setItem(this.TOKEN_KEY, token);
+                    } else {
+                        localStorage.removeItem(this.TOKEN_KEY);
+                    }
+                } catch (e) {}
+            },
+
+            async init() {
+                const token = this.getToken();
+                if (token) {
+                    await this.restoreSession(token);
+                } else {
+                    this.state = { status: 'guest', user: null, token: null };
+                    this.updateUI();
+                    HistoryEngine.fetchHistory(false);
+                }
+            },
+
+            async restoreSession(token) {
+                this.state.status = 'loading';
+                try {
+                    const response = await fetch('/api/v1/auth/me', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        const user = await response.json();
+                        this.state = { status: 'authenticated', user: user, token: token };
+                        this.updateUI();
+                        HistoryEngine.fetchHistory(false);
+                    } else {
+                        // Expired or invalid token
+                        this.setToken(null);
+                        this.state = { status: 'guest', user: null, token: null };
+                        this.updateUI();
+                        HistoryEngine.fetchHistory(false);
+                    }
+                } catch (e) {
+                    // Network or server offline — fallback safely to guest
+                    this.state = { status: 'guest', user: null, token: token };
+                    this.updateUI();
+                    HistoryEngine.fetchHistory(false);
+                }
+            },
+
+            async login(username_or_email, password) {
+                if (loginSubmitBtn) {
+                    loginSubmitBtn.disabled = true;
+                    loginSubmitBtn.textContent = 'Signing in...';
+                }
+                if (loginErrorAlert) loginErrorAlert.style.display = 'none';
+
+                try {
+                    const response = await fetch('/api/v1/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username_or_email, password })
+                    });
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        const errorMsg = data.detail || 'Those credentials could not be verified.';
+                        if (loginErrorAlert) {
+                            loginErrorAlert.textContent = typeof errorMsg === 'string' ? errorMsg : 'Those credentials could not be verified.';
+                            loginErrorAlert.style.display = 'block';
+                        }
+                        return;
+                    }
+
+                    if (data.mfa_required) {
+                        pendingMfaUserId = data.pending_user_id;
+                        this.showMfaForm();
+                        // Request OTP send
+                        try {
+                            await fetch('/api/v1/auth/mfa/send', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ pending_user_id: pendingMfaUserId })
+                            });
+                        } catch (err) {}
+                        return;
+                    }
+
+                    if (data.access_token) {
+                        this.setToken(data.access_token);
+                        this.state = {
+                            status: 'authenticated',
+                            user: data.user,
+                            token: data.access_token
+                        };
+                        this.updateUI();
+                        closeAuthModal();
+                        showShellToast(`Signed in as ${data.user.username}`);
+                        HistoryEngine.fetchHistory(false);
+                    }
+                } catch (err) {
+                    if (loginErrorAlert) {
+                        loginErrorAlert.textContent = 'Network error. Failed to reach authentication service.';
+                        loginErrorAlert.style.display = 'block';
+                    }
+                } finally {
+                    if (loginSubmitBtn) {
+                        loginSubmitBtn.disabled = false;
+                        loginSubmitBtn.textContent = 'Sign In';
+                    }
+                }
+            },
+
+            async register(username, email, password) {
+                if (registerSubmitBtn) {
+                    registerSubmitBtn.disabled = true;
+                    registerSubmitBtn.textContent = 'Creating account...';
+                }
+                if (registerErrorAlert) registerErrorAlert.style.display = 'none';
+
+                try {
+                    const response = await fetch('/api/v1/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, email, password })
+                    });
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        const errorMsg = data.detail || 'Your account could not be created. Please check your details.';
+                        if (registerErrorAlert) {
+                            registerErrorAlert.textContent = typeof errorMsg === 'string' ? errorMsg : 'Your account could not be created.';
+                            registerErrorAlert.style.display = 'block';
+                        }
+                        return;
+                    }
+
+                    if (data.access_token) {
+                        this.setToken(data.access_token);
+                        this.state = {
+                            status: 'authenticated',
+                            user: data.user,
+                            token: data.access_token
+                        };
+                        this.updateUI();
+                        closeAuthModal();
+                        showShellToast(`Account created. Welcome, ${data.user.username}!`);
+                        HistoryEngine.fetchHistory(false);
+                    }
+                } catch (err) {
+                    if (registerErrorAlert) {
+                        registerErrorAlert.textContent = 'Network error. Failed to reach registration service.';
+                        registerErrorAlert.style.display = 'block';
+                    }
+                } finally {
+                    if (registerSubmitBtn) {
+                        registerSubmitBtn.disabled = false;
+                        registerSubmitBtn.textContent = 'Create Account';
+                    }
+                }
+            },
+
+            async verifyMfa(otp) {
+                if (!pendingMfaUserId) return;
+                if (mfaSubmitBtn) {
+                    mfaSubmitBtn.disabled = true;
+                    mfaSubmitBtn.textContent = 'Verifying...';
+                }
+                if (mfaErrorAlert) mfaErrorAlert.style.display = 'none';
+
+                try {
+                    const response = await fetch('/api/v1/auth/mfa/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pending_user_id: pendingMfaUserId, otp_code: otp })
+                    });
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        const errorMsg = data.detail || 'Invalid or expired verification code.';
+                        if (mfaErrorAlert) {
+                            mfaErrorAlert.textContent = typeof errorMsg === 'string' ? errorMsg : 'Invalid code.';
+                            mfaErrorAlert.style.display = 'block';
+                        }
+                        return;
+                    }
+
+                    if (data.access_token) {
+                        this.setToken(data.access_token);
+                        this.state = {
+                            status: 'authenticated',
+                            user: data.user,
+                            token: data.access_token
+                        };
+                        this.updateUI();
+                        closeAuthModal();
+                        showShellToast(`Signed in as ${data.user.username}`);
+                        HistoryEngine.fetchHistory(false);
+                    }
+                } catch (err) {
+                    if (mfaErrorAlert) {
+                        mfaErrorAlert.textContent = 'Network error during verification.';
+                        mfaErrorAlert.style.display = 'block';
+                    }
+                } finally {
+                    if (mfaSubmitBtn) {
+                        mfaSubmitBtn.disabled = false;
+                        mfaSubmitBtn.textContent = 'Verify Code';
+                    }
+                }
+            },
+
+            logout() {
+                this.setToken(null);
+                this.state = { status: 'guest', user: null, token: null };
+                this.updateUI();
+                closeUserMenu();
+                closeSettingsDrawer();
+                HistoryEngine.fetchHistory(false);
+                showShellToast('Signed out successfully.');
+            },
+
+            showMfaForm() {
+                if (loginForm) loginForm.style.display = 'none';
+                if (registerForm) registerForm.style.display = 'none';
+                if (authTabs) authTabs.style.display = 'none';
+                if (mfaForm) mfaForm.style.display = 'flex';
+                if (authModalTitle) authModalTitle.textContent = 'Two-Factor Verification';
+                if (authModalSubtitle) authModalSubtitle.textContent = 'Enter the one-time password sent to your registered email.';
+                if (mfaOtpInput) {
+                    mfaOtpInput.value = '';
+                    mfaOtpInput.focus();
+                }
+            },
+
+            updateUI() {
+                const isAuth = this.state.status === 'authenticated' && this.state.user;
+                const user = this.state.user;
+
+                // Sidebar user card
+                if (sidebarUserName) {
+                    sidebarUserName.textContent = isAuth ? user.username : 'Guest Analyst';
+                }
+                if (sidebarUserRole) {
+                    sidebarUserRole.textContent = isAuth ? (user.email || 'Verified Analyst') : 'Research Mode';
+                }
+                if (sidebarUserAvatar) {
+                    if (isAuth) {
+                        const initials = (user.username.slice(0, 2) || 'AN').toUpperCase();
+                        sidebarUserAvatar.textContent = initials;
+                    } else {
+                        sidebarUserAvatar.textContent = 'GA';
+                    }
+                }
+                if (sidebarUserActionPill) {
+                    sidebarUserActionPill.textContent = isAuth ? 'Account' : 'Sign In';
+                }
+
+                // Topbar auth button
+                if (topbarAuthLabel) {
+                    topbarAuthLabel.textContent = isAuth ? user.username : 'Sign In';
+                }
+
+                // User menu popover
+                if (userMenuTitle) {
+                    userMenuTitle.textContent = isAuth ? user.username : 'Guest Analyst';
+                }
+                if (userMenuSub) {
+                    userMenuSub.textContent = isAuth ? (user.email || 'Verified Account') : 'Research Mode';
+                }
+                if (userMenuAuthBtn) {
+                    userMenuAuthBtn.style.display = isAuth ? 'none' : 'flex';
+                }
+                if (userMenuSignOutBtn) {
+                    userMenuSignOutBtn.style.display = isAuth ? 'flex' : 'none';
+                }
+                if (userMenuSignOutDivider) {
+                    userMenuSignOutDivider.style.display = isAuth ? 'block' : 'none';
+                }
+
+                // Settings drawer Account section
+                if (settingsAccountGuestView && settingsAccountAuthView) {
+                    settingsAccountGuestView.style.display = isAuth ? 'none' : 'block';
+                    settingsAccountAuthView.style.display = isAuth ? 'flex' : 'none';
+                }
+                if (isAuth && user) {
+                    if (settingsAuthUsername) settingsAuthUsername.textContent = user.username;
+                    if (settingsAuthEmail) settingsAuthEmail.textContent = user.email;
+                    if (settingsAuthCreated) {
+                        try {
+                            const d = new Date(user.created_at);
+                            settingsAuthCreated.textContent = isNaN(d.getTime()) ? user.created_at : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+                        } catch (e) {
+                            settingsAuthCreated.textContent = user.created_at || '-';
+                        }
+                    }
+                }
+            }
+        };
+
+        // ==========================================================================
+        // RECENT ANALYSES & SEARCH HISTORY ENGINE
+        // ==========================================================================
+        const HistoryEngine = {
+            items: [],
+            isLoading: false,
+
+            async fetchHistory(openDrawerAfter = false) {
+                this.isLoading = true;
+                const headers = {};
+                const token = AuthEngine.getToken();
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                try {
+                    const response = await fetch('/api/v1/history', { headers });
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.items = data.history || [];
+                        this.updateBadges(this.items.length);
+                        this.renderList(this.items);
+                    } else {
+                        this.renderError();
+                    }
+                } catch (e) {
+                    this.renderError();
+                } finally {
+                    this.isLoading = false;
+                    if (openDrawerAfter) {
+                        openRecentAnalysesDrawer();
+                    }
+                }
+            },
+
+            async clearHistory() {
+                const headers = {};
+                const token = AuthEngine.getToken();
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                try {
+                    const response = await fetch('/api/v1/history', {
+                        method: 'DELETE',
+                        headers
+                    });
+                    if (response.ok) {
+                        this.items = [];
+                        this.updateBadges(0);
+                        this.renderList([]);
+                        if (recentClearConfirm) recentClearConfirm.style.display = 'none';
+                        showShellToast('Search history cleared.');
+                    } else {
+                        showShellToast('Failed to clear search history.');
+                    }
+                } catch (e) {
+                    showShellToast('Network error while clearing history.');
+                }
+            },
+
+            updateBadges(count) {
+                if (recentAnalysesCount) {
+                    recentAnalysesCount.textContent = String(count);
+                }
+                if (sidebarRecentBadge) {
+                    sidebarRecentBadge.textContent = String(count);
+                    sidebarRecentBadge.style.display = count > 0 ? 'inline-block' : 'none';
+                }
+                if (recentAnalysesClearBtn) {
+                    recentAnalysesClearBtn.disabled = count === 0;
+                }
+            },
+
+            renderList(items) {
+                if (!recentAnalysesList) return;
+
+                if (!items || items.length === 0) {
+                    recentAnalysesList.innerHTML = `
+                        <div class="recent-empty-state">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <h4>No Recent Analyses</h4>
+                            <p>Analyze any NSE or BSE stock ticker to start recording your research history.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const rows = items.map(item => {
+                    const rec = (item.recommendation || 'HOLD').toUpperCase();
+                    const recClass = rec === 'BUY' ? 'buy' : (rec === 'SELL' ? 'sell' : 'hold');
+                    const score = typeof item.score === 'number' ? item.score.toFixed(1) : (item.score || '-');
+                    const grade = item.grade ? `Grade ${item.grade}` : '';
+                    
+                    let timeFormatted = '';
+                    try {
+                        const d = new Date(item.searched_at);
+                        if (!isNaN(d.getTime())) {
+                            const now = new Date();
+                            const diffMs = now - d;
+                            const diffMins = Math.floor(diffMs / 60000);
+                            const diffHours = Math.floor(diffMs / 3600000);
+                            if (diffMins < 2) timeFormatted = 'Just now';
+                            else if (diffMins < 60) timeFormatted = `${diffMins}m ago`;
+                            else if (diffHours < 24) timeFormatted = `${diffHours}h ago`;
+                            else timeFormatted = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                        } else {
+                            timeFormatted = item.searched_at || '';
+                        }
+                    } catch (e) {
+                        timeFormatted = item.searched_at || '';
+                    }
+
+                    return `
+                        <div class="recent-item-card" role="button" tabindex="0" data-ticker="${item.ticker}" data-exchange="${item.exchange || 'NSE'}" aria-label="Load analysis for ${item.ticker}">
+                            <div class="recent-item-top">
+                                <div class="recent-item-ticker-group">
+                                    <span class="recent-ticker">${item.ticker}</span>
+                                    <span class="recent-exchange">${item.exchange || 'NSE'}</span>
+                                </div>
+                                <div class="recent-item-badge-group">
+                                    <span class="recent-score-badge">${score}/10 ${grade ? `• ${grade}` : ''}</span>
+                                    <span class="recent-verdict-pill ${recClass}">${rec}</span>
+                                </div>
+                            </div>
+                            <div class="recent-company-name">${item.company_name || item.ticker}</div>
+                            <div class="recent-item-bottom">
+                                <span class="recent-time">${timeFormatted}</span>
+                                <span class="recent-action-hint">Load Analysis →</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                recentAnalysesList.innerHTML = rows;
+
+                // Bind click event to each card
+                recentAnalysesList.querySelectorAll('.recent-item-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const t = card.getAttribute('data-ticker');
+                        const ex = card.getAttribute('data-exchange') || 'NSE';
+                        if (t) {
+                            if (tickerInput) tickerInput.value = t;
+                            if (exchangeSelect) exchangeSelect.value = ex;
+                            closeRecentAnalysesDrawer();
+                            performSearch();
+                        }
+                    });
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            card.click();
+                        }
+                    });
+                });
+            },
+
+            filterList(query) {
+                if (!query || !query.trim()) {
+                    this.renderList(this.items);
+                    return;
+                }
+                const q = query.trim().toUpperCase();
+                const filtered = this.items.filter(item => {
+                    const t = (item.ticker || '').toUpperCase();
+                    const c = (item.company_name || '').toUpperCase();
+                    return t.includes(q) || c.includes(q);
+                });
+                this.renderList(filtered);
+            },
+
+            renderError() {
+                if (!recentAnalysesList) return;
+                recentAnalysesList.innerHTML = `
+                    <div class="recent-empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <h4>Recent Analyses Unavailable</h4>
+                        <p>Recent analyses are temporarily unavailable. Please try again later.</p>
+                    </div>
+                `;
+            }
+        };
+
+        // ==========================================================================
+        // MODAL & DRAWER CONTROLLERS
+        // ==========================================================================
+        function openAuthModal(tab = 'login') {
+            if (!authModalOverlay) return;
+            authModalOverlay.style.display = 'flex';
+            closeUserMenu();
+
+            if (loginErrorAlert) loginErrorAlert.style.display = 'none';
+            if (registerErrorAlert) registerErrorAlert.style.display = 'none';
+            if (mfaErrorAlert) mfaErrorAlert.style.display = 'none';
+
+            if (tab === 'register') {
+                showRegisterTab();
+            } else {
+                showLoginTab();
+            }
+        }
+
+        function closeAuthModal() {
+            if (!authModalOverlay) return;
+            authModalOverlay.style.display = 'none';
+            pendingMfaUserId = null;
+        }
+
+        function showLoginTab() {
+            if (authTabLogin) authTabLogin.classList.add('active');
+            if (authTabRegister) authTabRegister.classList.remove('active');
+            if (authTabs) authTabs.style.display = 'flex';
+            if (loginForm) loginForm.style.display = 'flex';
+            if (registerForm) registerForm.style.display = 'none';
+            if (mfaForm) mfaForm.style.display = 'none';
+            if (authModalTitle) authModalTitle.textContent = 'Sign In';
+            if (authModalSubtitle) authModalSubtitle.textContent = 'Access persistent equity research history and synchronized analyst workspaces.';
+            if (loginUsernameInput) loginUsernameInput.focus();
+        }
+
+        function showRegisterTab() {
+            if (authTabRegister) authTabRegister.classList.add('active');
+            if (authTabLogin) authTabLogin.classList.remove('active');
+            if (authTabs) authTabs.style.display = 'flex';
+            if (registerForm) registerForm.style.display = 'flex';
+            if (loginForm) loginForm.style.display = 'none';
+            if (mfaForm) mfaForm.style.display = 'none';
+            if (authModalTitle) authModalTitle.textContent = 'Create Analyst Account';
+            if (authModalSubtitle) authModalSubtitle.textContent = 'Register to store multi-year fundamental research history.';
+            if (registerUsernameInput) registerUsernameInput.focus();
+        }
+
+        function openRecentAnalysesDrawer() {
+            if (!recentAnalysesOverlay) return;
+            recentAnalysesOverlay.style.display = 'flex';
+            closeUserMenu();
+            if (recentSearchFilter) recentSearchFilter.value = '';
+            if (recentClearConfirm) recentClearConfirm.style.display = 'none';
+        }
+
+        function closeRecentAnalysesDrawer() {
+            if (!recentAnalysesOverlay) return;
+            recentAnalysesOverlay.style.display = 'none';
+        }
+
+        function toggleUserMenu(e) {
+            if (e) e.stopPropagation();
+            if (!userMenuPopover) return;
+            const isOpen = userMenuPopover.style.display === 'flex';
+            if (isOpen) {
+                closeUserMenu();
+            } else {
+                userMenuPopover.style.display = 'flex';
+                if (sidebarUserBtn) sidebarUserBtn.setAttribute('aria-expanded', 'true');
+            }
+        }
+
+        function closeUserMenu() {
+            if (!userMenuPopover) return;
+            userMenuPopover.style.display = 'none';
+            if (sidebarUserBtn) sidebarUserBtn.setAttribute('aria-expanded', 'false');
         }
 
         function openSettingsDrawer() {
             if (!settingsDrawerOverlay) return;
             settingsDrawerOverlay.style.display = 'flex';
+            closeUserMenu();
             
             // Sync settings theme state
             const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
@@ -8192,7 +9699,9 @@
             if (sidebarOverlay) sidebarOverlay.classList.remove('active');
         }
 
-        // Initialize Product Shell
+        // ==========================================================================
+        // SHELL INITIALIZATION & EVENT WIRING
+        // ==========================================================================
         function initializeProductShell() {
             // SOON items click triggers
             document.querySelectorAll('[data-soon-msg]').forEach(btn => {
@@ -8208,10 +9717,153 @@
             if (navSettings) navSettings.addEventListener('click', openSettingsDrawer);
             if (mobNavSettings) mobNavSettings.addEventListener('click', openSettingsDrawer);
             if (settingsDrawerClose) settingsDrawerClose.addEventListener('click', closeSettingsDrawer);
-
             if (settingsDrawerOverlay) {
                 settingsDrawerOverlay.addEventListener('click', (e) => {
                     if (e.target === settingsDrawerOverlay) closeSettingsDrawer();
+                });
+            }
+
+            // Recent Analyses Open & Close
+            if (navRecentAnalyses) navRecentAnalyses.addEventListener('click', () => HistoryEngine.fetchHistory(true));
+            if (topbarRecentBtn) topbarRecentBtn.addEventListener('click', () => HistoryEngine.fetchHistory(true));
+            if (mobNavRecent) mobNavRecent.addEventListener('click', () => HistoryEngine.fetchHistory(true));
+            if (recentAnalysesClose) recentAnalysesClose.addEventListener('click', closeRecentAnalysesDrawer);
+            if (recentAnalysesOverlay) {
+                recentAnalysesOverlay.addEventListener('click', (e) => {
+                    if (e.target === recentAnalysesOverlay) closeRecentAnalysesDrawer();
+                });
+            }
+
+            // Recent Analyses Filter & Clear
+            if (recentSearchFilter) {
+                recentSearchFilter.addEventListener('input', (e) => {
+                    HistoryEngine.filterList(e.target.value);
+                });
+            }
+            if (recentAnalysesClearBtn) {
+                recentAnalysesClearBtn.addEventListener('click', () => {
+                    if (recentClearConfirm) recentClearConfirm.style.display = 'block';
+                });
+            }
+            if (recentCancelClearBtn) {
+                recentCancelClearBtn.addEventListener('click', () => {
+                    if (recentClearConfirm) recentClearConfirm.style.display = 'none';
+                });
+            }
+            if (recentDoClearBtn) {
+                recentDoClearBtn.addEventListener('click', () => {
+                    HistoryEngine.clearHistory();
+                });
+            }
+
+            // User Card & Popover
+            if (sidebarUserBtn) {
+                sidebarUserBtn.addEventListener('click', toggleUserMenu);
+                sidebarUserBtn.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleUserMenu(e);
+                    }
+                });
+            }
+            if (userMenuAuthBtn) {
+                userMenuAuthBtn.addEventListener('click', () => openAuthModal('login'));
+            }
+            if (userMenuRecentBtn) {
+                userMenuRecentBtn.addEventListener('click', () => HistoryEngine.fetchHistory(true));
+            }
+            if (userMenuSettingsBtn) {
+                userMenuSettingsBtn.addEventListener('click', openSettingsDrawer);
+            }
+            if (userMenuSignOutBtn) {
+                userMenuSignOutBtn.addEventListener('click', () => AuthEngine.logout());
+            }
+
+            // Topbar Auth button
+            if (topbarAuthBtn) {
+                topbarAuthBtn.addEventListener('click', () => {
+                    if (AuthEngine.state.status === 'authenticated') {
+                        openSettingsDrawer();
+                    } else {
+                        openAuthModal('login');
+                    }
+                });
+            }
+
+            // Settings Account buttons
+            if (settingsSignInBtn) {
+                settingsSignInBtn.addEventListener('click', () => {
+                    closeSettingsDrawer();
+                    openAuthModal('login');
+                });
+            }
+            if (settingsSignOutBtn) {
+                settingsSignOutBtn.addEventListener('click', () => {
+                    AuthEngine.logout();
+                });
+            }
+
+            // Auth Modal Tabs & Forms
+            if (authTabLogin) authTabLogin.addEventListener('click', showLoginTab);
+            if (authTabRegister) authTabRegister.addEventListener('click', showRegisterTab);
+            if (switchToRegisterLink) switchToRegisterLink.addEventListener('click', showRegisterTab);
+            if (switchToLoginLink) switchToLoginLink.addEventListener('click', showLoginTab);
+            if (mfaBackToLoginBtn) mfaBackToLoginBtn.addEventListener('click', showLoginTab);
+            if (authModalClose) authModalClose.addEventListener('click', closeAuthModal);
+            if (authModalOverlay) {
+                authModalOverlay.addEventListener('click', (e) => {
+                    if (e.target === authModalOverlay) closeAuthModal();
+                });
+            }
+
+            // Login Form Submit
+            if (loginForm) {
+                loginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const username = loginUsernameInput ? loginUsernameInput.value.trim() : '';
+                    const password = loginPasswordInput ? loginPasswordInput.value : '';
+                    if (username && password) {
+                        AuthEngine.login(username, password);
+                    }
+                });
+            }
+
+            // Register Form Submit
+            if (registerForm) {
+                registerForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const username = registerUsernameInput ? registerUsernameInput.value.trim() : '';
+                    const email = registerEmailInput ? registerEmailInput.value.trim() : '';
+                    const password = registerPasswordInput ? registerPasswordInput.value : '';
+                    if (username && email && password) {
+                        AuthEngine.register(username, email, password);
+                    }
+                });
+            }
+
+            // MFA Form Submit
+            if (mfaForm) {
+                mfaForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const otp = mfaOtpInput ? mfaOtpInput.value.trim() : '';
+                    if (otp && pendingMfaUserId) {
+                        AuthEngine.verifyMfa(otp);
+                    }
+                });
+            }
+            if (mfaResendBtn) {
+                mfaResendBtn.addEventListener('click', async () => {
+                    if (!pendingMfaUserId) return;
+                    try {
+                        await fetch('/api/v1/auth/mfa/send', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ pending_user_id: pendingMfaUserId })
+                        });
+                        showShellToast('Verification code resent to your email.');
+                    } catch (e) {
+                        showShellToast('Failed to resend verification code.');
+                    }
                 });
             }
 
@@ -8273,17 +9925,38 @@
                 });
             }
 
+            // Global Document click handling for user menu dismissal
+            document.addEventListener('click', (e) => {
+                if (userMenuPopover && userMenuPopover.style.display === 'flex') {
+                    if (!userMenuPopover.contains(e.target) && !sidebarUserBtn.contains(e.target)) {
+                        closeUserMenu();
+                    }
+                }
+            });
+
             // Global Escape key handling
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
+                    if (authModalOverlay && authModalOverlay.style.display === 'flex') {
+                        closeAuthModal();
+                    }
+                    if (recentAnalysesOverlay && recentAnalysesOverlay.style.display === 'flex') {
+                        closeRecentAnalysesDrawer();
+                    }
                     if (settingsDrawerOverlay && settingsDrawerOverlay.style.display === 'flex') {
                         closeSettingsDrawer();
+                    }
+                    if (userMenuPopover && userMenuPopover.style.display === 'flex') {
+                        closeUserMenu();
                     }
                     if (appSidebar && appSidebar.classList.contains('open')) {
                         closeSidebarMobile();
                     }
                 }
             });
+
+            // Initialize Auth State & History on start
+            AuthEngine.init();
         }
 
         // Initialize shell immediately
