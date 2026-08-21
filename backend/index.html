@@ -4211,8 +4211,690 @@
                 break-inside: avoid;
                 margin-bottom: 1rem !important;
             }
-            .radial-svg circle.radial-bg {
-                stroke: #eee !important;
+        /* ==========================================================================
+           PHASE 4.0 — AXION PRODUCT SHELL, SIDEBAR & MODULE FRAME
+           ========================================================================== */
+        /* Shell Root Layout */
+        .app-shell {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Sidebar Rail (Desktop: 220px) */
+        .app-sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 110;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s ease;
+        }
+
+        .sidebar-header {
+            padding: var(--s-4) var(--s-4) var(--s-3);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-brand-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--s-2);
+        }
+
+        .sidebar-badge {
+            font-family: var(--font-mono);
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--accent-soft);
+            padding: 0.15rem 0.4rem;
+            border-radius: var(--r-pill);
+            border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+        }
+
+        .sidebar-nav {
+            flex: 1 1 auto;
+            padding: var(--s-3) var(--s-2);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            overflow-y: auto;
+        }
+
+        .sidebar-section-label {
+            font-family: var(--font-mono);
+            font-size: 0.64rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-faint);
+            padding: var(--s-2) var(--s-3) var(--s-1);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: var(--s-2) var(--s-2);
+        }
+
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--s-3);
+            width: 100%;
+            padding: 0.6rem var(--s-3);
+            border: 1px solid transparent;
+            border-radius: var(--r-sm);
+            background: transparent;
+            color: var(--text-lo);
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            user-select: none;
+        }
+
+        .sidebar-nav-item:hover {
+            color: var(--text-hi);
+            background: var(--card-hi);
+        }
+
+        .sidebar-nav-item.active {
+            color: var(--text-hi);
+            background: var(--accent-soft);
+            border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+        }
+
+        .sidebar-nav-item.active svg {
+            stroke: var(--accent);
+        }
+
+        .sidebar-nav-item.disabled {
+            color: var(--text-faint);
+            cursor: default;
+            opacity: 0.75;
+        }
+
+        .sidebar-nav-item.disabled:hover {
+            background: transparent;
+            color: var(--text-faint);
+        }
+
+        .sidebar-nav-label-group {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            min-width: 0;
+        }
+
+        .sidebar-nav-label-group svg {
+            flex-shrink: 0;
+        }
+
+        .sidebar-nav-label-group span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-status-pill {
+            font-family: var(--font-mono);
+            font-size: 0.58rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            padding: 0.12rem 0.35rem;
+            border-radius: var(--r-pill);
+            text-transform: uppercase;
+        }
+
+        .nav-status-pill.live {
+            background: color-mix(in srgb, var(--up) 15%, transparent);
+            color: var(--up);
+            border: 1px solid color-mix(in srgb, var(--up) 30%, transparent);
+        }
+
+        .nav-status-pill.soon {
+            background: var(--card-hi);
+            color: var(--text-faint);
+            border: 1px solid var(--border);
+        }
+
+        .sidebar-footer {
+            padding: var(--s-3);
+            border-top: 1px solid var(--border);
+        }
+
+        .sidebar-user-card {
+            display: flex;
+            align-items: center;
+            gap: var(--s-3);
+            padding: var(--s-2) var(--s-3);
+            border-radius: var(--r-sm);
+            background: var(--card-hi);
+            border: 1px solid var(--border);
+        }
+
+        .sidebar-user-avatar {
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--r-pill);
+            background: linear-gradient(135deg, var(--card) 0%, var(--border-hi) 100%);
+            border: 1px solid var(--border-hi);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-hi);
+            flex-shrink: 0;
+        }
+
+        .sidebar-user-info {
+            min-width: 0;
+        }
+
+        .sidebar-user-name {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-hi);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-user-role {
+            font-family: var(--font-mono);
+            font-size: 0.64rem;
+            color: var(--text-faint);
+        }
+
+        /* Main Layout Area */
+        .app-main-layout {
+            flex: 1 1 0%;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* TopBar */
+        .app-topbar {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--s-5);
+            background: color-mix(in srgb, var(--surface) 90%, transparent);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: var(--s-3);
+        }
+
+        .topbar-menu-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            color: var(--text-hi);
+            cursor: pointer;
+        }
+
+        .topbar-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.84rem;
+        }
+
+        .topbar-module-name {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--text-hi);
+        }
+
+        .topbar-sep {
+            color: var(--text-faint);
+            font-size: 0.8rem;
+        }
+
+        .topbar-sub-name {
+            color: var(--text-lo);
+            font-size: 0.78rem;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: var(--s-2);
+        }
+
+        .topbar-settings-btn {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: var(--r-sm);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-hi);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .topbar-settings-btn:hover {
+            border-color: var(--accent);
+            background: var(--card-hi);
+        }
+
+        /* Module Frame */
+        .module-frame {
+            flex: 1 1 auto;
+            width: 100%;
+            min-width: 0;
+        }
+
+        /* Mobile Bottom Navigation (< 640px) */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 52px;
+            background: color-mix(in srgb, var(--surface) 95%, transparent);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border);
+            z-index: 105;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 var(--s-2);
+        }
+
+        .mob-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.15rem;
+            background: transparent;
+            border: none;
+            color: var(--text-faint);
+            font-family: var(--font-body);
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            padding: 0.35rem 0.6rem;
+            border-radius: var(--r-xs);
+            transition: var(--transition-smooth);
+        }
+
+        .mob-nav-item svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .mob-nav-item.active {
+            color: var(--accent);
+        }
+
+        .mob-nav-item.disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .mob-soon-badge {
+            position: absolute;
+            top: 2px;
+            right: 0;
+            font-family: var(--font-mono);
+            font-size: 0.5rem;
+            font-weight: 800;
+            background: var(--card-hi);
+            color: var(--text-faint);
+            padding: 0.05rem 0.2rem;
+            border-radius: var(--r-pill);
+            border: 1px solid var(--border);
+        }
+
+        /* Settings Drawer / Modal */
+        .settings-drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .settings-drawer {
+            width: 100%;
+            max-width: 360px;
+            height: 100%;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--el-3);
+            animation: slideInRight 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .settings-drawer-header {
+            padding: var(--s-4);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .settings-drawer-header h3 {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-hi);
+            margin: 0;
+        }
+
+        .settings-drawer-close {
+            width: 1.8rem;
+            height: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--r-xs);
+            color: var(--text-lo);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .settings-drawer-close:hover {
+            color: var(--text-hi);
+            border-color: var(--accent);
+        }
+
+        .settings-drawer-body {
+            flex: 1 1 auto;
+            padding: var(--s-4);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--s-4);
+        }
+
+        .settings-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--s-2);
+        }
+
+        .settings-section-title {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-faint);
+            margin: 0;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--s-3);
+            padding: var(--s-3);
+            background: var(--card-hi);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+        }
+
+        .settings-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-hi);
+        }
+
+        .settings-hint {
+            margin: 0.2rem 0 0;
+            font-size: 0.72rem;
+            color: var(--text-lo);
+        }
+
+        .settings-theme-toggle {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            overflow: hidden;
+        }
+
+        .settings-btn {
+            padding: 0.3rem 0.65rem;
+            background: var(--surface);
+            border: none;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-lo);
+            cursor: pointer;
+        }
+
+        .settings-btn.active {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .settings-action-btn {
+            padding: 0.35rem 0.75rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-hi);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            white-space: nowrap;
+        }
+
+        .settings-action-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .settings-status-indicator {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--up);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .settings-status-indicator::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--up);
+        }
+
+        .settings-status-value {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-lo);
+        }
+
+        /* Toast Notification for SOON items */
+        .shell-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface);
+            border: 1px solid var(--border-hi);
+            box-shadow: var(--el-3);
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--r-pill);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-hi);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: toastFadeIn 0.2s ease-out;
+        }
+
+        @keyframes toastFadeIn {
+            from { opacity: 0; transform: translate(-50%, 10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        /* Sidebar Backdrop (Tablet / Mobile) */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+            z-index: 108;
+        }
+
+        /* Responsive Rules for Shell */
+        @media (max-width: 1099px) {
+            .app-sidebar {
+                width: 68px;
+            }
+            .sidebar-badge,
+            .sidebar-section-label,
+            .sidebar-nav-label-group span,
+            .nav-status-pill,
+            .sidebar-user-info,
+            .sidebar-brand-name {
+                display: none;
+            }
+            .sidebar-header {
+                padding: var(--s-3);
+                display: flex;
+                justify-content: center;
+            }
+            .sidebar-nav-item {
+                justify-content: center;
+                padding: 0.6rem 0;
+            }
+            .sidebar-user-card {
+                padding: 0.2rem;
+                justify-content: center;
+                border: none;
+                background: transparent;
+            }
+        }
+
+        @media (max-width: 879px) {
+            .app-sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 220px;
+                transform: translateX(-100%);
+            }
+            .app-sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-overlay.active {
+                display: block;
+            }
+            .sidebar-badge,
+            .sidebar-section-label,
+            .sidebar-nav-label-group span,
+            .nav-status-pill,
+            .sidebar-user-info,
+            .sidebar-brand-name {
+                display: block;
+            }
+            .sidebar-header {
+                padding: var(--s-4) var(--s-4) var(--s-3);
+                display: block;
+            }
+            .sidebar-nav-item {
+                justify-content: space-between;
+                padding: 0.6rem var(--s-3);
+            }
+            .sidebar-user-card {
+                padding: var(--s-2) var(--s-3);
+                justify-content: flex-start;
+                border: 1px solid var(--border);
+                background: var(--card-hi);
+            }
+            .topbar-menu-btn {
+                display: inline-flex;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .app-sidebar {
+                display: none;
+            }
+            .topbar-breadcrumb {
+                font-size: 0.76rem;
+            }
+            .topbar-sub-name {
+                display: none;
+            }
+            .topbar-sep {
+                display: none;
+            }
+            .mobile-bottom-nav {
+                display: flex;
+            }
+            .comparison-dock {
+                bottom: 58px;
+            }
+            .app-main-layout {
+                padding-bottom: 54px;
             }
         }
     </style>
@@ -4221,24 +4903,140 @@
 <body>
     <div class="grid-bg"></div>
 
-    <header>
-        <div class="logo-container">
-            <div class="logo-icon">AG</div>
-            <div class="logo-text">
-                <h1>Axion</h1>
-                <p></p>
+    <div class="app-shell">
+        <!-- 1. Left Rail Sidebar (220px desktop) -->
+        <aside class="app-sidebar" id="appSidebar" aria-label="Main Navigation">
+            <div class="sidebar-header">
+                <div class="sidebar-brand-group">
+                    <div class="logo-container">
+                        <div class="logo-icon">AG</div>
+                        <div class="logo-text">
+                            <h1 class="sidebar-brand-name">Axion</h1>
+                        </div>
+                    </div>
+                    <span class="sidebar-badge">v1.0</span>
+                </div>
             </div>
-        </div>
-        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
-            <!-- SVG Moon Icon -->
-            <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-        </button>
-    </header>
 
-    <div class="container">
+            <nav class="sidebar-nav" aria-label="Primary Modules">
+                <div class="sidebar-section-label">Modules</div>
+                <button type="button" class="sidebar-nav-item active" id="navAdvisor" aria-current="page">
+                    <div class="sidebar-nav-label-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                        </svg>
+                        <span>Advisor</span>
+                    </div>
+                    <span class="nav-status-pill live">LIVE</span>
+                </button>
+
+                <button type="button" class="sidebar-nav-item disabled" id="navTrading" aria-disabled="true" data-soon-msg="Assisted Trading is in active development.">
+                    <div class="sidebar-nav-label-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="4" y1="21" x2="4" y2="14"></line>
+                            <line x1="4" y1="10" x2="4" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12" y2="3"></line>
+                            <line x1="20" y1="21" x2="20" y2="16"></line>
+                            <line x1="20" y1="12" x2="20" y2="3"></line>
+                            <line x1="1" y1="14" x2="7" y2="14"></line>
+                            <line x1="9" y1="8" x2="15" y2="8"></line>
+                            <line x1="17" y1="16" x2="23" y2="16"></line>
+                        </svg>
+                        <span>Assisted Trading</span>
+                    </div>
+                    <span class="nav-status-pill soon">SOON</span>
+                </button>
+
+                <button type="button" class="sidebar-nav-item disabled" id="navBot" aria-disabled="true" data-soon-msg="Automated Strategy Bot is planned for a future release.">
+                    <div class="sidebar-nav-label-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                            <circle cx="12" cy="5" r="2"></circle>
+                            <path d="M12 7v4"></path>
+                            <line x1="8" y1="16" x2="8" y2="16"></line>
+                            <line x1="16" y1="16" x2="16" y2="16"></line>
+                        </svg>
+                        <span>Auto Bot</span>
+                    </div>
+                    <span class="nav-status-pill soon">SOON</span>
+                </button>
+
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-section-label">Tools</div>
+
+                <button type="button" class="sidebar-nav-item disabled" id="navWatchlist" aria-disabled="true" data-soon-msg="Watchlist is coming in a future release.">
+                    <div class="sidebar-nav-label-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <span>Watchlist</span>
+                    </div>
+                    <span class="nav-status-pill soon">SOON</span>
+                </button>
+
+                <button type="button" class="sidebar-nav-item" id="navSettings">
+                    <div class="sidebar-nav-label-group">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        <span>Settings</span>
+                    </div>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user-card">
+                    <div class="sidebar-user-avatar">GA</div>
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name">Guest Analyst</div>
+                        <div class="sidebar-user-role">Research Mode</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay for tablet/mobile off-canvas -->
+        <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+        <!-- 2. Main Layout Area -->
+        <div class="app-main-layout">
+            <header class="app-topbar" id="appTopbar">
+                <div class="topbar-left">
+                    <button type="button" class="topbar-menu-btn" id="topbarMenuBtn" aria-label="Toggle navigation menu">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="topbar-breadcrumb">
+                        <span class="topbar-module-name">Advisor</span>
+                        <span class="topbar-sep">/</span>
+                        <span class="topbar-sub-name">Fundamental Analysis</span>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
+                        <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                    <button type="button" class="topbar-settings-btn" id="topbarSettingsBtn" aria-label="Open settings">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 3. Module Frame -->
+            <main class="module-frame active" id="moduleAdvisor" tabindex="-1">
+                <div class="container">
         <!-- Search Section -->
         <section class="search-area">
             <div class="search-header-group">
@@ -4911,6 +5709,117 @@
             </div>
         </main>
     </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation (< 640px) -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Mobile Navigation">
+        <button type="button" class="mob-nav-item active" id="mobNavAdvisor" aria-current="page">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+            <span>Advisor</span>
+        </button>
+        <button type="button" class="mob-nav-item disabled" id="mobNavTrading" aria-disabled="true" data-soon-msg="Assisted Trading is in active development.">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+            </svg>
+            <span>Trading</span>
+            <span class="mob-soon-badge">SOON</span>
+        </button>
+        <button type="button" class="mob-nav-item disabled" id="mobNavBot" aria-disabled="true" data-soon-msg="Automated Strategy Bot is planned for a future release.">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                <circle cx="12" cy="5" r="2"></circle>
+                <path d="M12 7v4"></path>
+            </svg>
+            <span>Bot</span>
+            <span class="mob-soon-badge">SOON</span>
+        </button>
+        <button type="button" class="mob-nav-item" id="mobNavSettings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Settings</span>
+        </button>
+    </nav>
+
+    <!-- Settings Drawer / Modal -->
+    <div class="settings-drawer-overlay" id="settingsDrawerOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsDrawerTitle" style="display: none;">
+        <div class="settings-drawer" id="settingsDrawer">
+            <div class="settings-drawer-header">
+                <h3 id="settingsDrawerTitle">Axion Settings</h3>
+                <button type="button" class="settings-drawer-close" id="settingsDrawerClose" aria-label="Close settings">✕</button>
+            </div>
+            <div class="settings-drawer-body">
+                <!-- Appearance Section -->
+                <div class="settings-section">
+                    <h4 class="settings-section-title">Appearance</h4>
+                    <div class="settings-row">
+                        <div>
+                            <span class="settings-label">Color Theme</span>
+                            <p class="settings-hint">Toggle between dark and light research surfaces.</p>
+                        </div>
+                        <div class="settings-theme-toggle">
+                            <button type="button" class="settings-btn active" id="settingsThemeDark">Dark</button>
+                            <button type="button" class="settings-btn" id="settingsThemeLight">Light</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferences Section -->
+                <div class="settings-section">
+                    <h4 class="settings-section-title">Analysis Preferences</h4>
+                    <div class="settings-row">
+                        <div>
+                            <span class="settings-label">Default Exchange</span>
+                            <p class="settings-hint">Preferred stock exchange for ticker lookup.</p>
+                        </div>
+                        <select id="settingsDefaultExchange" class="metrics-select" style="min-width: 110px;">
+                            <option value="NSE" selected>NSE</option>
+                            <option value="BSE">BSE</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Local Workspace State Section -->
+                <div class="settings-section">
+                    <h4 class="settings-section-title">Local Workspace</h4>
+                    <div class="settings-row">
+                        <div>
+                            <span class="settings-label">Reset Workspace State</span>
+                            <p class="settings-hint">Clears pinned comparison metrics and active filters.</p>
+                        </div>
+                        <button type="button" class="settings-action-btn" id="settingsClearCacheBtn">Reset State</button>
+                    </div>
+                </div>
+
+                <!-- System Status Section -->
+                <div class="settings-section">
+                    <h4 class="settings-section-title">System Health</h4>
+                    <div class="settings-row">
+                        <span class="settings-label">Core Engine API</span>
+                        <span class="settings-status-indicator" id="settingsApiStatus">Online (v1.0)</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">Analysis Calibration</span>
+                        <span class="settings-status-value">14 Fundamental Rules</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification for SOON items -->
+    <div class="shell-toast" id="shellToast" role="status" aria-live="polite" style="display: none;"></div>
 
     <!-- Comparison Dock (Phase 3.3) -->
     <div class="comparison-dock" id="comparisonDock" role="region" aria-label="Metric comparison tray">
@@ -7075,6 +7984,188 @@
                 }
             }
         }
+
+        /* ==========================================================================
+           PHASE 4.0 — PRODUCT SHELL, SIDEBAR & SETTINGS ENGINE
+           ========================================================================== */
+        const appSidebar = document.getElementById('appSidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const topbarMenuBtn = document.getElementById('topbarMenuBtn');
+        const topbarSettingsBtn = document.getElementById('topbarSettingsBtn');
+        const navSettings = document.getElementById('navSettings');
+        const mobNavSettings = document.getElementById('mobNavSettings');
+        const settingsDrawerOverlay = document.getElementById('settingsDrawerOverlay');
+        const settingsDrawerClose = document.getElementById('settingsDrawerClose');
+        const settingsThemeDark = document.getElementById('settingsThemeDark');
+        const settingsThemeLight = document.getElementById('settingsThemeLight');
+        const settingsDefaultExchange = document.getElementById('settingsDefaultExchange');
+        const settingsClearCacheBtn = document.getElementById('settingsClearCacheBtn');
+        const settingsApiStatus = document.getElementById('settingsApiStatus');
+        const shellToast = document.getElementById('shellToast');
+
+        let toastTimeout = null;
+
+        function showShellToast(message) {
+            if (!shellToast) return;
+            if (toastTimeout) clearTimeout(toastTimeout);
+            shellToast.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><span>${message}</span>`;
+            shellToast.style.display = 'flex';
+            toastTimeout = setTimeout(() => {
+                shellToast.style.display = 'none';
+            }, 2600);
+        }
+
+        function openSettingsDrawer() {
+            if (!settingsDrawerOverlay) return;
+            settingsDrawerOverlay.style.display = 'flex';
+            
+            // Sync settings theme state
+            const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+            if (settingsThemeDark && settingsThemeLight) {
+                settingsThemeDark.classList.toggle('active', isDark);
+                settingsThemeLight.classList.toggle('active', !isDark);
+            }
+
+            // Sync default exchange
+            if (settingsDefaultExchange && exchangeSelect) {
+                settingsDefaultExchange.value = exchangeSelect.value;
+            }
+
+            // Ping health endpoint if available
+            fetch('/health')
+                .then(r => r.json())
+                .then(d => {
+                    if (settingsApiStatus && d.status === 'healthy') {
+                        settingsApiStatus.textContent = `Online (${d.version || 'v1.0'})`;
+                        settingsApiStatus.style.color = 'var(--up)';
+                    }
+                })
+                .catch(() => {
+                    if (settingsApiStatus) {
+                        settingsApiStatus.textContent = 'Local Standalone';
+                        settingsApiStatus.style.color = 'var(--text-lo)';
+                    }
+                });
+        }
+
+        function closeSettingsDrawer() {
+            if (!settingsDrawerOverlay) return;
+            settingsDrawerOverlay.style.display = 'none';
+        }
+
+        function toggleSidebarMobile() {
+            if (!appSidebar) return;
+            const isOpen = appSidebar.classList.contains('open');
+            if (isOpen) {
+                appSidebar.classList.remove('open');
+                if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+            } else {
+                appSidebar.classList.add('open');
+                if (sidebarOverlay) sidebarOverlay.classList.add('active');
+            }
+        }
+
+        function closeSidebarMobile() {
+            if (appSidebar) appSidebar.classList.remove('open');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        }
+
+        // Initialize Product Shell
+        function initializeProductShell() {
+            // SOON items click triggers
+            document.querySelectorAll('[data-soon-msg]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const msg = btn.getAttribute('data-soon-msg') || 'This module is in active development.';
+                    showShellToast(msg);
+                });
+            });
+
+            // Settings Open & Close
+            if (topbarSettingsBtn) topbarSettingsBtn.addEventListener('click', openSettingsDrawer);
+            if (navSettings) navSettings.addEventListener('click', openSettingsDrawer);
+            if (mobNavSettings) mobNavSettings.addEventListener('click', openSettingsDrawer);
+            if (settingsDrawerClose) settingsDrawerClose.addEventListener('click', closeSettingsDrawer);
+
+            if (settingsDrawerOverlay) {
+                settingsDrawerOverlay.addEventListener('click', (e) => {
+                    if (e.target === settingsDrawerOverlay) closeSettingsDrawer();
+                });
+            }
+
+            // Mobile menu trigger
+            if (topbarMenuBtn) topbarMenuBtn.addEventListener('click', toggleSidebarMobile);
+            if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebarMobile);
+
+            // Settings Theme Toggles
+            if (settingsThemeDark) {
+                settingsThemeDark.addEventListener('click', () => {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('axion-theme', 'dark');
+                    if (themeIcon) themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+                    settingsThemeDark.classList.add('active');
+                    if (settingsThemeLight) settingsThemeLight.classList.remove('active');
+                });
+            }
+
+            if (settingsThemeLight) {
+                settingsThemeLight.addEventListener('click', () => {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    localStorage.setItem('axion-theme', 'light');
+                    if (themeIcon) themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+                    settingsThemeLight.classList.add('active');
+                    if (settingsThemeDark) settingsThemeDark.classList.remove('active');
+                });
+            }
+
+            // Settings Exchange Sync
+            if (settingsDefaultExchange) {
+                settingsDefaultExchange.addEventListener('change', () => {
+                    if (exchangeSelect) exchangeSelect.value = settingsDefaultExchange.value;
+                });
+            }
+
+            // Settings Reset Cache / Filter State
+            if (settingsClearCacheBtn) {
+                settingsClearCacheBtn.addEventListener('click', () => {
+                    if (typeof pinnedMetrics !== 'undefined') {
+                        pinnedMetrics.clear();
+                        renderComparisonDock();
+                    }
+                    const searchBox = document.getElementById('metricSearchInput');
+                    const scoreFilter = document.getElementById('metricScoreFilter');
+                    const trendFilter = document.getElementById('metricTrendFilter');
+                    const sortSelect = document.getElementById('metricSortSelect');
+                    if (searchBox) searchBox.value = '';
+                    if (scoreFilter) scoreFilter.value = 'all';
+                    if (trendFilter) trendFilter.value = 'all';
+                    if (sortSelect) sortSelect.value = 'default';
+                    document.querySelectorAll('.metric-cat-btn').forEach(b => {
+                        b.classList.toggle('active', b.getAttribute('data-category') === 'all');
+                    });
+                    if (typeof filterAndRenderMetrics === 'function') {
+                        filterAndRenderMetrics();
+                    }
+                    showShellToast('Workspace state &amp; filters reset.');
+                    closeSettingsDrawer();
+                });
+            }
+
+            // Global Escape key handling
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (settingsDrawerOverlay && settingsDrawerOverlay.style.display === 'flex') {
+                        closeSettingsDrawer();
+                    }
+                    if (appSidebar && appSidebar.classList.contains('open')) {
+                        closeSidebarMobile();
+                    }
+                }
+            });
+        }
+
+        // Initialize shell immediately
+        initializeProductShell();
     </script>
 </body>
 
