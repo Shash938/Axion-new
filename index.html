@@ -1,0 +1,4237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Investment Advisor - Fundamental Analysis</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* HSL harmonies for sleek dark theme */
+            --bg-color: #0b0f19;
+            --panel-bg: rgba(22, 30, 46, 0.7);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            
+            --color-emerald: #10b981;
+            --color-emerald-glow: rgba(16, 185, 129, 0.15);
+            --color-amber: #f59e0b;
+            --color-amber-glow: rgba(245, 158, 11, 0.15);
+            --color-crimson: #ef4444;
+            --color-crimson-glow: rgba(239, 68, 68, 0.15);
+            --color-blue: #3b82f6;
+            
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --shadow-premium: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Light theme overrides */
+        [data-theme="light"] {
+            --bg-color: #f8fafc;
+            --panel-bg: rgba(255, 255, 255, 0.85);
+            --panel-border: rgba(15, 23, 42, 0.08);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --shadow-premium: 0 20px 40px -15px rgba(15, 23, 42, 0.1);
+            --color-emerald-glow: rgba(16, 185, 129, 0.08);
+            --color-amber-glow: rgba(245, 158, 11, 0.08);
+            --color-crimson-glow: rgba(239, 68, 68, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* Dynamic Grid Background */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, var(--color-emerald-glow) 0px, transparent 50%);
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        /* Glassmorphic Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: rgba(var(--bg-color), 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--panel-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 3.75rem;
+            height: 2.5rem;
+            display: block;
+            object-fit: contain;
+            filter: invert(1);
+        }
+
+        [data-theme="light"] .logo-icon { filter: none; }
+
+        .logo-text h1 {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--panel-border);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 2.2rem;
+            height: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .theme-toggle-btn:hover {
+            background: var(--panel-border);
+            transform: scale(1.05);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .auth-btn, .settings-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--panel-border);
+            color: var(--text-primary);
+            padding: 0.45rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: var(--transition-smooth);
+        }
+
+        .auth-btn:hover, .settings-btn:hover {
+            background: var(--panel-border);
+            transform: translateY(-1px);
+        }
+
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--color-blue);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .logout-btn:hover {
+            color: var(--color-crimson);
+        }
+
+        /* Modal Overlay & Card */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-card {
+            background: var(--bg-color);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 580px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 1.75rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            position: relative;
+            animation: modalSlideUp 0.3s ease;
+        }
+
+        @keyframes modalSlideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .modal-header h3 {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0.2rem;
+            border-radius: 6px;
+        }
+
+        .modal-close-btn:hover {
+            color: var(--text-primary);
+            background: var(--panel-border);
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .auth-tab-btn.active {
+            background: var(--color-blue);
+            color: white;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .form-input:focus {
+            border-color: var(--color-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--color-blue), #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            margin-top: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .auth-feedback {
+            padding: 0.65rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .auth-feedback.error {
+            display: block;
+            background: var(--color-crimson-glow);
+            border: 1px solid var(--color-crimson);
+            color: var(--color-crimson);
+        }
+
+        .auth-feedback.success {
+            display: block;
+            background: var(--color-emerald-glow);
+            border: 1px solid var(--color-emerald);
+            color: var(--color-emerald);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.75rem;
+        }
+
+        .history-table th, .history-table td {
+            padding: 0.65rem 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--panel-border);
+            font-size: 0.85rem;
+        }
+
+        .history-table th {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .history-row {
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .history-row:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        /* Container & Main Layout */
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* Search Section */
+        .search-area {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .search-area h2 {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-area p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: stretch;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 0.35rem;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: var(--transition-smooth);
+        }
+
+        .search-container:focus-within {
+            border-color: var(--color-blue);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .search-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 1.05rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .exchange-selector {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            padding: 0.25rem 0.75rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            margin: 0.2rem;
+            transition: var(--transition-smooth);
+        }
+
+        .exchange-selector:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, var(--color-blue), #2563eb);
+            border: none;
+            color: white;
+            padding: 0 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition-smooth);
+        }
+
+        .search-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Quick suggestions */
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+        }
+
+        .suggestion-tag {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 20px;
+            padding: 0.35rem 0.9rem;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .suggestion-tag:hover {
+            background: var(--panel-border);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        /* Loading / Shimmer State */
+        .loading-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 3rem auto;
+        }
+
+        .spinner {
+            width: 3.5rem;
+            height: 3.5rem;
+            border: 4px solid var(--panel-border);
+            border-top: 4px solid var(--color-blue);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            animation: pulse-text 1.5s ease-in-out infinite;
+        }
+
+        /* Results Screen */
+        .results-container {
+            display: none;
+            flex-direction: column;
+            gap: 2rem;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Hero Stock Info Card */
+        .stock-hero-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .stock-meta-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .company-name {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .ticker-details {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .ticker-badge {
+            background: var(--panel-border);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.5px;
+        }
+
+        .exchange-badge {
+            color: var(--color-blue);
+            font-weight: 600;
+        }
+
+        .sector-badge {
+            color: var(--text-muted);
+        }
+
+        .stock-price-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+            gap: 0.25rem;
+        }
+
+        .current-price {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .market-cap {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Main Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        /* Side Card: Overall Score */
+        .overall-score-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 2.2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            text-align: center;
+        }
+
+        .overall-score-card h3 {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Radial Progress SVG */
+        .radial-progress-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .radial-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .radial-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.03);
+            stroke-width: 12px;
+        }
+
+        .radial-fill {
+            fill: none;
+            stroke: var(--color-emerald);
+            stroke-width: 12px;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 1s ease-out;
+        }
+
+        .radial-text-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .radial-score-val {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .radial-score-max {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.15rem;
+        }
+
+        .radial-score-label {
+            margin-top: 0.35rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        /* Grade & Recommendation Badges */
+        .grade-rec-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .badge-box {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .badge-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-value {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .badge-value.buy-glow {
+            color: var(--color-emerald);
+            text-shadow: 0 0 10px var(--color-emerald-glow);
+        }
+        .badge-value.hold-glow {
+            color: var(--color-amber);
+            text-shadow: 0 0 10px var(--color-amber-glow);
+        }
+        .badge-value.sell-glow {
+            color: var(--color-crimson);
+            text-shadow: 0 0 10px var(--color-crimson-glow);
+        }
+
+        /* Info card: coverage */
+        .coverage-info {
+            width: 100%;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+
+        .coverage-label-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .coverage-track {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .coverage-bar {
+            height: 100%;
+            background: var(--color-blue);
+            width: 0%;
+            border-radius: 3px;
+            transition: width 1s ease-out;
+        }
+
+        /* Center Column: Summary & Explanation */
+        .summary-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 2.2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: var(--shadow-premium);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .summary-card h3 {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 0.75rem;
+        }
+
+        .summary-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .summary-subtitle {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin-top: 0.35rem;
+        }
+
+        .summary-recommendation-pill {
+            border-radius: 999px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            border: 1px solid var(--panel-border);
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .summary-recommendation-pill.buy { color: var(--color-emerald); background: var(--color-emerald-glow); }
+        .summary-recommendation-pill.hold { color: var(--color-amber); background: var(--color-amber-glow); }
+        .summary-recommendation-pill.sell { color: var(--color-crimson); background: var(--color-crimson-glow); }
+
+        .hero-eyebrow {
+            font-size: 0.72rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 0.45rem;
+        }
+
+        .snapshot-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+            width: 100%;
+            margin-top: 1.25rem;
+        }
+
+        .snapshot-tile {
+            padding: 0.8rem 0.9rem;
+            border-radius: 10px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .snapshot-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .snapshot-tile strong {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .snapshot-tile small {
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+        }
+
+        .score-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+        }
+
+        .score-tile {
+            padding: 1rem 1.05rem;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .score-tile-primary {
+            border-color: rgba(59,130,246,0.25);
+            background: rgba(59,130,246,0.08);
+        }
+
+        .score-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .score-value {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-caption {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .thesis-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .thesis-paragraph {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            padding: 0.8rem 0.9rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.9rem;
+        }
+
+        @media (min-width: 800px) {
+            .history-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .history-card {
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .history-card h5 {
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .history-card p, .history-card li {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .history-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .metric-trend-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.45rem;
+            border-radius: 999px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .data-quality-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .data-quality-details {
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 0.75rem 0.9rem;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .data-quality-details summary {
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .data-quality-details div {
+            margin-top: 0.6rem;
+            color: var(--text-secondary);
+            font-size: 0.84rem;
+            line-height: 1.6;
+        }
+
+        .summary-paragraph {
+            line-height: 1.7;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            white-space: pre-line;
+        }
+
+        .summary-quote {
+            margin-top: 0.25rem;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 0.9rem 1rem;
+            border-left: 3px solid var(--color-blue);
+            background: rgba(59,130,246,0.08);
+            border-radius: 10px;
+        }
+
+        .summary-focus-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.7rem;
+            margin: 0.8rem 0 0.9rem;
+        }
+
+        @media (min-width: 700px) {
+            .summary-focus-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .focus-card {
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 0.8rem 0.9rem;
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .focus-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .focus-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .focus-meta {
+            font-size: 0.8rem;
+            line-height: 1.45;
+            color: var(--text-secondary);
+        }
+
+        .business-breakdown-card {
+            margin-top: 0.5rem;
+            padding: 0.8rem 0.9rem;
+            border-radius: 12px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .breakdown-title {
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 0.55rem;
+        }
+
+        .breakdown-list {
+            display: grid;
+            gap: 0.4rem;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .breakdown-value {
+            color: var(--text-primary);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .breakdown-total {
+            margin-top: 0.55rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--panel-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .verdict-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 1rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .verdict-title {
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .verdict-stars {
+            font-size: 1rem;
+            letter-spacing: 0.2em;
+            color: var(--color-amber);
+        }
+
+        .verdict-headline {
+            font-size: 1.02rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .verdict-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.7rem;
+        }
+
+        @media (min-width: 700px) {
+            .verdict-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        .verdict-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.6rem 0.7rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+        }
+
+        .verdict-item span {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .verdict-item strong {
+            font-size: 0.86rem;
+            line-height: 1.45;
+            color: var(--text-secondary);
+        }
+
+        .data-quality-state {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding: 0.8rem 0.9rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--panel-border);
+        }
+
+        .summary-brief-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 700px) {
+            .summary-brief-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .brief-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .brief-card h4 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .brief-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .brief-card li {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .brief-card li strong {
+            color: var(--text-primary);
+        }
+
+        /* Bullet lists for Strengths and Weaknesses */
+        .sw-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 600px) {
+            .sw-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .sw-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .sw-header {
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sw-header.strengths {
+            color: var(--color-emerald);
+        }
+
+        .sw-header.weaknesses {
+            color: var(--color-crimson);
+        }
+
+        .sw-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sw-item {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--panel-border);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sw-icon {
+            font-size: 1rem;
+        }
+
+        /* Warnings alert box */
+        .warnings-alert-box {
+            display: none; /* hidden if no warnings */
+            background: var(--color-amber-glow);
+            border: 1px solid var(--color-amber);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            color: var(--text-primary);
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .warnings-title {
+            color: var(--color-amber);
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .warnings-list {
+            padding-left: 1.25rem;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        /* Metrics Ratios Grid Section */
+        .ratios-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .ratios-section h3 {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-top: 1rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 600px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 900px) {
+            .metrics-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Metric Card styling */
+        .metric-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.3);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--color-blue);
+        }
+
+        .metric-card.score-high::before { background: var(--color-emerald); }
+        .metric-card.score-mid::before { background: var(--color-amber); }
+        .metric-card.score-low::before { background: var(--color-crimson); }
+        .metric-card.score-unavailable::before { background: var(--text-muted); }
+
+        .metric-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .metric-name {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        .metric-score-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--panel-border);
+            flex-shrink: 0;
+        }
+
+        .metric-card.score-high .metric-score-badge {
+            background: var(--color-emerald-glow);
+            color: var(--color-emerald);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        .metric-card.score-mid .metric-score-badge {
+            background: var(--color-amber-glow);
+            color: var(--color-amber);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+        .metric-card.score-low .metric-score-badge {
+            background: var(--color-crimson-glow);
+            color: var(--color-crimson);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .metric-primary-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .metric-value-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.35rem;
+        }
+
+        .metric-raw-val {
+            font-family: var(--font-display);
+            font-size: 1.7rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .metric-unit {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Mini progress bar on cards */
+        .metric-bar-track {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 2px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            background: var(--color-blue);
+            width: 0%;
+            transition: width 1s ease-out;
+        }
+
+        .metric-card.score-high .metric-bar-fill { background: var(--color-emerald); }
+        .metric-card.score-mid .metric-bar-fill { background: var(--color-amber); }
+        .metric-card.score-low .metric-bar-fill { background: var(--color-crimson); }
+        .metric-card.score-unavailable .metric-bar-fill { background: var(--text-muted); }
+
+        .metric-desc-collapsed {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .metric-summary {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.6rem;
+        }
+
+        .metric-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            padding: 0.55rem 0.65rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+        }
+
+        .metric-field span {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .metric-field strong {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        .metric-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
+        .metric-card.expanded .metric-desc-collapsed {
+            display: block;
+            -webkit-line-clamp: none;
+            overflow: visible;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--panel-border);
+            padding-top: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .expand-indicator {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            align-self: center;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.25rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-card.expanded .expand-indicator {
+            transform: rotate(180deg);
+        }
+
+        /* Research Dashboard */
+        .research-dashboard {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .research-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 1.25rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .research-panel h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .research-panel p, .research-panel li {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .research-panel ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .research-panel li {
+            padding: 0.25rem 0;
+        }
+
+        .research-panel.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .research-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .research-pill {
+            border-radius: 999px;
+            padding: 0.35rem 0.7rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--color-blue);
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.2);
+        }
+
+        .dimension-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.9rem;
+        }
+
+        @media (min-width: 700px) {
+            .dimension-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .dimension-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        .dimension-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            min-height: 100%;
+        }
+
+        .dimension-card::before {
+            content: '';
+            width: 100%;
+            height: 3px;
+            border-radius: 999px;
+            background: var(--panel-border);
+        }
+
+        .dimension-card.score-high::before { background: var(--color-emerald); }
+        .dimension-card.score-mid::before { background: var(--color-amber); }
+        .dimension-card.score-low::before { background: var(--color-crimson); }
+        .dimension-card.score-unavailable::before { background: var(--text-muted); }
+
+        .dimension-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .dimension-card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .dimension-card-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            line-height: 1.45;
+        }
+
+        .dimension-card-score {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .dimension-card-rating {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .dimension-card p {
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .dimension-section-title {
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-top: 0.1rem;
+        }
+
+        .dimension-contributions {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-top: 0.35rem;
+        }
+
+        .dimension-contributions li {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 0.35rem 0.45rem;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+        }
+
+        .dimension-evidence {
+            font-size: 0.82rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        /* Metric expanded details */
+        .metric-expanded-details {
+            display: none;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--panel-border);
+        }
+
+        .metric-card.expanded .metric-expanded-details {
+            display: block;
+        }
+
+        .metric-stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .metric-stat-chip {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+
+        .metric-stat-chip span {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .metric-history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .metric-history-table th,
+        .metric-history-table td {
+            padding: 0.4rem 0.5rem;
+            text-align: right;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .metric-history-table th:first-child,
+        .metric-history-table td:first-child {
+            text-align: left;
+        }
+
+        .metric-history-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .metric-benchmark {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-score-reason {
+            font-size: 0.78rem;
+            color: var(--color-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .grade-s { color: #a855f7 !important; text-shadow: 0 0 12px rgba(168,85,247,0.4); }
+
+        /* Error Banner */
+        .error-banner {
+            display: none;
+            background: var(--color-crimson-glow);
+            border: 1px solid var(--color-crimson);
+            border-radius: 12px;
+            padding: 1.25rem;
+            color: var(--text-primary);
+            gap: 0.75rem;
+            align-items: flex-start;
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            animation: shake 0.4s ease-out;
+        }
+
+        .error-title {
+            color: var(--color-crimson);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .error-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Animations */
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-text {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            border-top: 1px solid var(--panel-border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: auto;
+        }
+
+        footer a {
+            color: var(--color-blue);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Password Strength, MFA & Biometrics Support styles */
+        .password-strength-bar-container {
+            display: flex;
+            height: 6px;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
+            margin-top: 0.5rem;
+        }
+
+        .password-strength-bar-segment {
+            flex: 1;
+            height: 100%;
+            transition: background-color 0.2s ease-in-out;
+            background: transparent;
+        }
+
+        .strength-text {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: right;
+            margin-bottom: 0.5rem;
+        }
+
+        .strength-weak { background-color: var(--color-crimson) !important; }
+        .strength-fair { background-color: var(--color-amber) !important; }
+        .strength-strong { background-color: var(--color-emerald) !important; }
+        .strength-very-strong { 
+            background-color: #10b981 !important; 
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+        }
+
+        .text-weak { color: var(--color-crimson); }
+        .text-fair { color: var(--color-amber); }
+        .text-strong { color: var(--color-emerald); }
+        .text-very-strong { color: #10b981; text-shadow: 0 0 4px rgba(16, 185, 129, 0.3); }
+
+        .mfa-container {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            animation: modalSlideUp 0.3s ease;
+        }
+
+        .otp-input-group {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .otp-digit {
+            width: 45px;
+            height: 50px;
+            font-size: 1.5rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .otp-digit:focus {
+            outline: none;
+            border-color: var(--color-blue);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+        }
+
+        .biometric-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            margin-top: 1rem;
+        }
+
+        .biometric-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .biometric-btn:active {
+            transform: translateY(0);
+        }
+
+        .biometric-badge-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+
+    <header>
+        <div class="logo-container">
+            <img class="logo-icon" src="/assets/axion.svg" alt="Axion" />
+            <div class="logo-text">
+                <h1>Axion</h1>
+                <p>AI Investment Advisor</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div id="userBadge" style="display:none;" class="user-badge">
+                <span id="usernameDisplay">User</span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+            <button class="auth-btn" id="authBtn">Sign In</button>
+            <button class="settings-btn" id="settingsBtn" title="Settings & Search History">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
+            <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
+                <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Search Section -->
+        <section class="search-area">
+            <h2>Analyze Indian Stocks</h2>
+            <p>Enter a ticker symbol to get a comprehensive, AI-graded fundamental evaluation report.</p>
+            <div class="search-container">
+                <input type="text" id="tickerInput" class="search-input" placeholder="Search stock (e.g. TCS, RELIANCE, INFY, HDFCBANK)" autocomplete="off">
+                <select id="exchangeSelect" class="exchange-selector">
+                    <option value="NSE">NSE</option>
+                    <option value="BSE">BSE</option>
+                </select>
+                <button id="searchBtn" class="search-btn">
+                    <!-- Search Icon SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    Analyze
+                </button>
+            </div>
+            <div class="suggestions">
+                <span class="suggestion-tag" data-ticker="TCS" data-exchange="NSE">TCS</span>
+                <span class="suggestion-tag" data-ticker="RELIANCE" data-exchange="NSE">RELIANCE</span>
+                <span class="suggestion-tag" data-ticker="INFY" data-exchange="NSE">INFY</span>
+                <span class="suggestion-tag" data-ticker="HDFCBANK" data-exchange="NSE">HDFC Bank</span>
+                <span class="suggestion-tag" data-ticker="ICICIBANK" data-exchange="NSE">ICICI Bank</span>
+            </div>
+        </section>
+
+        <!-- Error Banner -->
+        <div class="error-banner" id="errorBanner">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-crimson)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div>
+                <div class="error-title" id="errorTitle">Analysis Failed</div>
+                <div class="error-desc" id="errorDesc">Connection timed out while fetching financial statement data. Please try again.</div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-container" id="loadingState">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">Fetching financial statements...</div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-container" id="resultsSection">
+            <!-- Hero Card -->
+            <div class="stock-hero-card">
+                <div class="stock-meta-info">
+                    <div class="hero-eyebrow">Investment Snapshot</div>
+                    <h2 class="company-name" id="heroCompanyName">Tata Consultancy Services</h2>
+                    <div class="ticker-details">
+                        <span class="ticker-badge" id="heroTicker">TCS</span>
+                        <span class="exchange-badge" id="heroExchange">NSE</span>
+                        <span class="sector-badge" id="heroSector">Technology / IT Services</span>
+                    </div>
+                </div>
+                <div class="stock-price-info">
+                    <div class="current-price" id="heroPrice">₹3,920.00</div>
+                    <div class="market-cap" id="heroMarketCap">Market Cap: ₹14,24,677 Cr</div>
+                </div>
+                <div class="snapshot-grid">
+                    <div class="snapshot-tile">
+                        <span class="snapshot-label">Business Quality</span>
+                        <strong id="snapshotBusinessQualityValue">—</strong>
+                        <small id="snapshotBusinessQualityLabel">—</small>
+                    </div>
+                    <div class="snapshot-tile">
+                        <span class="snapshot-label">Investment Attractiveness</span>
+                        <strong id="snapshotAttractivenessValue">—</strong>
+                        <small id="snapshotAttractivenessLabel">—</small>
+                    </div>
+                    <div class="snapshot-tile">
+                        <span class="snapshot-label">Current Valuation</span>
+                        <strong id="snapshotValuation">—</strong>
+                        <small>Relative to quality and risk</small>
+                    </div>
+                    <div class="snapshot-tile">
+                        <span class="snapshot-label">Investment Verdict</span>
+                        <strong id="snapshotVerdict">—</strong>
+                        <small id="snapshotConviction">—</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Score Grid -->
+            <div class="dashboard-grid">
+                <div class="overall-score-card">
+                    <div class="summary-card-header" style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:0.5rem; width:100%;">
+                        <div>
+                            <h3>Business Quality & Investment Attractiveness</h3>
+                            <p class="summary-subtitle">Independent views on the franchise and the entry point.</p>
+                        </div>
+                    </div>
+                    <div class="radial-progress-container">
+                        <svg class="radial-svg" viewBox="0 0 160 160" aria-hidden="true">
+                            <circle class="radial-bg" cx="80" cy="80" r="70"></circle>
+                            <circle class="radial-fill" id="recommendationRing" cx="80" cy="80" r="70"></circle>
+                        </svg>
+                        <div class="radial-text-content">
+                            <div class="radial-score-val" id="recommendationRingScore">8.4</div>
+                            <div class="radial-score-max">/10</div>
+                            <div class="radial-score-label" id="recommendationRingLabel">BUY</div>
+                        </div>
+                    </div>
+
+                    <div class="score-stack">
+                        <div class="score-tile score-tile-primary">
+                            <div class="score-label">Business Quality</div>
+                            <div class="score-value" id="businessQualityScore">9.3</div>
+                            <div class="score-caption" id="businessQualityCaption">Exceptional business</div>
+                        </div>
+                        <div class="score-tile">
+                            <div class="score-label">Investment Attractiveness</div>
+                            <div class="score-value" id="investmentAttractivenessScore">6.8</div>
+                            <div class="score-caption" id="investmentAttractivenessCaption">Fairly valued</div>
+                        </div>
+                    </div>
+
+                    <div class="coverage-info">
+                        <div class="coverage-label-bar">
+                            <span>Data Coverage</span>
+                            <span id="coverageText">100% (14/14)</span>
+                        </div>
+                        <div class="coverage-track">
+                            <div class="coverage-bar" id="coverageBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="business-breakdown-card">
+                        <div class="breakdown-title">Business Quality Breakdown</div>
+                        <div class="breakdown-list" id="businessQualityBreakdown"></div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-card-header">
+                        <div>
+                            <h3>Investment Verdict</h3>
+                            <p class="summary-subtitle">The decision is based on quality, valuation, risk and confidence.</p>
+                        </div>
+                        <div class="summary-recommendation-pill buy" id="recommendationPill">BUY</div>
+                    </div>
+                    <div class="verdict-card">
+                        <div class="verdict-title">Recommendation</div>
+                        <div class="verdict-headline" id="verdictHeadline">Exceptional business at a premium valuation</div>
+                        <div class="verdict-grid">
+                            <div class="verdict-item">
+                                <span>Why now</span>
+                                <strong id="verdictStrength">High-quality franchise with durable returns</strong>
+                            </div>
+                            <div class="verdict-item">
+                                <span>Primary risk</span>
+                                <strong id="verdictRisk">Valuation discipline and execution consistency</strong>
+                            </div>
+                            <div class="verdict-item">
+                                <span>Holding period</span>
+                                <strong id="verdictInvestor">Long-term quality investor</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="thesis-body" id="overallExplanation"></div>
+                    <div class="summary-quote" id="summaryQuote">Recommendation rationale will appear here.</div>
+
+                    <div class="sw-container">
+                        <div class="sw-column">
+                            <div class="sw-header strengths">
+                                <span class="sw-icon">✓</span> Business Strengths
+                            </div>
+                            <ul class="sw-list" id="strengthsList">
+                                <li class="sw-item">Return on Equity</li>
+                            </ul>
+                        </div>
+                        <div class="sw-column">
+                            <div class="sw-header weaknesses">
+                                <span class="sw-icon">!</span> Business Risks
+                            </div>
+                            <ul class="sw-list" id="weaknessesList">
+                                <li class="sw-item">Revenue Growth</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="research-dashboard" id="researchDashboard">
+                <div class="research-panel full-width">
+                    <div class="research-panel-header">
+                        <div>
+                            <h4>Institutional Scorecard</h4>
+                            <p>Concise dimensions that explain the investment view without repeating the thesis.</p>
+                        </div>
+                        <div class="research-pill">Research View</div>
+                    </div>
+                    <div class="dimension-grid" id="dimensionGrid"></div>
+                </div>
+            </div>
+
+            <div class="ratios-section">
+                <h3>Detailed Metric Analysis</h3>
+                <div class="metrics-grid" id="metricsGrid"></div>
+            </div>
+
+            <div class="research-dashboard">
+                <div class="research-panel full-width">
+                    <div class="research-panel-header">
+                        <div>
+                            <h4>Historical Analysis</h4>
+                            <p>What changed over the last several years.</p>
+                        </div>
+                    </div>
+                    <div class="history-grid" id="historicalAnalysisGrid"></div>
+                </div>
+            </div>
+
+            <div class="research-dashboard">
+                <div class="research-panel full-width">
+                    <div class="research-panel-header">
+                        <div>
+                            <h4>Data Quality</h4>
+                            <p>Coverage and confidence behind the report.</p>
+                        </div>
+                    </div>
+                    <div class="data-quality-card">
+                        <div class="data-quality-state" id="dataQualityState">No data quality issues detected.</div>
+                        <details class="data-quality-details" id="dataQualityDetails">
+                            <summary>Technical details</summary>
+                            <div id="dataQualityDetailsBody"></div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Configurable Backend API Base URL
+        const BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? ''
+            : 'https://axion-new-4.onrender.com';
+
+        // DOM Elements
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        const tickerInput = document.getElementById('tickerInput');
+        const exchangeSelect = document.getElementById('exchangeSelect');
+        const searchBtn = document.getElementById('searchBtn');
+        const errorBanner = document.getElementById('errorBanner');
+        const errorTitle = document.getElementById('errorTitle');
+        const errorDesc = document.getElementById('errorDesc');
+        const loadingState = document.getElementById('loadingState');
+        const loadingText = document.getElementById('loadingText');
+        const resultsSection = document.getElementById('resultsSection');
+        
+        // Results Elements
+        const heroCompanyName = document.getElementById('heroCompanyName');
+        const heroTicker = document.getElementById('heroTicker');
+        const heroExchange = document.getElementById('heroExchange');
+        const heroSector = document.getElementById('heroSector');
+        const heroPrice = document.getElementById('heroPrice');
+        const heroMarketCap = document.getElementById('heroMarketCap');
+        const snapshotBusinessQualityValue = document.getElementById('snapshotBusinessQualityValue');
+        const snapshotBusinessQualityLabel = document.getElementById('snapshotBusinessQualityLabel');
+        const snapshotAttractivenessValue = document.getElementById('snapshotAttractivenessValue');
+        const snapshotAttractivenessLabel = document.getElementById('snapshotAttractivenessLabel');
+        const snapshotValuation = document.getElementById('snapshotValuation');
+        const snapshotVerdict = document.getElementById('snapshotVerdict');
+        const snapshotConviction = document.getElementById('snapshotConviction');
+        
+        const businessQualityScore = document.getElementById('businessQualityScore');
+        const businessQualityCaption = document.getElementById('businessQualityCaption');
+        const investmentAttractivenessScore = document.getElementById('investmentAttractivenessScore');
+        const investmentAttractivenessCaption = document.getElementById('investmentAttractivenessCaption');
+        const coverageText = document.getElementById('coverageText');
+        const coverageBar = document.getElementById('coverageBar');
+        
+        const overallExplanation = document.getElementById('overallExplanation');
+        const summaryQuote = document.getElementById('summaryQuote');
+        const recommendationPill = document.getElementById('recommendationPill');
+        const recommendationRing = document.getElementById('recommendationRing');
+        const recommendationRingScore = document.getElementById('recommendationRingScore');
+        const recommendationRingLabel = document.getElementById('recommendationRingLabel');
+        const businessQualityBreakdown = document.getElementById('businessQualityBreakdown');
+        const verdictHeadline = document.getElementById('verdictHeadline');
+        const verdictStrength = document.getElementById('verdictStrength');
+        const verdictRisk = document.getElementById('verdictRisk');
+        const verdictInvestor = document.getElementById('verdictInvestor');
+        const strengthsList = document.getElementById('strengthsList');
+        const weaknessesList = document.getElementById('weaknessesList');
+        const dataQualityState = document.getElementById('dataQualityState');
+        const dataQualityDetailsBody = document.getElementById('dataQualityDetailsBody');
+        const metricsGrid = document.getElementById('metricsGrid');
+        const dimensionGrid = document.getElementById('dimensionGrid');
+        const historicalAnalysisGrid = document.getElementById('historicalAnalysisGrid');
+
+        // Score color tiers (aligned with backend grade boundaries)
+        const SCORE_HIGH = 7.0;
+        const SCORE_MID = 5.5;
+
+        function scoreColorClass(score, available) {
+            if (!available) return 'score-unavailable';
+            if (score >= SCORE_HIGH) return 'score-high';
+            if (score >= SCORE_MID) return 'score-mid';
+            return 'score-low';
+        }
+
+        function scoreStrokeColor(score) {
+            if (score >= 8.3) return 'var(--color-emerald)';
+            if (score >= SCORE_MID) return 'var(--color-amber)';
+            return 'var(--color-crimson)';
+        }
+
+        function updateRecommendationRing(score, recommendation) {
+            const value = Number(score ?? 0);
+            const progress = Math.max(0, Math.min(100, value * 10));
+            const offset = CIRCLE_CIRCUMFERENCE - (progress / 100) * CIRCLE_CIRCUMFERENCE;
+            recommendationRing.style.strokeDasharray = CIRCLE_CIRCUMFERENCE;
+            recommendationRing.style.strokeDashoffset = offset;
+
+            if (recommendation === 'SELL') {
+                recommendationRing.style.stroke = 'var(--color-crimson)';
+            } else if (recommendation === 'HOLD' || recommendation === 'ACCUMULATE') {
+                recommendationRing.style.stroke = 'var(--color-amber)';
+            } else {
+                recommendationRing.style.stroke = 'var(--color-emerald)';
+            }
+
+            recommendationRingScore.textContent = value.toFixed(1);
+            recommendationRingLabel.textContent = recommendation || 'HOLD';
+        }
+
+        // Circular progress parameters
+        const CIRCLE_RADIUS = 70;
+        const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * CIRCLE_RADIUS; // 439.82
+
+        // Setup theme (dark by default)
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeUI();
+
+        themeToggleBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            updateThemeUI();
+        });
+
+        function updateThemeUI() {
+            if (currentTheme === 'light') {
+                themeIcon.innerHTML = `
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.22" x2="19.78" y2="4.22"></line>
+                `;
+            } else {
+                themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+            }
+        }
+
+        // Ticker suggestion tags
+        document.querySelectorAll('.suggestion-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                tickerInput.value = tag.getAttribute('data-ticker');
+                exchangeSelect.value = tag.getAttribute('data-exchange');
+                performSearch();
+            });
+        });
+
+        // Search trigger
+        searchBtn.addEventListener('click', performSearch);
+        tickerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Loading message rotation
+        const loadingMessages = [
+            "Connecting to Yahoo Finance...",
+            "Downloading balance sheets and income statements...",
+            "Parsing financial statements...",
+            "Calculating growth rates and margins...",
+            "Scoring company financial health...",
+            "Assembling AI recommendations..."
+        ];
+        let messageTimer = null;
+
+        function startLoadingIndicator() {
+            errorBanner.style.display = 'none';
+            resultsSection.style.display = 'none';
+            loadingState.style.display = 'flex';
+            
+            let index = 0;
+            loadingText.textContent = loadingMessages[0];
+            messageTimer = setInterval(() => {
+                index = (index + 1) % loadingMessages.length;
+                loadingText.textContent = loadingMessages[index];
+            }, 2000);
+        }
+
+        function stopLoadingIndicator() {
+            loadingState.style.display = 'none';
+            if (messageTimer) {
+                clearInterval(messageTimer);
+                messageTimer = null;
+            }
+        }
+
+        // Fetch and Analyse API call
+        async function performSearch() {
+            const ticker = tickerInput.value.trim().toUpperCase();
+            const exchange = exchangeSelect.value;
+
+            if (!ticker) {
+                showError("Invalid Input", "Please enter a valid stock ticker symbol.");
+                return;
+            }
+
+            startLoadingIndicator();
+
+            try {
+                // Pass Auth token if user is logged in so search is attached to their account
+                const headers = {};
+                const token = localStorage.getItem('axion_token');
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const response = await fetch(`${BASE_URL}/api/v1/analyze/${ticker}?exchange=${exchange}`, { headers });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Extract error details returned by API
+                    const errorDetail = data.detail || {};
+                    const msg = errorDetail.detail || "An unexpected error occurred.";
+                    const title = errorDetail.title || "Analysis Failed";
+                    showError(title, msg);
+                    return;
+                }
+
+                // Success! Display results
+                renderResults(data);
+            } catch (error) {
+                console.error("Fetch error:", error);
+                showError("Network Connection Error", "Failed to connect to the backend server. Make sure the server is running on port 8000.");
+            } finally {
+                stopLoadingIndicator();
+            }
+        }
+
+        function showError(title, msg) {
+            errorTitle.textContent = title;
+            errorDesc.textContent = msg;
+            errorBanner.style.display = 'flex';
+            tickerInput.focus();
+        }
+
+        function formatCurrency(val, currency = "INR") {
+            if (val === null || val === undefined) return "N/A";
+            
+            let symbol = currency === "INR" ? "₹" : "$";
+            
+            if (val >= 100000) {
+                return `${symbol}${(val / 100000).toLocaleString('en-IN', {maximumFractionDigits: 1})} Lk`;
+            } else if (val >= 1000) {
+                return `${symbol}${(val / 1000).toLocaleString('en-IN', {maximumFractionDigits: 1})} K`;
+            }
+            return `${symbol}${val.toLocaleString('en-IN', {maximumFractionDigits: 2})}`;
+        }
+
+        function formatCategory(cat) {
+            if (!cat) return '—';
+            if (typeof cat === 'string') return cat;
+            const scorePart = cat.score != null ? `${cat.score.toFixed(1)}/10` : 'N/A';
+            const gradePart = cat.grade || 'N/A';
+            const explanation = cat.explanation || '';
+            return `${gradePart} (${scorePart}) — ${explanation}`;
+        }
+
+        function formatMarketCap(val, currency = "INR") {
+            if (val === null || val === undefined || val === 0) return "Market Cap: N/A";
+            let symbol = currency === "INR" ? "₹" : "$";
+            // API returns market cap already in INR Crores
+            if (val >= 100000) {
+                return `Market Cap: ${symbol}${(val / 100000).toLocaleString('en-IN', {maximumFractionDigits: 2})} L Cr`;
+            }
+            return `Market Cap: ${symbol}${val.toLocaleString('en-IN', {maximumFractionDigits: 0})} Cr`;
+        }
+
+        function renderListItems(listEl, items, emptyText) {
+            listEl.innerHTML = '';
+            if (items && items.length > 0) {
+                items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    listEl.appendChild(li);
+                });
+            } else {
+                listEl.innerHTML = `<li style="color:var(--text-muted)">${emptyText}</li>`;
+            }
+        }
+
+        function isGrowthMetric(metric) {
+            return ['revenue_growth', 'profit_growth', 'eps_growth', 'cash_flow_growth', 'book_value_growth', 'dividend_growth'].includes(metric.metric_key);
+        }
+
+        function buildHistoryTable(metric) {
+            if (!metric.history || metric.history.length === 0) {
+                return '<p class="metric-benchmark">No historical data available.</p>';
+            }
+            const title = isGrowthMetric(metric) ? 'YoY Growth' : 'Value';
+            let rows = metric.history.map(h =>
+                `<tr><td>${h.year}</td><td>${formatMetricValue(h.value, metric.raw_value_unit)}</td></tr>`
+            ).join('');
+            return `<table class="metric-history-table"><thead><tr><th>Year</th><th>${title}</th></tr></thead><tbody>${rows}</tbody></table>`;
+        }
+
+        function buildBusinessQualityContributions(fs) {
+            const weights = {
+                financial_quality: 0.40,
+                consistency: 0.15,
+                risk: 0.10,
+                earnings_quality: 0.10,
+                capital_allocation: 0.10,
+                moat: 0.05,
+            };
+            const totalWeight = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
+            return Object.entries(weights).map(([key, weight]) => {
+                const score = Number(fs[`${key}_score`] ?? fs[key] ?? 0);
+                return {
+                    label: formatContributionLabel(key),
+                    contribution: score * weight / totalWeight,
+                };
+            });
+        }
+
+        function formatContributionLabel(key) {
+            const labels = {
+                financial_quality: 'Financial Quality',
+                consistency: 'Historical Consistency',
+                risk: 'Risk',
+                earnings_quality: 'Earnings Quality',
+                capital_allocation: 'Capital Allocation',
+                moat: 'Moat',
+            };
+            return labels[key] || key;
+        }
+
+        function getBusinessQualityLabel(score) {
+            if (score >= 8.5) return 'Exceptional business';
+            if (score >= 7.5) return 'Very strong business';
+            if (score >= 6.5) return 'Solid business';
+            if (score >= 5.5) return 'Average business';
+            return 'Weak business';
+        }
+
+        function getAttractivenessLabel(score, recommendation) {
+            if (recommendation === 'SELL') return 'Demanding valuation';
+            if (score >= 7.0) return 'Attractive valuation';
+            if (score >= 6.0) return 'Fairly valued';
+            return 'Premium valuation';
+        }
+
+        function getVerdictMeta(rec, businessScore, valuationScore, riskScore, confidenceScore) {
+            const quality = businessScore >= 8.0;
+            const attractive = valuationScore >= 6.2 && riskScore <= 6.5;
+            const strongConfidence = confidenceScore >= 70;
+
+            if (rec === 'BUY' && quality && attractive && strongConfidence) {
+                return {
+                    headline: 'Exceptional business at an attractive entry point',
+                    strength: 'Exceptional returns on capital and durable cash generation',
+                    risk: 'Valuation can remain elevated if growth slows',
+                    investor: 'Long-term investors seeking quality compounders'
+                };
+            }
+            if (rec === 'BUY' && quality) {
+                return {
+                    headline: 'Exceptional business with a premium valuation',
+                    strength: 'High-quality franchise with durable earnings power',
+                    risk: 'Price discipline matters more than business quality',
+                    investor: 'Investors comfortable with a premium multiple'
+                };
+            }
+            if (rec === 'HOLD' || rec === 'ACCUMULATE') {
+                return {
+                    headline: 'High-quality business, but the entry point is not yet compelling',
+                    strength: 'Competitive position and balance-sheet strength remain intact',
+                    risk: 'The current price leaves limited margin of safety',
+                    investor: 'Selective investors with a medium-term horizon'
+                };
+            }
+            return {
+                headline: 'Business quality is not sufficient to justify ownership at the current price',
+                strength: 'The franchise lacks enough support from valuation and risk',
+                risk: 'The downside is not adequately compensated',
+                investor: 'Investors focused on downside protection'
+            };
+        }
+
+        function renderBusinessQualityBreakdown(fs) {
+            const contributions = buildBusinessQualityContributions(fs);
+            const total = Number(fs.business_quality_score ?? fs.total_score ?? 0);
+            const rows = contributions.map(item => `
+                <div class="breakdown-item">
+                    <span>${item.label}</span>
+                    <span class="breakdown-value">+${item.contribution.toFixed(1)}</span>
+                </div>
+            `).join('');
+            businessQualityBreakdown.innerHTML = `${rows}<div class="breakdown-total"><span>Total</span><span>${total.toFixed(1)}</span></div>`;
+        }
+
+        function getBenchmarkText(metric, sector) {
+            const rawLabel = metric.benchmark_label || metric.benchmark_summary || '';
+            const text = rawLabel.toLowerCase();
+            if (!text) return '';
+            if (/good|healthy|strong/i.test(text)) {
+                if (/it|technology/i.test(sector)) return 'Above sector expectations for IT Services';
+                if (/bank|financial/i.test(sector)) return 'Typical for private sector banks';
+                return 'Above sector expectations';
+            }
+            if (/excellent/i.test(text)) return 'Excellent versus the peer group';
+            if (/below/i.test(text)) return 'Below historical average';
+            return rawLabel;
+        }
+
+        function buildMetricNarrative(metric, metrics) {
+            const map = Object.fromEntries((metrics || []).map(item => [item.metric_key, item]));
+            if (metric.metric_key === 'roe') {
+                const value = map.roe?.raw_value;
+                return value !== null && value !== undefined ? `ROE of ${value.toFixed(1)}% is a core driver of the quality assessment.` : 'Return on equity remains relevant to the quality view.';
+            }
+            if (metric.metric_key === 'roce') {
+                const value = map.roce?.raw_value;
+                return value !== null && value !== undefined ? `ROCE of ${value.toFixed(1)}% indicates how efficiently capital is being deployed.` : 'Capital efficiency is relevant to the allocation assessment.';
+            }
+            if (metric.metric_key === 'operating_margin' || metric.metric_key === 'net_margin') {
+                const value = metric.raw_value;
+                return value !== null && value !== undefined ? `Margin is ${value.toFixed(1)}%, which informs profitability quality.` : 'Margin performance is relevant to the operating profile.';
+            }
+            if (metric.metric_key === 'debt_to_equity' || metric.metric_key === 'current_ratio' || metric.metric_key === 'interest_coverage') {
+                const value = metric.raw_value;
+                return value !== null && value !== undefined ? `The balance-sheet metric is ${value.toFixed(2)}${metric.raw_value_unit}, which informs risk.` : 'Balance-sheet strength is relevant to the risk assessment.';
+            }
+            if (metric.metric_key === 'revenue_growth' || metric.metric_key === 'profit_growth' || metric.metric_key === 'eps_growth') {
+                const value = metric.raw_value;
+                return value !== null && value !== undefined ? `Growth of ${value.toFixed(1)}% matters for the trajectory of earnings and cash flow.` : 'Growth trends are relevant to the historical view.';
+            }
+            return metric.explanation || 'The metric remains relevant to the overall conclusion.';
+        }
+
+        function buildDimensionNarrative(key, value, metrics) {
+            const map = Object.fromEntries((metrics || []).map(item => [item.metric_key, item]));
+            if (key === 'financial_quality') {
+                const roe = map.roe?.raw_value;
+                const roce = map.roce?.raw_value;
+                if (roe !== null && roe !== undefined && roce !== null && roce !== undefined) {
+                    return `ROE ${roe.toFixed(1)}% and ROCE ${roce.toFixed(1)}% frame the profitability profile.`;
+                }
+                return value >= 8 ? 'Profitability is well supported by returns and margins.' : 'Profitability is more mixed.';
+            }
+            if (key === 'consistency') {
+                const revenueGrowth = map.revenue_growth?.cagr5 ?? map.revenue_growth?.yoy;
+                if (revenueGrowth !== null && revenueGrowth !== undefined) {
+                    return `Revenue growth has been ${revenueGrowth > 0 ? 'positive' : 'flat or negative'} through the available history.`;
+                }
+                return value >= 7 ? 'Performance has been steady over time.' : 'Performance has been less steady.';
+            }
+            if (key === 'capital_allocation') {
+                const roce = map.roce?.raw_value;
+                const fcf = map.fcf_margin?.raw_value;
+                if (roce !== null && roce !== undefined && fcf !== null && fcf !== undefined) {
+                    return `ROCE ${roce.toFixed(1)}% and FCF margin ${fcf.toFixed(1)}% reflect capital discipline.`;
+                }
+                return value >= 7 ? 'Capital deployment appears disciplined.' : 'Capital deployment has been less consistent.';
+            }
+            if (key === 'earnings_quality') {
+                const ocf = map.fcf_margin?.raw_value;
+                if (ocf !== null && ocf !== undefined) {
+                    return `FCF conversion of ${ocf.toFixed(1)}% supports the earnings profile.`;
+                }
+                return value >= 7 ? 'Reported earnings appear cash-backed.' : 'Earnings quality is less convincing.';
+            }
+            if (key === 'moat') {
+                const roe = map.roe?.raw_value;
+                const margin = map.operating_margin?.raw_value;
+                if (roe !== null && roe !== undefined && margin !== null && margin !== undefined) {
+                    return `ROE ${roe.toFixed(1)}% and operating margin ${margin.toFixed(1)}% suggest durable pricing power.`;
+                }
+                return value >= 7 ? 'Competitive strength appears durable.' : 'Competitive strength is less clear.';
+            }
+            if (key === 'risk') {
+                const debt = map.debt_to_equity?.raw_value;
+                const current = map.current_ratio?.raw_value;
+                if (debt !== null && debt !== undefined && current !== null && current !== undefined) {
+                    return `Debt to equity is ${debt.toFixed(2)}x and current ratio is ${current.toFixed(2)}x.`;
+                }
+                return value >= 7 ? 'Balance-sheet strength reduces downside risk.' : 'Balance-sheet pressure remains a watchpoint.';
+            }
+            if (key === 'valuation') {
+                return value >= 7 ? 'The price appears reasonable relative to the quality profile.' : 'The price appears demanding relative to current fundamentals.';
+            }
+            if (key === 'confidence') {
+                return 'Confidence is tied to the breadth and quality of the underlying financial statement coverage.';
+            }
+            return 'The score is displayed directly below.';
+        }
+
+        function formatMetricValue(val, unit) {
+            if (val === null || val === undefined) return 'N/A';
+            if (unit === '₹ Cr') return val.toLocaleString('en-IN', {maximumFractionDigits: 0});
+            if (unit === 'x') return val.toFixed(2);
+            if (unit === '₹') return '₹' + val.toFixed(2);
+            return val.toFixed(1) + (unit === '%' ? '%' : '');
+        }
+
+        function buildStatChips(metric) {
+            const chips = [];
+            if (isGrowthMetric(metric) && metric.yoy !== null && metric.yoy !== undefined) {
+                chips.push(`Latest YoY: <span>${formatMetricValue(metric.yoy, metric.raw_value_unit)}</span>`);
+            } else if (metric.cagr5 !== null && metric.cagr5 !== undefined) {
+                chips.push(`5Y CAGR: <span>${metric.cagr5.toFixed(1)}%</span>`);
+            }
+            if (metric.history && metric.history.length > 0 && !isGrowthMetric(metric)) {
+                const avg = metric.history.reduce((sum, item) => sum + item.value, 0) / metric.history.length;
+                chips.push(`Historical Avg: <span>${formatMetricValue(avg, metric.raw_value_unit)}</span>`);
+            }
+            if (metric.trend) chips.push(`Trend: <span>${metric.trend}</span>`);
+            return chips.map(c => `<div class="metric-stat-chip">${c}</div>`).join('');
+        }
+
+        function formatScoreValue(score, maxScore = 10) {
+            if (score === null || score === undefined) return '—';
+            return `${score.toFixed(1)}/${maxScore}`;
+        }
+
+        function scoreToneClass(score, maxScore = 10) {
+            if (score === null || score === undefined) return 'score-unavailable';
+            const normalized = maxScore === 100 ? score / 100 : score / 10;
+            if (normalized >= 0.83) return 'score-high';
+            if (normalized >= 0.55) return 'score-mid';
+            return 'score-low';
+        }
+
+        function scoreDescriptor(score, maxScore = 10) {
+            if (score === null || score === undefined) return 'Unavailable';
+            const normalized = maxScore === 100 ? score / 100 : score / 10;
+            if (normalized >= 0.83) return 'High score';
+            if (normalized >= 0.67) return 'Above average';
+            if (normalized >= 0.55) return 'Near average';
+            if (normalized >= 0.35) return 'Below average';
+            return 'Low score';
+        }
+
+        function buildDimensionExplanation(key, value) {
+            const score = value ?? 0;
+            if (key === 'business_quality') {
+                if (score >= 8.5) return 'The score is driven by strong profitability, cash generation and balance-sheet resilience.';
+                if (score >= 7.0) return 'The score reflects solid profitability and a dependable operating profile.';
+                if (score >= 5.5) return 'The score reflects an acceptable business profile, though the evidence is less compelling.';
+                return 'The score reflects weak or inconsistent fundamentals.';
+            }
+            if (key === 'financial_quality') {
+                if (score >= 8.0) return 'Returns, margins and cash conversion are all strong.';
+                if (score >= 6.5) return 'Returns and margins are acceptable, with moderate cash conversion.';
+                if (score >= 5.0) return 'Profitability is mixed and cash conversion is less clear.';
+                return 'Returns and cash flow quality are weak.';
+            }
+            if (key === 'consistency') {
+                if (score >= 8.0) return 'Revenue, earnings and cash flow have remained stable through the cycle.';
+                if (score >= 6.5) return 'Performance has been relatively steady, with moderate variability.';
+                if (score >= 5.0) return 'Historical performance has been uneven.';
+                return 'Historical consistency is weak.';
+            }
+            if (key === 'earnings_quality') {
+                if (score >= 8.0) return 'Reported earnings are broadly cash-backed.';
+                if (score >= 6.5) return 'Earnings are mostly credible, though cash conversion is not fully clean.';
+                if (score >= 5.0) return 'Earnings quality is mixed.';
+                return 'Earnings quality is weaker.';
+            }
+            if (key === 'capital_allocation') {
+                if (score >= 8.0) return 'Capital has been allocated into high-return opportunities.';
+                if (score >= 6.5) return 'Capital allocation is generally sensible.';
+                if (score >= 5.0) return 'Allocation discipline is mixed.';
+                return 'Capital allocation has been inconsistent.';
+            }
+            if (key === 'moat') {
+                if (score >= 8.0) return 'Competitive advantages appear durable.';
+                if (score >= 6.5) return 'The competitive position is credible.';
+                if (score >= 5.0) return 'The competitive position is moderate.';
+                return 'The moat is limited or less durable.';
+            }
+            if (key === 'risk') {
+                if (score >= 8.0) return 'Leverage and liquidity support a lower-risk profile.';
+                if (score >= 6.5) return 'Balance-sheet risk is manageable.';
+                if (score >= 5.0) return 'Balance-sheet risk is moderate.';
+                return 'Leverage or coverage is a concern.';
+            }
+            if (key === 'valuation') {
+                if (score >= 8.0) return 'The price appears reasonable relative to fundamentals.';
+                if (score >= 6.5) return 'The valuation is fair.';
+                if (score >= 5.0) return 'The valuation is not especially compelling.';
+                return 'The valuation is demanding.';
+            }
+            if (key === 'confidence') {
+                if (score >= 80) return 'The analysis is supported by broad financial statement coverage.';
+                if (score >= 60) return 'Confidence is moderate because some inputs are incomplete.';
+                if (score >= 40) return 'Confidence is limited because several inputs are sparse.';
+                return 'Confidence is low because the dataset is incomplete.';
+            }
+            return 'The backend score is shown directly below.';
+        }
+
+        function buildDimensionContributions(key, value, fs = {}) {
+            const score = value ?? 0;
+            if (key === 'business_quality') {
+                return buildBusinessQualityContributions(fs);
+            }
+            if (key === 'financial_quality') {
+                return [
+                    { label: 'ROE and ROCE', contribution: score * 0.35 },
+                    { label: 'Margins', contribution: score * 0.25 },
+                    { label: 'Cash conversion', contribution: score * 0.2 },
+                ];
+            }
+            if (key === 'risk') {
+                return [
+                    { label: 'Leverage', contribution: score * 0.35 },
+                    { label: 'Liquidity', contribution: score * 0.3 },
+                    { label: 'Coverage', contribution: score * 0.35 },
+                ];
+            }
+            return [];
+        }
+
+        function renderResearchDimensions(data) {
+            const fs = data.fundamental_score || {};
+            const metrics = data.metric_scores || [];
+            const dimensions = [
+                { key: 'business_quality', label: 'Business Quality', subtitle: 'Composite view of quality and durability', value: fs.business_quality_score ?? fs.total_score ?? 0, maxScore: 10 },
+                { key: 'financial_quality', label: 'Financial Quality', subtitle: 'Returns, margins, and cash generation', value: fs.financial_quality_score ?? 0, maxScore: 10 },
+                { key: 'consistency', label: 'Historical Consistency', subtitle: 'Stability and trend quality through time', value: fs.consistency_score ?? 0, maxScore: 10 },
+                { key: 'earnings_quality', label: 'Earnings Quality', subtitle: 'Cash-backed profitability and accrual discipline', value: fs.earnings_quality_score ?? 0, maxScore: 10 },
+                { key: 'capital_allocation', label: 'Capital Allocation', subtitle: 'Deployment of capital into attractive returns', value: fs.capital_allocation_score ?? 0, maxScore: 10 },
+                { key: 'moat', label: 'Moat', subtitle: 'Competitive durability and pricing power', value: fs.moat_score ?? 0, maxScore: 10 },
+                { key: 'risk', label: 'Risk', subtitle: 'Balance-sheet strength and liquidity profile', value: fs.risk_score ?? 0, maxScore: 10 },
+                { key: 'valuation', label: 'Valuation', subtitle: 'Independent attractiveness of the price', value: fs.valuation_score ?? 0, maxScore: 10 },
+                { key: 'confidence', label: 'Confidence', subtitle: 'Quality and completeness of the dataset', value: fs.confidence_score ?? 0, maxScore: 100 },
+            ];
+
+            dimensionGrid.innerHTML = dimensions.map((dimension) => {
+                const contributions = buildDimensionContributions(dimension.key, dimension.value, fs);
+                const rating = buildDimensionNarrative(dimension.key, dimension.value, metrics);
+                return `
+                    <div class="dimension-card ${scoreToneClass(dimension.value, dimension.maxScore)}">
+                        <div class="dimension-card-top">
+                            <div>
+                                <div class="dimension-card-title">${dimension.label}</div>
+                                <div class="dimension-card-subtitle">${dimension.subtitle}</div>
+                            </div>
+                            <div class="dimension-card-score">${formatScoreValue(dimension.value, dimension.maxScore)}</div>
+                        </div>
+                        <div class="dimension-card-rating">${rating}</div>
+                        <p>${buildDimensionExplanation(dimension.key, dimension.value)}</p>
+                        ${contributions.length ? `<div class="dimension-section-title">What drives the score</div><ul class="dimension-contributions">${contributions.map(item => `<li>${item.label} +${item.contribution.toFixed(1)}</li>`).join('')}</ul>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatWatchpointText(text) {
+            if (!text) return '';
+            const normalized = String(text).trim();
+            if (/book value growth/i.test(normalized)) {
+                return 'Book value growth is currently the weakest relative financial metric.';
+            }
+            if (/revenue growth/i.test(normalized)) {
+                return 'Revenue growth remains the most significant relative weakness.';
+            }
+            return normalized
+                .replace(/weakness/gi, 'relative weakness')
+                .replace(/is in a moderate weakness/gi, 'has lagged the company\'s otherwise strong financial performance')
+                .replace(/\s+/g, ' ')
+                .replace(/^./, (char) => char.toUpperCase());
+        }
+
+        function buildHistoricalNarrative(metrics, sector) {
+            const growthMetric = metrics.find(metric => metric.metric_key === 'revenue_growth') || metrics.find(metric => metric.metric_key === 'profit_growth');
+            const marginMetric = metrics.find(metric => metric.metric_key === 'operating_margin') || metrics.find(metric => metric.metric_key === 'net_margin');
+            const qualityMetric = metrics.find(metric => metric.metric_key === 'roe') || metrics.find(metric => metric.metric_key === 'roce');
+
+            const growthText = growthMetric && growthMetric.raw_value !== null && growthMetric.raw_value !== undefined
+                ? `growth of ${growthMetric.raw_value.toFixed(1)}%`
+                : 'steady operating momentum';
+            const marginText = marginMetric && marginMetric.raw_value !== null && marginMetric.raw_value !== undefined
+                ? `margin of ${marginMetric.raw_value.toFixed(1)}%`
+                : 'strong cash conversion';
+            const qualityText = qualityMetric && qualityMetric.raw_value !== null && qualityMetric.raw_value !== undefined
+                ? `returns of ${qualityMetric.raw_value.toFixed(1)}%`
+                : 'solid operating discipline';
+
+            return `${sector ? `${sector} dynamics` : 'The business'} are being shaped by ${growthText}, ${marginText} and ${qualityText}.`;
+        }
+
+        function renderResults(data) {
+            heroCompanyName.textContent = data.company.company_name;
+            heroTicker.textContent = data.company.ticker;
+            heroExchange.textContent = data.company.exchange;
+            heroSector.textContent = `${data.company.sector || 'N/A'} • ${data.company.industry || 'N/A'}`;
+            heroPrice.textContent = formatCurrency(data.company.current_price, data.company.currency);
+            heroMarketCap.textContent = formatMarketCap(data.company.market_cap, data.company.currency);
+
+            const fs = data.fundamental_score || {};
+            const rec = (fs.recommendation || 'HOLD').toUpperCase();
+            const businessScore = fs.business_quality_score ?? fs.total_score ?? 0;
+            const valuationScore = fs.valuation_score ?? 0;
+            const riskScore = fs.risk_score ?? 0;
+            const confidenceScore = fs.confidence_score ?? 0;
+            const qualityLabel = getBusinessQualityLabel(businessScore);
+            const attractivenessLabel = getAttractivenessLabel(valuationScore, rec);
+            const verdict = getVerdictMeta(rec, businessScore, valuationScore, riskScore, confidenceScore);
+
+            snapshotBusinessQualityValue.textContent = `${businessScore.toFixed(1)}/10`;
+            snapshotBusinessQualityLabel.textContent = qualityLabel;
+            snapshotAttractivenessValue.textContent = `${valuationScore.toFixed(1)}/10`;
+            snapshotAttractivenessLabel.textContent = attractivenessLabel;
+            snapshotValuation.textContent = valuationScore >= 7.0 ? 'Attractive' : valuationScore >= 6.0 ? 'Fair' : 'Premium';
+            snapshotVerdict.textContent = rec;
+            snapshotConviction.textContent = confidenceScore >= 70 ? 'High conviction' : 'Moderate conviction';
+
+            businessQualityScore.textContent = businessScore.toFixed(1);
+            businessQualityCaption.textContent = qualityLabel;
+            investmentAttractivenessScore.textContent = valuationScore.toFixed(1);
+            investmentAttractivenessCaption.textContent = attractivenessLabel;
+
+            const coverage = data.fundamental_score.coverage_pct;
+            const evalCount = data.fundamental_score.metrics_evaluated;
+            const totalCount = data.fundamental_score.metrics_total;
+            coverageText.textContent = `${coverage.toFixed(0)}% (${evalCount}/${totalCount})`;
+            coverageBar.style.width = `${coverage}%`;
+
+            renderBusinessQualityBreakdown(fs);
+
+            recommendationPill.textContent = rec;
+            recommendationPill.className = 'summary-recommendation-pill';
+            if (rec === 'BUY') {
+                recommendationPill.classList.add('buy');
+            } else if (rec === 'HOLD' || rec === 'ACCUMULATE') {
+                recommendationPill.classList.add('hold');
+            } else {
+                recommendationPill.classList.add('sell');
+            }
+            updateRecommendationRing(businessScore, rec);
+
+            const quoteText = (data.overall_explanation || '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            const thesisParagraphs = [
+                `<div class="thesis-paragraph"><strong>Business quality:</strong> ${qualityLabel.toLowerCase()} with ${businessScore.toFixed(1)}/10 on the underlying franchise score; returns, cash generation and balance-sheet resilience are the main drivers.</div>`,
+                `<div class="thesis-paragraph"><strong>Investment attractiveness:</strong> ${attractivenessLabel.toLowerCase()} at ${valuationScore.toFixed(1)}/10, which is the central determinant of whether the stock is attractive at the current price.</div>`,
+                `<div class="thesis-paragraph"><strong>Risk posture:</strong> ${riskScore >= 6.5 ? 'The balance sheet and liquidity profile look manageable.' : 'Balance-sheet pressure remains the primary monitoring point.'}</div>`,
+                `<div class="thesis-paragraph"><strong>Primary strengths:</strong> ${data.strengths && data.strengths.length ? data.strengths.slice(0, 2).join(' · ') : 'Financial quality and cash conversion remain the key positives.'}</div>`,
+                `<div class="thesis-paragraph"><strong>Primary risks:</strong> ${data.weaknesses && data.weaknesses.length ? data.weaknesses.slice(0, 2).map(item => item.replace(/\s+/g, ' ')).join(' · ') : 'The risk is mainly valuation and execution sensitivity.'}</div>`
+            ];
+            overallExplanation.innerHTML = thesisParagraphs.join('');
+            summaryQuote.innerHTML = `<strong>Recommendation:</strong> ${rec === 'BUY' ? 'Business quality is compelling and the entry point is acceptable.' : rec === 'SELL' ? 'The business is not compelling enough at the current price.' : 'The investment case depends on whether the valuation is justified.'}`;
+
+            verdictHeadline.textContent = verdict.headline;
+            verdictStrength.textContent = verdict.strength;
+            verdictRisk.textContent = verdict.risk;
+            verdictInvestor.textContent = verdict.investor;
+
+            const dataQualityNotes = (fs.data_quality_notes && fs.data_quality_notes.length > 0)
+                ? fs.data_quality_notes
+                : (data.warnings && data.warnings.length > 0 ? data.warnings : []);
+
+            if (dataQualityNotes.length > 0) {
+                dataQualityState.textContent = dataQualityNotes[0];
+                dataQualityDetailsBody.innerHTML = dataQualityNotes.map(note => `<div>• ${note}</div>`).join('');
+                document.getElementById('dataQualityDetails').style.display = 'block';
+            } else {
+                dataQualityState.textContent = 'No data quality issues detected.';
+                dataQualityDetailsBody.innerHTML = '';
+                document.getElementById('dataQualityDetails').style.display = 'none';
+            }
+
+            strengthsList.innerHTML = '';
+            if (data.strengths && data.strengths.length > 0) {
+                data.strengths.slice(0, 4).forEach(str => {
+                    const li = document.createElement('li');
+                    li.className = 'sw-item';
+                    li.innerHTML = `<span class="sw-icon">✓</span> ${str}`;
+                    strengthsList.appendChild(li);
+                });
+            } else {
+                strengthsList.innerHTML = '<li class="sw-item" style="color:var(--text-muted)">No material strengths identified</li>';
+            }
+
+            weaknessesList.innerHTML = '';
+            if (data.weaknesses && data.weaknesses.length > 0) {
+                data.weaknesses.slice(0, 4).forEach(wk => {
+                    const li = document.createElement('li');
+                    li.className = 'sw-item';
+                    li.innerHTML = `<span class="sw-icon">!</span> ${formatWatchpointText(wk)}`;
+                    weaknessesList.appendChild(li);
+                });
+            } else {
+                weaknessesList.innerHTML = '<li class="sw-item" style="color:var(--text-muted)">No material watchpoints identified</li>';
+            }
+
+            renderResearchDimensions(data);
+
+            const metricEntries = (data.metric_scores || []).filter(metric => {
+                const sector = (data.company?.sector || '').toLowerCase();
+                if (sector.includes('bank') || sector.includes('financial')) {
+                    return !['roce', 'current_ratio', 'operating_margin', 'interest_coverage', 'capital_employed', 'ebit'].includes(metric.metric_key)
+                        && metric.data_available !== false;
+                }
+                return metric.data_available !== false;
+            });
+
+            historicalAnalysisGrid.innerHTML = '';
+            const historicalCards = [
+                {
+                    title: 'What changed',
+                    body: buildHistoricalNarrative(metricEntries, data.company?.sector || '')
+                },
+                {
+                    title: 'Confidence',
+                    body: `${confidenceScore >= 70 ? 'Confidence is high' : 'Confidence is moderate'} because ${coverage.toFixed(0)}% of the core metrics were evaluated.`
+                }
+            ];
+            historicalAnalysisGrid.innerHTML = historicalCards.map(card => `
+                <div class="history-card">
+                    <h5>${card.title}</h5>
+                    <p>${card.body}</p>
+                </div>
+            `).join('');
+
+            metricsGrid.innerHTML = '';
+            metricEntries.forEach(metric => {
+                const card = document.createElement('div');
+                const scoreClass = scoreColorClass(metric.score, metric.data_available);
+                card.className = 'metric-card ' + scoreClass;
+
+                let rawDisplayVal = 'Unavailable';
+                if (metric.metric_key === 'dividend' && !metric.data_available) {
+                    rawDisplayVal = 'No Dividend History';
+                } else if (metric.raw_value !== null && metric.raw_value !== undefined) {
+                    rawDisplayVal = formatMetricValue(metric.raw_value, metric.raw_value_unit);
+                }
+
+                const isInformational = metric.informational === true;
+                const scoreBadge = !metric.data_available
+                    ? 'Unavailable'
+                    : isInformational
+                        ? 'Info'
+                        : metric.score.toFixed(0) + '/10';
+                const barWidth = metric.data_available && !isInformational ? (metric.score * 10) + '%' : '0%';
+
+                const benchmarkText = getBenchmarkText(metric, data.company?.sector || '');
+                const benchmarkHtml = benchmarkText
+                    ? `<div class="metric-benchmark"><strong>Benchmark:</strong> ${benchmarkText}</div>`
+                    : '';
+
+                const scoreReasonHtml = metric.score_reason
+                    ? `<div class="metric-score-reason">${metric.score_reason}</div>` : '';
+
+                const conciseExplanation = buildMetricNarrative(metric, metricEntries);
+                const primaryLabel = isGrowthMetric(metric) ? 'Current CAGR' : 'Current Value';
+                const yoyLine = isGrowthMetric(metric) && metric.yoy !== null && metric.yoy !== undefined
+                    ? `<div class="metric-secondary-value">Latest YoY: ${formatMetricValue(metric.yoy, metric.raw_value_unit)}</div>`
+                    : '';
+
+                card.innerHTML = `
+                    <div class="metric-card-header">
+                        <div class="metric-name">${metric.metric_name}</div>
+                        <div class="metric-score-badge">${scoreBadge}</div>
+                    </div>
+                    <div class="metric-primary-label">${primaryLabel}</div>
+                    <div class="metric-value-row">
+                        <span class="metric-raw-val">${rawDisplayVal}</span>
+                        <span class="metric-unit">${metric.data_available ? metric.raw_value_unit : ''}</span>
+                    </div>
+                    ${yoyLine}
+                    <div class="metric-bar-track">
+                        <div class="metric-bar-fill" style="width: ${barWidth}"></div>
+                    </div>
+                    <div class="metric-desc-collapsed">${conciseExplanation.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
+                    <div class="metric-expanded-details">
+                        <div class="metric-stats-row">${buildStatChips(metric)}</div>
+                        ${buildHistoryTable(metric)}
+                        ${benchmarkHtml}
+                        ${scoreReasonHtml}
+                    </div>
+                    <div class="expand-indicator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                        <span>Details</span>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => {
+                    card.classList.toggle('expanded');
+                    const label = card.querySelector('.expand-indicator span');
+                    label.textContent = card.classList.contains('expanded') ? 'Collapse' : 'Details';
+                });
+
+                metricsGrid.appendChild(card);
+            });
+
+            resultsSection.style.display = 'flex';
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="authModalTitle">Sign In to Axion</h3>
+                <button class="modal-close-btn" id="closeAuthModal">&times;</button>
+            </div>
+            <div class="auth-tabs" id="authTabsContainer">
+                <button class="auth-tab-btn active" id="tabLoginBtn">Login</button>
+                <button class="auth-tab-btn" id="tabRegisterBtn">Register Account</button>
+                <button class="auth-tab-btn" id="tabBiometricBtn">Face ID</button>
+            </div>
+            <div class="auth-feedback" id="authFeedback"></div>
+            
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username or Email</label>
+                    <input type="text" id="loginUsername" class="form-input" placeholder="e.g. investor_john" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div style="position: relative;">
+                        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required style="padding-right: 2.5rem;">
+                        <button type="button" id="toggleLoginPasswordBtn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;" title="Toggle Password Visibility">👁️</button>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Sign In</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" style="display:none;">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="regUsername" class="form-input" placeholder="e.g. investor_john" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" class="form-input" placeholder="john@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password (Min 8 characters recommended)</label>
+                    <div style="position: relative;">
+                        <input type="password" id="regPassword" class="form-input" placeholder="••••••••" required minlength="6" style="padding-right: 2.5rem;">
+                        <button type="button" id="toggleRegPasswordBtn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;" title="Toggle Password Visibility">👁️</button>
+                    </div>
+                    <div id="passwordStrengthWrapper" style="display: none;">
+                        <div class="password-strength-bar-container">
+                            <div id="strengthBar1" class="password-strength-bar-segment"></div>
+                            <div id="strengthBar2" class="password-strength-bar-segment"></div>
+                            <div id="strengthBar3" class="password-strength-bar-segment"></div>
+                            <div id="strengthBar4" class="password-strength-bar-segment"></div>
+                        </div>
+                        <div id="strengthText" class="strength-text text-weak">Weak</div>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Create Account</button>
+            </form>
+
+            <!-- OpenCV Face ID Login Form -->
+            <form id="biometricLoginForm" style="display:none;" onsubmit="return false;">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="biometricUsername" class="form-input" placeholder="e.g. investor_john" required>
+                </div>
+                <div style="text-align:center; margin: 0.75rem 0;">
+                    <div style="position:relative; width:260px; height:195px; margin:0 auto; border-radius:12px; overflow:hidden; border:2px solid var(--color-blue); background:#000;">
+                        <video id="faceLoginVideo" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover; transform:scaleX(-1);"></video>
+                        <canvas id="faceLoginCanvas" width="320" height="240" style="display:none;"></canvas>
+                        <div id="faceLoginOverlay" style="position:absolute; inset:0; border:2px dashed rgba(59,130,246,0.6); border-radius:50%; margin:20px; pointer-events:none; box-shadow:0 0 0 9999px rgba(0,0,0,0.3);"></div>
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.4rem;">Position your face in the oval & click below</div>
+                </div>
+                <div style="display:flex; gap:0.5rem;">
+                    <button type="button" id="startFaceLoginBtn" class="biometric-btn" style="flex:1; background: linear-gradient(135deg, var(--color-blue), #1d4ed8); margin-top:0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                        Scan Face & Sign In
+                    </button>
+                    <button type="button" id="uploadFaceLoginBtn" style="background:rgba(255,255,255,0.06); border:1px solid var(--panel-border); color:var(--text-primary); padding:0.75rem; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.85rem; display:flex; align-items:center; gap:0.35rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        Upload Photo
+                    </button>
+                    <input type="file" id="faceLoginFileInput" accept="image/*" style="display:none;">
+                </div>
+            </form>
+
+            <!-- MFA Container -->
+            <div id="mfaContainer" class="mfa-container">
+                <div style="text-align: center; margin-bottom: 0.5rem;">
+                    <p style="color: var(--text-primary); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem;">Multi-Factor Authentication</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem;">Enter the 6-digit code sent to your registered email address:</p>
+                    <p id="mfaEmailHint" style="color: var(--color-blue); font-size: 0.85rem; font-weight: 600; margin-top: 0.25rem;"></p>
+                </div>
+                <div class="otp-input-group">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="0" autofocus>
+                    <input type="text" maxlength="1" class="otp-digit" data-index="1">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="2">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="3">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="4">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="5">
+                </div>
+                <div id="mfaFeedback" class="auth-feedback error" style="display:none; margin-bottom:1rem; text-align:center;"></div>
+                <button id="verifyMfaBtn" class="submit-btn">Verify & Sign In</button>
+                <button id="cancelMfaBtn" style="background:transparent; border:1px solid var(--panel-border); color:var(--text-secondary);" class="submit-btn">Back to Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings & Search History Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Settings & Search History</h3>
+                <button class="modal-close-btn" id="closeSettingsModal">&times;</button>
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">User Profile</h4>
+                <div id="userProfileInfo" style="padding: 0.75rem; background: rgba(255,255,255,0.03); border: 1px solid var(--panel-border); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+                    Not logged in (Guest Session)
+                </div>
+            </div>
+            <div id="biometricsProfileSection" style="margin-bottom: 1.5rem; display: none;">
+                <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Face Recognition (OpenCV)</h4>
+                <div id="biometricCredentialsList"></div>
+                <div id="faceRegCameraContainer" style="display:none; margin: 0.75rem 0; text-align:center;">
+                    <div style="position:relative; width:240px; height:180px; margin:0 auto; border-radius:12px; overflow:hidden; border:2px solid var(--color-emerald); background:#000;">
+                        <video id="faceRegVideo" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover; transform:scaleX(-1);"></video>
+                        <canvas id="faceRegCanvas" width="320" height="240" style="display:none;"></canvas>
+                        <div style="position:absolute; inset:0; border:2px dashed rgba(16,185,129,0.6); border-radius:50%; margin:15px; pointer-events:none;"></div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:0.5rem; margin-top:0.75rem;">
+                    <button id="registerBiometricBtn" class="biometric-btn" style="flex:1; margin-top:0;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.25rem;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                        Use Camera
+                    </button>
+                    <button id="uploadFaceRegBtn" type="button" style="background:rgba(255,255,255,0.06); border:1px solid var(--panel-border); color:var(--text-primary); padding:0.75rem; border-radius:8px; font-weight:600; cursor:pointer; font-size:0.85rem; display:flex; align-items:center; gap:0.35rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        Upload Photo
+                    </button>
+                    <input type="file" id="faceRegFileInput" accept="image/*" style="display:none;">
+                </div>
+                <button id="resetFaceBtn" style="display:none; background:transparent; border:1px solid var(--color-crimson); color:var(--color-crimson); width:100%; padding:0.5rem; border-radius:8px; margin-top:0.5rem; font-size:0.8rem; cursor:pointer; font-weight:600;">
+                    Reset Face Recognition Data
+                </button>
+                <div id="biometricFeedback" class="auth-feedback" style="display:none; margin-top:0.5rem; font-size:0.8rem;"></div>
+            </div>
+            <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
+                    <h4 style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Recent Search History</h4>
+                    <button id="clearHistoryBtn" style="background:transparent; border:none; color:var(--color-crimson); font-size:0.8rem; cursor:pointer; font-weight:600;">Clear History</button>
+                </div>
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Ticker</th>
+                                <th>Company</th>
+                                <th>Score</th>
+                                <th>Rec</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align:center; color: var(--text-muted);">No search history recorded yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auth & Settings DOM Elements
+        const authBtn = document.getElementById('authBtn');
+        const userBadge = document.getElementById('userBadge');
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        
+        const authModal = document.getElementById('authModal');
+        const closeAuthModal = document.getElementById('closeAuthModal');
+        const authModalTitle = document.getElementById('authModalTitle');
+        const tabLoginBtn = document.getElementById('tabLoginBtn');
+        const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+        const tabBiometricBtn = document.getElementById('tabBiometricBtn');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const biometricLoginForm = document.getElementById('biometricLoginForm');
+        const authFeedback = document.getElementById('authFeedback');
+
+        const settingsModal = document.getElementById('settingsModal');
+        const closeSettingsModal = document.getElementById('closeSettingsModal');
+        const userProfileInfo = document.getElementById('userProfileInfo');
+        const historyTableBody = document.getElementById('historyTableBody');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+        // State Management
+        let currentUser = null;
+        let pendingMFAUserId = null;
+
+        // Base64URL conversions for WebAuthn API
+        function bufferToBase64Url(buffer) {
+            let binary = "";
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            const base64 = window.btoa(binary);
+            return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+        }
+
+        function base64UrlToBuffer(base64url) {
+            let base64 = base64url.replace(/-/g, "+").replace(/_/g, "/");
+            while (base64.length % 4) {
+                base64 += "=";
+            }
+            const binary = window.atob(base64);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        async function checkUserSession() {
+            const token = localStorage.getItem('axion_token');
+            if (!token) {
+                renderUnauthenticated();
+                return;
+            }
+            try {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    currentUser = await res.json();
+                    renderAuthenticated(currentUser);
+                } else {
+                    localStorage.removeItem('axion_token');
+                    renderUnauthenticated();
+                }
+            } catch (err) {
+                renderUnauthenticated();
+            }
+        }
+
+        function renderAuthenticated(user) {
+            authBtn.style.display = 'none';
+            userBadge.style.display = 'inline-flex';
+            usernameDisplay.textContent = user.username;
+            document.getElementById('biometricsProfileSection').style.display = 'block';
+            loadFaceStatus();
+        }
+
+        function renderUnauthenticated() {
+            currentUser = null;
+            authBtn.style.display = 'inline-flex';
+            userBadge.style.display = 'none';
+            document.getElementById('biometricsProfileSection').style.display = 'none';
+            stopCamera();
+        }
+
+        // Modal Controls
+        authBtn.addEventListener('click', () => {
+            authModal.classList.add('active');
+            hideMFAScreen();
+        });
+        closeAuthModal.addEventListener('click', () => {
+            authModal.classList.remove('active');
+            authFeedback.style.display = 'none';
+            stopCamera();
+            hideMFAScreen();
+        });
+
+        settingsBtn.addEventListener('click', async () => {
+            settingsModal.classList.add('active');
+            await loadUserSettingsAndHistory();
+        });
+        closeSettingsModal.addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+            stopCamera();
+            const cameraContainer = document.getElementById('faceRegCameraContainer');
+            if (cameraContainer) cameraContainer.style.display = 'none';
+        });
+
+        // Tab Switching
+        tabLoginBtn.addEventListener('click', () => {
+            tabLoginBtn.classList.add('active');
+            tabRegisterBtn.classList.remove('active');
+            tabBiometricBtn.classList.remove('active');
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            biometricLoginForm.style.display = 'none';
+            authModalTitle.textContent = 'Sign In to Axion';
+            authFeedback.style.display = 'none';
+            stopCamera();
+        });
+
+        tabRegisterBtn.addEventListener('click', () => {
+            tabRegisterBtn.classList.add('active');
+            tabLoginBtn.classList.remove('active');
+            tabBiometricBtn.classList.remove('active');
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            biometricLoginForm.style.display = 'none';
+            authModalTitle.textContent = 'Create New Account';
+            authFeedback.style.display = 'none';
+            stopCamera();
+        });
+
+        tabBiometricBtn.addEventListener('click', () => {
+            tabBiometricBtn.classList.add('active');
+            tabLoginBtn.classList.remove('active');
+            tabRegisterBtn.classList.remove('active');
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'none';
+            biometricLoginForm.style.display = 'block';
+            authModalTitle.textContent = 'Sign In with Face ID';
+            authFeedback.style.display = 'none';
+        });
+
+        // Password Visibility Toggles
+        function bindPasswordToggle(inputId, toggleBtnId) {
+            const inputEl = document.getElementById(inputId);
+            const toggleBtn = document.getElementById(toggleBtnId);
+            if (inputEl && toggleBtn) {
+                toggleBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const isPassword = inputEl.type === 'password';
+                    inputEl.type = isPassword ? 'text' : 'password';
+                    toggleBtn.textContent = isPassword ? '🙈' : '👁️';
+                });
+            }
+        }
+        bindPasswordToggle('loginPassword', 'toggleLoginPasswordBtn');
+        bindPasswordToggle('regPassword', 'toggleRegPasswordBtn');
+
+        // Password Strength Checker
+        const regPasswordInput = document.getElementById('regPassword');
+        const passwordStrengthWrapper = document.getElementById('passwordStrengthWrapper');
+        const strengthBars = [
+            document.getElementById('strengthBar1'),
+            document.getElementById('strengthBar2'),
+            document.getElementById('strengthBar3'),
+            document.getElementById('strengthBar4')
+        ];
+        const strengthText = document.getElementById('strengthText');
+
+        regPasswordInput.addEventListener('input', () => {
+            const pwd = regPasswordInput.value;
+            if (!pwd) {
+                passwordStrengthWrapper.style.display = 'none';
+                return;
+            }
+            passwordStrengthWrapper.style.display = 'block';
+
+            let score = 0;
+            if (pwd.length >= 8) score++;
+            if (/[A-Z]/.test(pwd)) score++;
+            if (/[a-z]/.test(pwd)) score++;
+            if (/[0-9]/.test(pwd)) score++;
+            if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+            const displayScore = Math.min(4, score);
+
+            strengthBars.forEach(bar => {
+                bar.className = 'password-strength-bar-segment';
+            });
+            strengthText.className = 'strength-text';
+
+            if (displayScore === 0 || displayScore === 1) {
+                strengthBars[0].classList.add('strength-weak');
+                strengthText.textContent = 'Weak';
+                strengthText.classList.add('text-weak');
+            } else if (displayScore === 2) {
+                strengthBars[0].classList.add('strength-fair');
+                strengthBars[1].classList.add('strength-fair');
+                strengthText.textContent = 'Fair';
+                strengthText.classList.add('text-fair');
+            } else if (displayScore === 3) {
+                strengthBars[0].classList.add('strength-strong');
+                strengthBars[1].classList.add('strength-strong');
+                strengthBars[2].classList.add('strength-strong');
+                strengthText.textContent = 'Strong';
+                strengthText.classList.add('text-strong');
+            } else if (displayScore === 4) {
+                strengthBars.forEach(bar => bar.classList.add('strength-very-strong'));
+                strengthText.textContent = 'Very Strong';
+                strengthText.classList.add('text-very-strong');
+            }
+        });
+
+        // MFA flow functions
+        function showMFAScreen(userId, emailHint) {
+            loginForm.style.display = 'none';
+            document.getElementById('authTabsContainer').style.display = 'none';
+            authModalTitle.textContent = 'Verify Your Identity';
+            authFeedback.style.display = 'none';
+
+            const mfaContainer = document.getElementById('mfaContainer');
+            mfaContainer.style.display = 'flex';
+            document.getElementById('mfaEmailHint').textContent = `Code sent to: ${emailHint}`;
+
+            pendingMFAUserId = userId;
+
+            document.querySelectorAll('.otp-digit').forEach(input => {
+                input.value = '';
+            });
+            document.querySelector('.otp-digit[data-index="0"]').focus();
+        }
+
+        function hideMFAScreen() {
+            document.getElementById('mfaContainer').style.display = 'none';
+            document.getElementById('mfaFeedback').style.display = 'none';
+
+            loginForm.style.display = 'block';
+            document.getElementById('authTabsContainer').style.display = 'flex';
+            authModalTitle.textContent = 'Sign In to Axion';
+            pendingMFAUserId = null;
+        }
+
+        const otpDigits = document.querySelectorAll('.otp-digit');
+        otpDigits.forEach((digitInput, idx) => {
+            digitInput.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (val && idx < 5) {
+                    otpDigits[idx + 1].focus();
+                }
+            });
+            digitInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+                    otpDigits[idx - 1].focus();
+                }
+            });
+        });
+
+        document.getElementById('cancelMfaBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            hideMFAScreen();
+        });
+
+        async function triggerMfaSend(userId) {
+            try {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/mfa/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pending_user_id: userId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showMFAScreen(userId, data.email_hint);
+                } else {
+                    authFeedback.className = 'auth-feedback error';
+                    authFeedback.textContent = data.detail || 'Failed to send verification code.';
+                    authFeedback.style.display = 'block';
+                }
+            } catch (err) {
+                authFeedback.className = 'auth-feedback error';
+                authFeedback.textContent = 'Network error sending OTP.';
+                authFeedback.style.display = 'block';
+            }
+        }
+
+        document.getElementById('verifyMfaBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const otpCode = Array.from(otpDigits).map(input => input.value).join('');
+            const mfaFeedback = document.getElementById('mfaFeedback');
+            mfaFeedback.style.display = 'none';
+
+            if (otpCode.length < 6) {
+                mfaFeedback.textContent = 'Please enter all 6 digits.';
+                mfaFeedback.style.display = 'block';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/mfa/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pending_user_id: pendingMFAUserId, otp_code: otpCode })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('axion_token', data.access_token);
+                    currentUser = data.user;
+                    renderAuthenticated(currentUser);
+                    authModal.classList.remove('active');
+                    hideMFAScreen();
+                    loginForm.reset();
+                } else {
+                    mfaFeedback.textContent = data.detail || 'Verification failed.';
+                    mfaFeedback.style.display = 'block';
+                }
+            } catch (err) {
+                mfaFeedback.textContent = 'Network error. Please try again.';
+                mfaFeedback.style.display = 'block';
+            }
+        });
+
+        function formatErrorMessage(data, fallback) {
+            if (!data || !data.detail) return fallback;
+            if (typeof data.detail === 'string') return data.detail;
+            if (Array.isArray(data.detail)) {
+                return data.detail.map(err => (err.msg || JSON.stringify(err))).join(', ');
+            }
+            if (typeof data.detail === 'object') {
+                return data.detail.detail || data.detail.msg || JSON.stringify(data.detail);
+            }
+            return fallback;
+        }
+
+        // Login Handler
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username_or_email = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username_or_email, password })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    if (data.mfa_required) {
+                        await triggerMfaSend(data.pending_user_id);
+                    } else {
+                        localStorage.setItem('axion_token', data.access_token);
+                        currentUser = data.user;
+                        renderAuthenticated(currentUser);
+                        authModal.classList.remove('active');
+                        loginForm.reset();
+                    }
+                } else {
+                    authFeedback.className = 'auth-feedback error';
+                    authFeedback.textContent = formatErrorMessage(data, 'Login failed.');
+                    authFeedback.style.display = 'block';
+                }
+            } catch (err) {
+                authFeedback.className = 'auth-feedback error';
+                authFeedback.textContent = 'Network error. Please try again.';
+                authFeedback.style.display = 'block';
+            }
+        });
+
+        // Register Handler
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('axion_token', data.access_token);
+                    currentUser = data.user;
+                    renderAuthenticated(currentUser);
+                    authModal.classList.remove('active');
+                    registerForm.reset();
+                } else {
+                    authFeedback.className = 'auth-feedback error';
+                    authFeedback.textContent = formatErrorMessage(data, 'Registration failed.');
+                    authFeedback.style.display = 'block';
+                }
+            } catch (err) {
+                authFeedback.className = 'auth-feedback error';
+                authFeedback.textContent = 'Network error. Please try again.';
+                authFeedback.style.display = 'block';
+            }
+        });
+
+        // Biometric Face ID Login Handler
+        biometricLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('biometricUsername').value.trim();
+            await loginWithBiometrics(username);
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('axion_token');
+            renderUnauthenticated();
+        });
+
+        // OpenCV Webcam Face Recognition Functions
+        let activeWebcamStream = null;
+
+        async function startCamera(videoElement) {
+            stopCamera();
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error("Webcam API not supported in this browser environment.");
+            }
+            
+            let lastError = null;
+            
+            // 1. Try standard getUserMedia
+            try {
+                activeWebcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            } catch (err) {
+                lastError = err;
+            }
+
+            // 2. If standard failed, try enumerating video devices specifically (e.g. built-in webcam vs virtual camera)
+            if (!activeWebcamStream && navigator.mediaDevices.enumerateDevices) {
+                try {
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    const videoDevices = devices.filter(d => d.kind === 'videoinput');
+                    for (const dev of videoDevices) {
+                        try {
+                            activeWebcamStream = await navigator.mediaDevices.getUserMedia({
+                                video: { deviceId: { exact: dev.deviceId } }
+                            });
+                            if (activeWebcamStream) break;
+                        } catch (e) {
+                            lastError = e;
+                        }
+                    }
+                } catch (enumErr) {
+                    console.error("Device enumeration failed:", enumErr);
+                }
+            }
+
+            if (!activeWebcamStream) {
+                console.error("Webcam access error:", lastError);
+                const err = lastError || {};
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    throw new Error("Camera permission is currently blocked by your browser. Please click the Camera/Lock icon in your address bar, set Camera to Allow, and refresh the page.");
+                } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                    throw new Error("No webcam device found connected to your computer.");
+                } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+                    throw new Error("Camera is currently in use by another app (e.g. Zoom, Teams, virtual camera). Please close other apps and try again.");
+                } else {
+                    throw new Error("Unable to start camera stream. You can also click 'Upload Photo' below to register.");
+                }
+            }
+
+            videoElement.srcObject = activeWebcamStream;
+            try {
+                await videoElement.play();
+            } catch (playErr) {}
+        }
+
+        function stopCamera() {
+            if (activeWebcamStream) {
+                activeWebcamStream.getTracks().forEach(track => track.stop());
+                activeWebcamStream = null;
+            }
+        }
+
+        function captureFrameBase64(videoElement, canvasElement) {
+            const ctx = canvasElement.getContext('2d');
+            canvasElement.width = videoElement.videoWidth || 320;
+            canvasElement.height = videoElement.videoHeight || 240;
+            ctx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+            return canvasElement.toDataURL('image/jpeg', 0.85);
+        }
+
+        // OpenCV Face Registration
+        document.getElementById('registerBiometricBtn').addEventListener('click', async () => {
+            const feedback = document.getElementById('biometricFeedback');
+            const cameraContainer = document.getElementById('faceRegCameraContainer');
+            const videoEl = document.getElementById('faceRegVideo');
+            const canvasEl = document.getElementById('faceRegCanvas');
+            const regBtn = document.getElementById('registerBiometricBtn');
+
+            feedback.style.display = 'none';
+
+            if (cameraContainer.style.display === 'none') {
+                try {
+                    await startCamera(videoEl);
+                    cameraContainer.style.display = 'block';
+                    regBtn.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.25rem;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Capture & Save Face Sample
+                    `;
+                } catch (err) {
+                    feedback.className = 'auth-feedback error';
+                    feedback.textContent = err.message;
+                    feedback.style.display = 'block';
+                }
+                return;
+            }
+
+            // Capture and send to backend
+            try {
+                feedback.className = 'auth-feedback info';
+                feedback.textContent = 'Processing face detection with OpenCV...';
+                feedback.style.display = 'block';
+
+                const imageBase64 = captureFrameBase64(videoEl, canvasEl);
+                const token = localStorage.getItem('axion_token');
+
+                const res = await fetch(`${BASE_URL}/api/v1/auth/face/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ image: imageBase64 })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    feedback.className = 'auth-feedback success';
+                    feedback.textContent = data.message || 'Face sample registered successfully!';
+                    stopCamera();
+                    cameraContainer.style.display = 'none';
+                    regBtn.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.25rem;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                        Add Another Face Sample
+                    `;
+                    loadFaceStatus();
+                } else {
+                    feedback.className = 'auth-feedback error';
+                    feedback.textContent = data.detail || 'Face registration failed.';
+                }
+            } catch (err) {
+                feedback.className = 'auth-feedback error';
+                feedback.textContent = 'Network error or camera failure.';
+            }
+        });
+
+        // Photo File Upload Fallback
+        const uploadFaceRegBtn = document.getElementById('uploadFaceRegBtn');
+        const faceRegFileInput = document.getElementById('faceRegFileInput');
+
+        if (uploadFaceRegBtn && faceRegFileInput) {
+            uploadFaceRegBtn.addEventListener('click', () => faceRegFileInput.click());
+
+            faceRegFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async (evt) => {
+                    const base64Image = evt.target.result;
+                    const feedback = document.getElementById('biometricFeedback');
+                    const token = localStorage.getItem('axion_token');
+
+                    feedback.className = 'auth-feedback info';
+                    feedback.textContent = 'Processing uploaded face photo with OpenCV...';
+                    feedback.style.display = 'block';
+
+                    try {
+                        const res = await fetch(`${BASE_URL}/api/v1/auth/face/register`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ image: base64Image })
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                            feedback.className = 'auth-feedback success';
+                            feedback.textContent = data.message || 'Uploaded face registered successfully!';
+                            loadFaceStatus();
+                        } else {
+                            feedback.className = 'auth-feedback error';
+                            feedback.textContent = data.detail || 'Face registration failed.';
+                        }
+                    } catch (err) {
+                        feedback.className = 'auth-feedback error';
+                        feedback.textContent = 'Network error processing photo.';
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Reset Face Data
+        document.getElementById('resetFaceBtn').addEventListener('click', async () => {
+            const token = localStorage.getItem('axion_token');
+            if (!token) return;
+            try {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/face/reset`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    loadFaceStatus();
+                }
+            } catch (err) {}
+        });
+
+        // OpenCV Face Login Trigger
+        document.getElementById('startFaceLoginBtn').addEventListener('click', async () => {
+            const username = document.getElementById('biometricUsername').value.trim();
+            if (!username) {
+                authFeedback.className = 'auth-feedback error';
+                authFeedback.textContent = 'Please enter your username first.';
+                authFeedback.style.display = 'block';
+                return;
+            }
+
+            const videoEl = document.getElementById('faceLoginVideo');
+            const canvasEl = document.getElementById('faceLoginCanvas');
+
+            if (!activeWebcamStream) {
+                try {
+                    await startCamera(videoEl);
+                    authFeedback.className = 'auth-feedback info';
+                    authFeedback.textContent = 'Camera started. Position your face in the oval and click again to scan!';
+                    authFeedback.style.display = 'block';
+                    return;
+                } catch (err) {
+                    authFeedback.className = 'auth-feedback error';
+                    authFeedback.textContent = err.message;
+                    authFeedback.style.display = 'block';
+                    return;
+                }
+            }
+
+            try {
+                authFeedback.className = 'auth-feedback info';
+                authFeedback.textContent = 'Running OpenCV face detection & matching...';
+                authFeedback.style.display = 'block';
+
+                const imageBase64 = captureFrameBase64(videoEl, canvasEl);
+
+                const res = await fetch(`${BASE_URL}/api/v1/auth/face/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, image: imageBase64 })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('axion_token', data.access_token);
+                    currentUser = data.user;
+                    renderAuthenticated(currentUser);
+                    authModal.classList.remove('active');
+                    stopCamera();
+                    authFeedback.style.display = 'none';
+                    loginForm.reset();
+                } else {
+                    authFeedback.className = 'auth-feedback error';
+                    authFeedback.textContent = data.detail || 'Face match failed.';
+                    authFeedback.style.display = 'block';
+                }
+            } catch (err) {
+                authFeedback.className = 'auth-feedback error';
+                authFeedback.textContent = 'Network or face recognition error.';
+                authFeedback.style.display = 'block';
+            }
+        });
+
+        // Photo Upload Login Handler
+        const uploadFaceLoginBtn = document.getElementById('uploadFaceLoginBtn');
+        const faceLoginFileInput = document.getElementById('faceLoginFileInput');
+
+        if (uploadFaceLoginBtn && faceLoginFileInput) {
+            uploadFaceLoginBtn.addEventListener('click', () => faceLoginFileInput.click());
+
+            faceLoginFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const username = document.getElementById('biometricUsername').value.trim();
+                if (!username) {
+                    authFeedback.className = 'auth-feedback error';
+                    authFeedback.textContent = 'Please enter your username first.';
+                    authFeedback.style.display = 'block';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = async (evt) => {
+                    const base64Image = evt.target.result;
+                    authFeedback.className = 'auth-feedback info';
+                    authFeedback.textContent = 'Processing uploaded face photo with OpenCV...';
+                    authFeedback.style.display = 'block';
+
+                    try {
+                        const res = await fetch(`${BASE_URL}/api/v1/auth/face/login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username, image: base64Image })
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                            localStorage.setItem('axion_token', data.access_token);
+                            currentUser = data.user;
+                            renderAuthenticated(currentUser);
+                            authModal.classList.remove('active');
+                            authFeedback.style.display = 'none';
+                            loginForm.reset();
+                        } else {
+                            authFeedback.className = 'auth-feedback error';
+                            authFeedback.textContent = data.detail || 'Face match failed.';
+                            authFeedback.style.display = 'block';
+                        }
+                    } catch (err) {
+                        authFeedback.className = 'auth-feedback error';
+                        authFeedback.textContent = 'Network or face recognition error.';
+                        authFeedback.style.display = 'block';
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function loadFaceStatus() {
+            const list = document.getElementById('biometricCredentialsList');
+            const resetBtn = document.getElementById('resetFaceBtn');
+            const token = localStorage.getItem('axion_token');
+            if (!token) return;
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/face/status`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.has_face) {
+                        list.innerHTML = `
+                            <div class="biometric-badge-row">
+                                <div style="display:flex; align-items:center; gap:0.5rem;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                    <span>Face Encodings Registered (${data.sample_count} sample${data.sample_count > 1 ? 's' : ''})</span>
+                                </div>
+                                <span style="font-size:0.75rem; color:#10b981; font-weight:600;">Active</span>
+                            </div>
+                        `;
+                        resetBtn.style.display = 'block';
+                    } else {
+                        list.innerHTML = `<div style="font-size:0.8rem; color:var(--text-muted); font-style:italic;">No face data registered yet. Scan your face below to enable face recognition login.</div>`;
+                        resetBtn.style.display = 'none';
+                    }
+                }
+            } catch (err) {}
+        }
+
+        // Load Settings & Search History
+        async function loadUserSettingsAndHistory() {
+            if (currentUser) {
+                userProfileInfo.innerHTML = `
+                    <div><strong>Username:</strong> ${currentUser.username}</div>
+                    <div><strong>Email:</strong> ${currentUser.email}</div>
+                    <div><strong>Member Since:</strong> ${new Date(currentUser.created_at).toLocaleDateString()}</div>
+                `;
+            } else {
+                userProfileInfo.innerHTML = `<div><em>Guest Session (Sign in to sync your search history across devices)</em></div>`;
+            }
+
+            const headers = {};
+            const token = localStorage.getItem('axion_token');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/v1/history`, { headers });
+                if (res.ok) {
+                    const data = await res.json();
+                    renderHistoryTable(data.history);
+                }
+            } catch (err) {
+                historyTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--color-crimson);">Failed to load search history.</td></tr>`;
+            }
+        }
+
+        function renderHistoryTable(historyItems) {
+            if (!historyItems || historyItems.length === 0) {
+                historyTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No search history recorded yet.</td></tr>`;
+                return;
+            }
+
+            historyTableBody.innerHTML = historyItems.map(item => {
+                const dateStr = new Date(item.searched_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const recClass = item.recommendation === 'BUY' ? 'color-emerald' : (item.recommendation === 'HOLD' ? 'color-amber' : 'color-crimson');
+                return `
+                    <tr class="history-row" data-ticker="${item.ticker}" data-exchange="${item.exchange}">
+                        <td><strong style="color: var(--color-blue);">${item.ticker}</strong></td>
+                        <td>${item.company_name}</td>
+                        <td><strong>${item.score.toFixed(1)}</strong> (${item.grade})</td>
+                        <td><span style="font-weight:700;" class="${recClass}">${item.recommendation}</span></td>
+                        <td style="color: var(--text-muted); font-size: 0.78rem;">${dateStr}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.querySelectorAll('.history-row').forEach(row => {
+                row.addEventListener('click', () => {
+                    const ticker = row.getAttribute('data-ticker');
+                    const exchange = row.getAttribute('data-exchange');
+                    tickerInput.value = ticker;
+                    exchangeSelect.value = exchange;
+                    settingsModal.classList.remove('active');
+                    performSearch();
+                });
+            });
+        }
+
+        clearHistoryBtn.addEventListener('click', async () => {
+            const headers = {};
+            const token = localStorage.getItem('axion_token');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/v1/history`, { method: 'DELETE', headers });
+                if (res.ok) {
+                    renderHistoryTable([]);
+                }
+            } catch (err) {}
+        });
+
+        // Initialize session on load
+        checkUserSession();
+    </script>
+</body>
+</html>

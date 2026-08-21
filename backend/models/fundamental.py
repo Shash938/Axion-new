@@ -20,7 +20,7 @@ Possible improvements:
     - Add localization fields when multi-language support is introduced.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, Optional
 
@@ -117,6 +117,9 @@ class AnalysisRequest(BaseModel):
                 cleaned = cleaned[: -len(suffix)]
         if not cleaned:
             raise ValueError("Ticker cannot be empty after normalisation.")
+        import re
+        if not re.match(r"^[A-Z0-9.\-]{1,20}$", cleaned):
+            raise ValueError("Invalid ticker symbol format. Tickers can only contain alphanumeric characters, dots, and hyphens.")
         return cleaned
 
 
@@ -445,7 +448,7 @@ class AnalysisResponse(BaseModel):
         description="Structured research dashboard with category assessments.",
     )
     analysed_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=lambda: datetime.now(timezone.utc),
         description="UTC timestamp when this analysis was generated.",
     )
 

@@ -9,7 +9,7 @@ Coordinates the complete fundamental analysis pipeline:
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Optional
 
 from models.fundamental import AnalysisRequest, AnalysisResponse, CompanyInfo
@@ -70,7 +70,7 @@ class FundamentalAnalyzerService:
         """
         ticker = request.ticker
         exchange = request.exchange.value
-        started_at = datetime.utcnow()
+        started_at = datetime.now(timezone.utc)
         logger.info("Starting fundamental analysis for %s (%s).", ticker, exchange)
 
         # Stage 1: Fetch
@@ -153,7 +153,7 @@ class FundamentalAnalyzerService:
             analysed_at=started_at,
         )
 
-        elapsed_ms = (datetime.utcnow() - started_at).total_seconds() * 1000
+        elapsed_ms = (datetime.now(timezone.utc) - started_at).total_seconds() * 1000
         logger.info(
             "Analysis complete for %s: score=%.2f, grade=%s, recommendation=%s, elapsed=%.0fms",
             ticker,
