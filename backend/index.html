@@ -4672,13 +4672,333 @@
         .history-row:hover {
             background: var(--card);
         }
+
+        /* ==========================================================================
+           APP SIDEBAR & DUAL COLUMN LAYOUT
+           ========================================================================== */
+        .app-layout-wrapper {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Left Aside Bar */
+        .app-sidebar {
+            width: 270px;
+            flex-shrink: 0;
+            background: color-mix(in srgb, var(--surface) 96%, transparent);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 999;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+            box-shadow: var(--el-1);
+            scrollbar-width: thin;
+        }
+
+        .sidebar-header {
+            padding: 1.25rem 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .sidebar-close-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-lo);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            line-height: 1;
+        }
+
+        .sidebar-section {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-faint);
+            margin-bottom: 0.6rem;
+        }
+
+        .sidebar-nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .sidebar-nav-item a, .sidebar-nav-item button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.55rem 0.75rem;
+            border-radius: var(--r-sm);
+            color: var(--text-lo);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            background: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-align: left;
+        }
+
+        .sidebar-nav-item a:hover, .sidebar-nav-item button:hover {
+            color: var(--text-hi);
+            background: var(--card);
+            border-color: var(--border);
+        }
+
+        .sidebar-nav-item.active a, .sidebar-nav-item a[aria-current="true"] {
+            color: var(--accent);
+            background: var(--accent-soft);
+            border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+        }
+
+        .sidebar-watchlist-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+
+        .sidebar-watchlist-chip {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--text-lo);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r-pill);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar-watchlist-chip:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .sidebar-bio-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 0.75rem;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        /* Hamburger button for header */
+        .sidebar-toggle-btn {
+            display: none;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            color: var(--text-hi);
+            padding: 0.45rem 0.65rem;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+        }
+
+        /* Main Content Container beside sidebar */
+        .app-main-viewport {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (max-width: 1024px) {
+            .app-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                z-index: 1000;
+                box-shadow: var(--el-3);
+            }
+            .app-sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-close-btn {
+                display: block;
+            }
+            .sidebar-toggle-btn {
+                display: inline-flex;
+            }
+        }
+
     </style>
 </head>
 
 <body>
     <div class="grid-bg"></div>
+    <!-- Mobile Sidebar Dim Backdrop -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-layout-wrapper">
+        <!-- ====================================================================
+             LEFT ASIDE NAVIGATION BAR (PERMANENT / DOCKED SIDEBAR)
+             ==================================================================== -->
+        <aside class="app-sidebar" id="appSidebar" aria-label="Main Application Sidebar">
+            <!-- Sidebar Header -->
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="logo-icon" style="width:28px; height:28px; font-size:0.75rem;">AG</div>
+                    <div>
+                        <div style="font-weight:700; font-size:0.95rem; color:var(--text-hi); font-family:var(--font-display);">Axion</div>
+                        <div style="font-size:0.68rem; color:var(--text-lo);">AI Advisor</div>
+                    </div>
+                </div>
+                <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">✕</button>
+            </div>
+
+            <!-- Navigation Sections -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Navigation &amp; Research</div>
+                <ul class="sidebar-nav-list">
+                    <li class="sidebar-nav-item">
+                        <a href="#searchArea" id="sideNavSearch">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            Stock Search
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#researchOverview" id="sideNavOverview">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                            Executive Verdict
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#researchDrivers" id="sideNavDrivers">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path></svg>
+                            Scorecard (9 Pillars)
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#researchMetrics" id="sideNavMetrics">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                            14 Financial Metrics
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#researchHistory" id="sideNavHistory">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            Multi-Year Trajectory
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#researchDataQuality" id="sideNavDataQuality">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            Data Audit &amp; Quality
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Quick Watchlist / Popular Tickers -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Popular Indian Equities</div>
+                <div class="sidebar-watchlist-grid">
+                    <button type="button" class="sidebar-watchlist-chip" data-ticker="TCS" data-exchange="NSE">TCS</button>
+                    <button type="button" class="sidebar-watchlist-chip" data-ticker="RELIANCE" data-exchange="NSE">RELIANCE</button>
+                    <button type="button" class="sidebar-watchlist-chip" data-ticker="INFY" data-exchange="NSE">INFY</button>
+                    <button type="button" class="sidebar-watchlist-chip" data-ticker="HDFCBANK" data-exchange="NSE">HDFC</button>
+                    <button type="button" class="sidebar-watchlist-chip" data-ticker="ICICIBANK" data-exchange="NSE">ICICI</button>
+                    <button type="button" class="sidebar-watchlist-chip" data-ticker="TATAMOTORS" data-exchange="NSE">TATAMOTORS</button>
+                    <button type="button" class="sidebar-watchlist-chip" data-ticker="SBIN" data-exchange="NSE">SBIN</button>
+                    <button type="button" class="sidebar-watchlist-chip" data-ticker="ITC" data-exchange="NSE">ITC</button>
+                </div>
+            </div>
+
+            <!-- Biometrics & Security Shortcuts -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Biometrics &amp; Tools</div>
+                <div class="sidebar-bio-card">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;">
+                        <span style="font-size:0.8rem; font-weight:700; color:var(--text-hi);">Face ID Status</span>
+                        <span id="sidebarFaceBadge" style="font-size:0.68rem; font-weight:700; color:var(--text-lo); background:var(--card-hi); padding:0.15rem 0.45rem; border-radius:var(--r-pill);">Guest</span>
+                    </div>
+                    <p style="font-size:0.75rem; color:var(--text-lo); margin:0 0 0.5rem; line-height:1.35;">Webcam biometric sign in &amp; search tracking.</p>
+                    <button type="button" id="sidebarOpenSettingsBtn" class="auth-btn" style="width:100%; padding:0.4rem; font-size:0.78rem; justify-content:center; border-radius:var(--r-sm);">
+                        Settings &amp; Face ID
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer: Theme & Session -->
+            <div class="sidebar-footer">
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <div style="width:8px; height:8px; border-radius:50%; background:var(--up);"></div>
+                    <span style="font-size:0.75rem; color:var(--text-lo); font-family:var(--font-mono);">Render Live</span>
+                </div>
+                <button type="button" id="sidebarAuthBtn" class="auth-btn" style="padding:0.35rem 0.75rem; font-size:0.78rem; border-radius:var(--r-sm);">
+                    Account
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Viewport containing Header & Content -->
+        <div class="app-main-viewport">
+
 
     <header>
+        <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle navigation menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
         <div class="logo-container">
             <div class="logo-icon">AG</div>
             <div class="logo-text">
@@ -4713,7 +5033,7 @@
 
     <div class="container">
         <!-- Search Section -->
-        <section class="search-area">
+        <section class="search-area" id="searchArea">
             <div class="search-header-group">
                 <span class="search-kicker">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
@@ -5387,6 +5707,9 @@
             </div>
         </main>
     </div>
+
+        </div> <!-- /app-main-viewport -->
+    </div> <!-- /app-layout-wrapper -->
 
     <!-- Comparison Dock (Phase 3.3) -->
     <div class="comparison-dock" id="comparisonDock" role="region" aria-label="Metric comparison tray">
@@ -7956,6 +8279,14 @@
             if (authBtn) authBtn.style.display = 'none';
             const bioSection = document.getElementById('biometricsProfileSection');
             if (bioSection) bioSection.style.display = 'block';
+            const sideFaceBadge = document.getElementById('sidebarFaceBadge');
+            if (sideFaceBadge) {
+                sideFaceBadge.textContent = user.username;
+                sideFaceBadge.style.color = 'var(--up)';
+                sideFaceBadge.style.background = 'var(--up-soft)';
+            }
+            const sideAuthBtn = document.getElementById('sidebarAuthBtn');
+            if (sideAuthBtn) sideAuthBtn.textContent = 'Profile';
         }
 
         function renderUnauthenticated() {
@@ -7964,6 +8295,14 @@
             if (authBtn) authBtn.style.display = 'inline-flex';
             const bioSection = document.getElementById('biometricsProfileSection');
             if (bioSection) bioSection.style.display = 'none';
+            const sideFaceBadge = document.getElementById('sidebarFaceBadge');
+            if (sideFaceBadge) {
+                sideFaceBadge.textContent = 'Guest';
+                sideFaceBadge.style.color = 'var(--text-lo)';
+                sideFaceBadge.style.background = 'var(--card-hi)';
+            }
+            const sideAuthBtn = document.getElementById('sidebarAuthBtn');
+            if (sideAuthBtn) sideAuthBtn.textContent = 'Sign In';
         }
 
         if (logoutBtn) {
@@ -8661,6 +9000,94 @@
                     }
                 } catch (err) {
                     console.error("Clear history error:", err);
+                }
+            });
+        }
+
+
+        // Sidebar Toggle Handler
+        const appSidebar = document.getElementById('appSidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+        const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+
+        function openSidebar() {
+            if (appSidebar) appSidebar.classList.add('open');
+            if (sidebarOverlay) sidebarOverlay.classList.add('active');
+        }
+
+        function closeSidebar() {
+            if (appSidebar) appSidebar.classList.remove('open');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        }
+
+        if (sidebarToggleBtn) sidebarToggleBtn.addEventListener('click', openSidebar);
+        if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', closeSidebar);
+        if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Sidebar Navigation Links
+        document.querySelectorAll('.sidebar-nav-item a').forEach(link => {
+            link.addEventListener('click', async (e) => {
+                const targetHref = link.getAttribute('href');
+                if (targetHref.startsWith('#')) {
+                    e.preventDefault();
+                    const targetId = targetHref.slice(1);
+                    closeSidebar();
+
+                    // Highlight active
+                    document.querySelectorAll('.sidebar-nav-item').forEach(item => item.classList.remove('active'));
+                    link.parentElement.classList.add('active');
+
+                    if (targetId === 'searchArea') {
+                        const searchElem = document.getElementById('searchArea');
+                        if (searchElem) searchElem.scrollIntoView({ behavior: 'smooth' });
+                        if (tickerInput) tickerInput.focus();
+                        return;
+                    }
+
+                    // If results not loaded, perform search first
+                    if (!resultsSection || resultsSection.style.display === 'none') {
+                        if (!tickerInput.value.trim()) tickerInput.value = 'TCS';
+                        await performSearch();
+                    }
+
+                    const targetElem = document.getElementById(targetId);
+                    if (targetElem) {
+                        targetElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        });
+
+        // Sidebar Watchlist Ticker Click
+        document.querySelectorAll('.sidebar-watchlist-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const ticker = btn.getAttribute('data-ticker');
+                const exchange = btn.getAttribute('data-exchange') || 'NSE';
+                if (tickerInput) tickerInput.value = ticker;
+                if (exchangeSelect) exchangeSelect.value = exchange;
+                closeSidebar();
+                performSearch();
+            });
+        });
+
+        // Sidebar Shortcuts
+        const sidebarOpenSettingsBtn = document.getElementById('sidebarOpenSettingsBtn');
+        if (sidebarOpenSettingsBtn) {
+            sidebarOpenSettingsBtn.addEventListener('click', () => {
+                closeSidebar();
+                if (settingsBtn) settingsBtn.click();
+            });
+        }
+
+        const sidebarAuthBtn = document.getElementById('sidebarAuthBtn');
+        if (sidebarAuthBtn) {
+            sidebarAuthBtn.addEventListener('click', () => {
+                closeSidebar();
+                if (currentUser) {
+                    if (settingsBtn) settingsBtn.click();
+                } else {
+                    if (authBtn) authBtn.click();
                 }
             });
         }
