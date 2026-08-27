@@ -5590,6 +5590,10 @@
     </div>
 
     <script>
+        const BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? ''
+            : 'https://axion-new-4.onrender.com';
+
         // DOM Elements
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         const themeIcon = document.getElementById('themeIcon');
@@ -5807,7 +5811,7 @@
                 if (token) headers['Authorization'] = `Bearer ${token}`;
 
                 // We use relative path so it hits the correct server origin
-                const response = await fetch(`/api/v1/analyze/${ticker}?exchange=${exchange}`, { headers });
+                const response = await fetch(`${BASE_URL}/api/v1/analyze/${ticker}?exchange=${exchange}`, { headers });
                 const data = await response.json();
 
                 if (!response.ok) {
@@ -7950,7 +7954,7 @@
                 return;
             }
             try {
-                const res = await fetch('/api/v1/auth/me', {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {
@@ -7975,7 +7979,7 @@
                 authFeedback.style.display = 'none';
 
                 try {
-                    const res = await fetch('/api/v1/auth/login', {
+                    const res = await fetch(`${BASE_URL}/api/v1/auth/login`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username_or_email, password })
@@ -8025,7 +8029,7 @@
                 authFeedback.style.display = 'none';
 
                 try {
-                    const res = await fetch('/api/v1/auth/register', {
+                    const res = await fetch(`${BASE_URL}/api/v1/auth/register`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username, email, password })
@@ -8088,7 +8092,7 @@
                 }
 
                 try {
-                    const res = await fetch('/api/v1/auth/mfa/verify', {
+                    const res = await fetch(`${BASE_URL}/api/v1/auth/mfa/verify`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ pending_user_id: pendingMfaUserId, otp_code: otp })
@@ -8234,7 +8238,7 @@
 
                     const imageBase64 = captureFrameBase64(videoEl, canvasEl);
 
-                    const res = await fetch('/api/v1/auth/face/login', {
+                    const res = await fetch(`${BASE_URL}/api/v1/auth/face/login`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username, image: imageBase64 })
@@ -8289,7 +8293,7 @@
                     authFeedback.style.display = 'block';
 
                     try {
-                        const res = await fetch('/api/v1/auth/face/login', {
+                        const res = await fetch(`${BASE_URL}/api/v1/auth/face/login`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ username, image: base64Image })
@@ -8359,7 +8363,7 @@
                     const imageBase64 = captureFrameBase64(videoEl, canvasEl);
                     const token = localStorage.getItem('axion_token');
 
-                    const res = await fetch('/api/v1/auth/face/register', {
+                    const res = await fetch(`${BASE_URL}/api/v1/auth/face/register`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -8420,7 +8424,7 @@
                     }
 
                     try {
-                        const res = await fetch('/api/v1/auth/face/register', {
+                        const res = await fetch(`${BASE_URL}/api/v1/auth/face/register`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -8460,7 +8464,7 @@
                 if (!token) return;
                 if (!confirm("Are you sure you want to remove all registered face data?")) return;
                 try {
-                    const res = await fetch('/api/v1/auth/face/reset', {
+                    const res = await fetch(`${BASE_URL}/api/v1/auth/face/reset`, {
                         method: 'DELETE',
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
@@ -8487,7 +8491,7 @@
             if (!token || !list) return;
 
             try {
-                const res = await fetch('/api/v1/auth/face/status', {
+                const res = await fetch(`${BASE_URL}/api/v1/auth/face/status`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (res.ok) {
@@ -8542,7 +8546,7 @@
             if (!tbody) return;
 
             try {
-                const res = await fetch('/api/v1/history', { headers });
+                const res = await fetch(`${BASE_URL}/api/v1/history`, { headers });
                 if (res.ok) {
                     const data = await res.json();
                     const items = data.history || [];
@@ -8583,7 +8587,7 @@
                 const token = localStorage.getItem('axion_token');
                 const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
                 try {
-                    const res = await fetch('/api/v1/history', { method: 'DELETE', headers });
+                    const res = await fetch(`${BASE_URL}/api/v1/history`, { method: 'DELETE', headers });
                     if (res.ok) {
                         const tbody = document.getElementById('historyTableBody');
                         if (tbody) {
