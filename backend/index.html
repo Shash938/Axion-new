@@ -4925,6 +4925,242 @@
             }
         }
 
+    
+        /* ==========================================================================
+           RIGHT SLIDE-OVER DRAWER (AXION SETTINGS & TOOLS)
+           ========================================================================== */
+        .drawer-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .drawer-backdrop.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .settings-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 400px;
+            max-width: 90vw;
+            height: 100vh;
+            background: #110D1A;
+            border-left: 1px solid var(--border);
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .settings-drawer.open {
+            transform: translateX(0);
+        }
+
+        /* Drawer Header */
+        .drawer-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #110D1A;
+        }
+
+        .drawer-title {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            letter-spacing: -0.01em;
+            margin: 0;
+        }
+
+        .drawer-close-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: #8C84A0;
+            width: 28px;
+            height: 28px;
+            border-radius: var(--r-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .drawer-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            border-color: var(--border-hi);
+        }
+
+        /* Drawer Scrollable Body */
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            scrollbar-width: thin;
+        }
+
+        .drawer-section-title {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #5A536B;
+            margin-bottom: 0.6rem;
+        }
+
+        /* Setting Card */
+        .setting-card {
+            background: #181324;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            padding: 0.9rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .setting-card-vertical {
+            background: #181324;
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            padding: 0.9rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .setting-card-text h4 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin: 0 0 0.2rem 0;
+        }
+
+        .setting-card-text p {
+            font-size: 0.75rem;
+            color: #8C84A0;
+            margin: 0;
+            line-height: 1.35;
+        }
+
+        /* Theme Segmented Switcher */
+        .theme-segmented-ctrl {
+            display: flex;
+            background: #110D1A;
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 2px;
+            gap: 2px;
+        }
+
+        .theme-seg-btn {
+            background: transparent;
+            border: none;
+            color: #8C84A0;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.3rem 0.65rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-body);
+        }
+
+        .theme-seg-btn.active {
+            background: #231C33;
+            color: #FFFFFF;
+        }
+
+        /* Setting Select */
+        .setting-select {
+            background: #110D1A;
+            border: 1px solid var(--border);
+            color: #FFFFFF;
+            font-size: 0.78rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            padding: 0.35rem 0.75rem;
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* Setting Action Buttons */
+        .setting-action-btn {
+            background: #231C33;
+            border: 1px solid var(--border);
+            color: #FFFFFF;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.4rem 0.85rem;
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            white-space: nowrap;
+        }
+
+        .setting-action-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #0E0B14;
+        }
+
+        /* Health Rows */
+        .health-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.65rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.8rem;
+        }
+
+        .health-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .health-label {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .health-value-green {
+            color: #4FD1A5;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .health-value-muted {
+            color: #8C84A0;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
     </style>
 </head>
 
@@ -5899,28 +6135,149 @@
     </div>
 
     <!-- Settings & Search History Modal -->
-    <div class="modal-overlay" id="settingsModal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>Settings & Search History</h3>
-                <button class="modal-close-btn" id="closeSettingsModal" aria-label="Close modal">&times;</button>
-            </div>
-            <div style="margin-bottom: 1.5rem;">
-                <h4 style="font-size: 0.85rem; color: var(--text-lo); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">User Profile</h4>
-                <div id="userProfileInfo" style="padding: 0.75rem; background: var(--card); border: 1px solid var(--border); border-radius: var(--r-sm); font-size: 0.85rem; color: var(--text-lo); line-height: 1.6;">
-                    Not logged in (Guest Session)
-                </div>
-            </div>
-            <div id="biometricsProfileSection" style="margin-bottom: 1.5rem; display: none;">
-                <h4 style="font-size: 0.85rem; color: var(--text-lo); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Face Recognition (Biometrics)</h4>
-                <div id="biometricCredentialsList"></div>
-                <div id="faceRegCameraContainer" style="display:none; margin: 0.75rem 0; text-align:center;">
-                    <div class="face-camera-box" style="border-color: var(--up);">
-                        <video id="faceRegVideo" autoplay playsinline muted></video>
-                        <canvas id="faceRegCanvas" width="320" height="240" style="display:none;"></canvas>
-                        <div class="face-oval-guide" style="border-color: rgba(79, 209, 165, 0.75);"></div>
+        <!-- Backdrop for Settings Drawer -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+    <!-- Axion Right Slide-over Settings Drawer -->
+    <aside class="settings-drawer" id="settingsDrawer" aria-label="Axion Settings and Controls">
+        <!-- Header -->
+        <div class="drawer-header">
+            <h3 class="drawer-title">Axion Settings</h3>
+            <button type="button" class="drawer-close-btn" id="closeDrawerBtn" aria-label="Close settings drawer">✕</button>
+        </div>
+
+        <!-- Body -->
+        <div class="drawer-body">
+            <!-- Appearance -->
+            <div>
+                <div class="drawer-section-title">APPEARANCE</div>
+                <div class="setting-card">
+                    <div class="setting-card-text">
+                        <h4>Color Theme</h4>
+                        <p>Toggle between dark and light research surfaces.</p>
+                    </div>
+                    <div class="theme-segmented-ctrl">
+                        <button type="button" class="theme-seg-btn active" id="themeDarkBtn">Dark</button>
+                        <button type="button" class="theme-seg-btn" id="themeLightBtn">Light</button>
                     </div>
                 </div>
+            </div>
+
+            <!-- Analysis Preferences -->
+            <div>
+                <div class="drawer-section-title">ANALYSIS PREFERENCES</div>
+                <div class="setting-card">
+                    <div class="setting-card-text">
+                        <h4>Default Exchange</h4>
+                        <p>Preferred stock exchange for ticker lookup.</p>
+                    </div>
+                    <select class="setting-select" id="drawerExchangeSelect">
+                        <option value="NSE" selected>NSE</option>
+                        <option value="BSE">BSE</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Account & Session -->
+            <div>
+                <div class="drawer-section-title">ACCOUNT &amp; SESSION</div>
+                <div class="setting-card">
+                    <div class="setting-card-text">
+                        <h4 id="drawerUserTitle">Guest Analyst</h4>
+                        <p id="drawerUserDesc">Local research mode. Sign in to sync your search history.</p>
+                    </div>
+                    <button type="button" class="setting-action-btn" id="drawerAuthBtn">Sign In</button>
+                </div>
+            </div>
+
+            <!-- Face ID Biometrics -->
+            <div>
+                <div class="drawer-section-title">BIOMETRICS &amp; FACE ID</div>
+                <div class="setting-card-vertical">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.8rem; font-weight:700; color:#FFFFFF;">Face Recognition Status</span>
+                        <span id="drawerFaceBadge" style="font-size:0.68rem; font-weight:700; color:#8C84A0; background:#110D1A; border:1px solid var(--border); padding:0.15rem 0.5rem; border-radius:999px;">Guest</span>
+                    </div>
+                    <div id="biometricCredentialsList"></div>
+                    <div id="faceRegCameraContainer" style="display:none; margin: 0.5rem 0; text-align:center;">
+                        <div class="face-camera-box" style="border-color: var(--up);">
+                            <video id="faceRegVideo" autoplay playsinline muted></video>
+                            <canvas id="faceRegCanvas" width="320" height="240" style="display:none;"></canvas>
+                            <div class="face-oval-guide" style="border-color: rgba(79, 209, 165, 0.75);"></div>
+                        </div>
+                    </div>
+                    <div id="biometricFeedback" class="auth-feedback" style="display:none;"></div>
+                    <div style="display:flex; gap:0.5rem;">
+                        <button type="button" id="registerBiometricBtn" class="setting-action-btn" style="flex:1;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.25rem;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            Enroll Face ID
+                        </button>
+                        <button type="button" id="uploadFaceRegBtn" class="btn-ghost" style="padding:0.4rem 0.65rem; font-size:0.75rem;" title="Upload photo file">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        </button>
+                        <input type="file" id="faceRegFileInput" accept="image/*" style="display:none;" />
+                    </div>
+                    <button type="button" id="resetFaceBtn" style="display:none; background:none; border:none; color:var(--down); font-size:0.75rem; cursor:pointer; text-decoration:underline; padding:0.25rem 0; text-align:left;">
+                        Remove registered face biometrics
+                    </button>
+                </div>
+            </div>
+
+            <!-- Local Workspace -->
+            <div>
+                <div class="drawer-section-title">LOCAL WORKSPACE</div>
+                <div class="setting-card">
+                    <div class="setting-card-text">
+                        <h4>Reset Workspace State</h4>
+                        <p>Clears pinned comparison metrics and active filters.</p>
+                    </div>
+                    <button type="button" class="setting-action-btn" id="drawerResetStateBtn">Reset State</button>
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div>
+                <div class="drawer-section-title">SYSTEM HEALTH</div>
+                <div class="setting-card-vertical">
+                    <div class="health-row">
+                        <span class="health-label">Core Engine API</span>
+                        <span class="health-value-green">Online (1.0.0)</span>
+                    </div>
+                    <div class="health-row">
+                        <span class="health-label">Analysis Calibration</span>
+                        <span class="health-value-muted">14 Fundamental Rules</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Analyses Table -->
+            <div id="drawerHistorySection">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+                    <div class="drawer-section-title" style="margin-bottom:0;">RECENT ANALYSES</div>
+                    <button type="button" id="clearHistoryBtn" style="background:none; border:none; color:var(--text-lo); font-size:0.72rem; cursor:pointer; text-decoration:underline;">Clear History</button>
+                </div>
+                <div style="background:#181324; border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden;">
+                    <table class="history-table" style="margin:0; width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Ticker</th>
+                                <th>Score</th>
+                                <th>Verdict</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="4" style="text-align:center; color:var(--text-lo); padding:1rem 0;">No searches yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Hidden container to preserve userProfileInfo DOM element for backward compatibility -->
+            <div id="userProfileInfo" style="display:none;"></div>
+        </div>
+    </aside>
+
                 <div style="display:flex; gap:0.5rem; margin-top:0.75rem;">
                     <button id="registerBiometricBtn" class="biometric-btn" style="flex:1; margin-top:0;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.25rem;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -8323,25 +8680,41 @@
                 if (usernameDisplay) usernameDisplay.textContent = user.username;
             }
             if (authBtn) authBtn.style.display = 'none';
-            const bioSection = document.getElementById('biometricsProfileSection');
-            if (bioSection) bioSection.style.display = 'block';
-
+            const drawerUserTitle = document.getElementById('drawerUserTitle');
+            const drawerUserDesc = document.getElementById('drawerUserDesc');
+            const drawerAuthBtn = document.getElementById('drawerAuthBtn');
+            const drawerFaceBadge = document.getElementById('drawerFaceBadge');
+            if (drawerUserTitle) drawerUserTitle.textContent = user.username;
+            if (drawerUserDesc) drawerUserDesc.textContent = user.email || 'Member account active';
+            if (drawerAuthBtn) drawerAuthBtn.textContent = 'Sign Out';
+            if (drawerFaceBadge) {
+                drawerFaceBadge.textContent = user.username;
+                drawerFaceBadge.style.color = 'var(--up)';
+            }
         }
 
         function renderUnauthenticated() {
             currentUser = null;
             if (userBadge) userBadge.style.display = 'none';
             if (authBtn) authBtn.style.display = 'inline-flex';
-            const bioSection = document.getElementById('biometricsProfileSection');
-            if (bioSection) bioSection.style.display = 'none';
-
+            const drawerUserTitle = document.getElementById('drawerUserTitle');
+            const drawerUserDesc = document.getElementById('drawerUserDesc');
+            const drawerAuthBtn = document.getElementById('drawerAuthBtn');
+            const drawerFaceBadge = document.getElementById('drawerFaceBadge');
+            if (drawerUserTitle) drawerUserTitle.textContent = 'Guest Analyst';
+            if (drawerUserDesc) drawerUserDesc.textContent = 'Local research mode. Sign in to sync your search history.';
+            if (drawerAuthBtn) drawerAuthBtn.textContent = 'Sign In';
+            if (drawerFaceBadge) {
+                drawerFaceBadge.textContent = 'Guest';
+                drawerFaceBadge.style.color = '#8C84A0';
+            }
         }
 
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
                 localStorage.removeItem('axion_token');
                 renderUnauthenticated();
-                if (settingsModal) settingsModal.classList.remove('active');
+                closeDrawer();
             });
         }
 
@@ -9039,8 +9412,48 @@
         }
 
 
-        
-        // Sidebar Navigation Button Bindings
+        // ==========================================================================
+        // AXION SETTINGS & TOOLS DRAWER CONTROLLERS
+        // ==========================================================================
+        const settingsDrawer = document.getElementById('settingsDrawer');
+        const drawerBackdrop = document.getElementById('drawerBackdrop');
+        const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+
+        function openDrawer(focusSectionId = null) {
+            if (settingsDrawer) settingsDrawer.classList.add('open');
+            if (drawerBackdrop) drawerBackdrop.classList.add('active');
+            loadUserSettingsAndHistory();
+            if (currentUser) loadFaceStatus();
+
+            if (focusSectionId) {
+                setTimeout(() => {
+                    const sec = document.getElementById(focusSectionId);
+                    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 150);
+            }
+        }
+
+        function closeDrawer() {
+            if (settingsDrawer) settingsDrawer.classList.remove('open');
+            if (drawerBackdrop) drawerBackdrop.classList.remove('active');
+            stopCamera();
+            const camContainer = document.getElementById('faceRegCameraContainer');
+            if (camContainer) camContainer.style.display = 'none';
+        }
+
+        if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+        if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+        // Sidebar & Top Nav Triggers
+        const navSettingsBtn = document.getElementById('navSettingsBtn');
+        if (navSettingsBtn) navSettingsBtn.addEventListener('click', () => openDrawer());
+
+        const navRecentAnalysesBtn = document.getElementById('navRecentAnalysesBtn');
+        if (navRecentAnalysesBtn) navRecentAnalysesBtn.addEventListener('click', () => openDrawer('drawerHistorySection'));
+
+        const topRecentsBtn = document.getElementById('topRecentsBtn');
+        if (topRecentsBtn) topRecentsBtn.addEventListener('click', () => openDrawer('drawerHistorySection'));
+
         const navAdvisorBtn = document.getElementById('navAdvisorBtn');
         if (navAdvisorBtn) {
             navAdvisorBtn.addEventListener('click', () => {
@@ -9049,24 +9462,69 @@
             });
         }
 
-        const navRecentAnalysesBtn = document.getElementById('navRecentAnalysesBtn');
-        if (navRecentAnalysesBtn) {
-            navRecentAnalysesBtn.addEventListener('click', () => {
-                if (settingsBtn) settingsBtn.click();
+        if (settingsBtn) settingsBtn.addEventListener('click', () => openDrawer());
+
+        // Drawer Exchange Select Sync
+        const drawerExchangeSelect = document.getElementById('drawerExchangeSelect');
+        if (drawerExchangeSelect && exchangeSelect) {
+            drawerExchangeSelect.value = exchangeSelect.value;
+            drawerExchangeSelect.addEventListener('change', (e) => {
+                exchangeSelect.value = e.target.value;
+            });
+            exchangeSelect.addEventListener('change', (e) => {
+                drawerExchangeSelect.value = e.target.value;
             });
         }
 
-        const navSettingsBtn = document.getElementById('navSettingsBtn');
-        if (navSettingsBtn) {
-            navSettingsBtn.addEventListener('click', () => {
-                if (settingsBtn) settingsBtn.click();
+        // Drawer Theme Segmented Buttons
+        const themeDarkBtn = document.getElementById('themeDarkBtn');
+        const themeLightBtn = document.getElementById('themeLightBtn');
+
+        function updateThemeSegButtons() {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            if (themeLightBtn) themeLightBtn.classList.toggle('active', isLight);
+            if (themeDarkBtn) themeDarkBtn.classList.toggle('active', !isLight);
+        }
+
+        if (themeDarkBtn) {
+            themeDarkBtn.addEventListener('click', () => {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('axion_theme', 'dark');
+                updateThemeSegButtons();
             });
         }
 
-        const topRecentsBtn = document.getElementById('topRecentsBtn');
-        if (topRecentsBtn) {
-            topRecentsBtn.addEventListener('click', () => {
-                if (settingsBtn) settingsBtn.click();
+        if (themeLightBtn) {
+            themeLightBtn.addEventListener('click', () => {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('axion_theme', 'light');
+                updateThemeSegButtons();
+            });
+        }
+
+        // Drawer Auth Button
+        const drawerAuthBtn = document.getElementById('drawerAuthBtn');
+        if (drawerAuthBtn) {
+            drawerAuthBtn.addEventListener('click', () => {
+                if (currentUser) {
+                    localStorage.removeItem('axion_token');
+                    renderUnauthenticated();
+                } else {
+                    closeDrawer();
+                    if (authModal) authModal.classList.add('active');
+                    switchAuthTab('login');
+                }
+            });
+        }
+
+        // Drawer Reset Workspace State
+        const drawerResetStateBtn = document.getElementById('drawerResetStateBtn');
+        if (drawerResetStateBtn) {
+            drawerResetStateBtn.addEventListener('click', () => {
+                if (pinnedMetricIds) pinnedMetricIds.clear();
+                if (comparisonDock) comparisonDock.classList.remove('active');
+                if (tickerInput) tickerInput.value = '';
+                closeDrawer();
             });
         }
 
