@@ -28,6 +28,9 @@ htmlcov/
 dist/
 build/
 
-# OS
-Thumbs.db
-.DS_Store
+# Database & Downloaded Models
+*.db
+*.db-shm
+*.db-wal
+backend/data/models/
+backend/data/*.db*
