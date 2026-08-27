@@ -5406,6 +5406,189 @@
         </div>
     </div>
 
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="authModalTitle">Sign In to Axion</h3>
+                <button class="modal-close-btn" id="closeAuthModal" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="auth-tabs" id="authTabsContainer">
+                <button class="auth-tab-btn active" id="tabLoginBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    Login
+                </button>
+                <button class="auth-tab-btn" id="tabRegisterBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                    Register
+                </button>
+                <button class="auth-tab-btn" id="tabBiometricBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    Face ID
+                </button>
+            </div>
+            <div class="auth-feedback" id="authFeedback"></div>
+            
+            <!-- Standard Login Form -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Username or Email</label>
+                    <input type="text" id="loginUsername" class="form-input" placeholder="e.g. investor_john" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div style="position: relative;">
+                        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required autocomplete="current-password" style="padding-right: 2.5rem;">
+                        <button type="button" id="toggleLoginPasswordBtn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;" title="Toggle Password Visibility">👁️</button>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Sign In</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" style="display:none;">
+                <div class="form-group">
+                    <label for="regUsername">Username</label>
+                    <input type="text" id="regUsername" class="form-input" placeholder="e.g. investor_john" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email Address</label>
+                    <input type="email" id="regEmail" class="form-input" placeholder="john@example.com" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password (Min 8 characters recommended)</label>
+                    <div style="position: relative;">
+                        <input type="password" id="regPassword" class="form-input" placeholder="••••••••" required minlength="6" autocomplete="new-password" style="padding-right: 2.5rem;">
+                        <button type="button" id="toggleRegPasswordBtn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;" title="Toggle Password Visibility">👁️</button>
+                    </div>
+                    <div id="passwordStrengthWrapper" style="display: none;">
+                        <div class="password-strength-bar-container">
+                            <div id="strengthBar1" class="password-strength-bar-segment"></div>
+                            <div id="strengthBar2" class="password-strength-bar-segment"></div>
+                            <div id="strengthBar3" class="password-strength-bar-segment"></div>
+                            <div id="strengthBar4" class="password-strength-bar-segment"></div>
+                        </div>
+                        <div id="strengthText" class="strength-text text-weak">Weak</div>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Create Account</button>
+            </form>
+
+            <!-- OpenCV / AI Face Recognition Login Form -->
+            <form id="biometricLoginForm" style="display:none;" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="biometricUsername">Username or Email</label>
+                    <input type="text" id="biometricUsername" class="form-input" placeholder="e.g. investor_john" required autocomplete="username">
+                </div>
+                <div style="text-align:center; margin: 0.75rem 0;">
+                    <div class="face-camera-box">
+                        <video id="faceLoginVideo" autoplay playsinline muted></video>
+                        <canvas id="faceLoginCanvas" width="320" height="240" style="display:none;"></canvas>
+                        <div id="faceLoginOverlay" class="face-oval-guide"></div>
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-lo); margin-top:0.4rem;">Position your face in the oval & click Scan Face below</div>
+                </div>
+                <div style="display:flex; gap:0.5rem;">
+                    <button type="button" id="startFaceLoginBtn" class="biometric-btn" style="flex:1; margin-top:0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        Scan Face & Sign In
+                    </button>
+                    <button type="button" id="uploadFaceLoginBtn" class="auth-btn" style="padding:0.75rem; border-radius:var(--r-sm); font-size:0.85rem; display:flex; align-items:center; gap:0.35rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Upload Photo
+                    </button>
+                    <input type="file" id="faceLoginFileInput" accept="image/*" style="display:none;">
+                </div>
+            </form>
+
+            <!-- MFA Container -->
+            <div id="mfaContainer" class="mfa-container">
+                <div style="text-align: center; margin-bottom: 0.5rem;">
+                    <p style="color: var(--text-hi); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem;">Multi-Factor Authentication</p>
+                    <p style="color: var(--text-lo); font-size: 0.8rem;">Enter the 6-digit code sent to your registered email address:</p>
+                    <p id="mfaEmailHint" style="color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 0.25rem;"></p>
+                </div>
+                <div class="otp-input-group">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="0" autofocus>
+                    <input type="text" maxlength="1" class="otp-digit" data-index="1">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="2">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="3">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="4">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="5">
+                </div>
+                <div id="mfaFeedback" class="auth-feedback error" style="display:none; margin-bottom:1rem; text-align:center;"></div>
+                <button id="verifyMfaBtn" class="submit-btn">Verify & Sign In</button>
+                <button id="cancelMfaBtn" style="background:transparent; border:1px solid var(--border); color:var(--text-lo); margin-top:0.5rem;" class="submit-btn">Back to Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings & Search History Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Settings & Search History</h3>
+                <button class="modal-close-btn" id="closeSettingsModal" aria-label="Close modal">&times;</button>
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="font-size: 0.85rem; color: var(--text-lo); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">User Profile</h4>
+                <div id="userProfileInfo" style="padding: 0.75rem; background: var(--card); border: 1px solid var(--border); border-radius: var(--r-sm); font-size: 0.85rem; color: var(--text-lo); line-height: 1.6;">
+                    Not logged in (Guest Session)
+                </div>
+            </div>
+            <div id="biometricsProfileSection" style="margin-bottom: 1.5rem; display: none;">
+                <h4 style="font-size: 0.85rem; color: var(--text-lo); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Face Recognition (Biometrics)</h4>
+                <div id="biometricCredentialsList"></div>
+                <div id="faceRegCameraContainer" style="display:none; margin: 0.75rem 0; text-align:center;">
+                    <div class="face-camera-box" style="border-color: var(--up);">
+                        <video id="faceRegVideo" autoplay playsinline muted></video>
+                        <canvas id="faceRegCanvas" width="320" height="240" style="display:none;"></canvas>
+                        <div class="face-oval-guide" style="border-color: rgba(79, 209, 165, 0.75);"></div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:0.5rem; margin-top:0.75rem;">
+                    <button id="registerBiometricBtn" class="biometric-btn" style="flex:1; margin-top:0;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.25rem;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        Use Camera
+                    </button>
+                    <button id="uploadFaceRegBtn" type="button" class="auth-btn" style="padding:0.75rem; border-radius:var(--r-sm); font-size:0.85rem; display:flex; align-items:center; gap:0.35rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Upload Photo
+                    </button>
+                    <input type="file" id="faceRegFileInput" accept="image/*" style="display:none;">
+                </div>
+                <button id="resetFaceBtn" style="display:none; background:transparent; border:1px solid var(--down); color:var(--down); width:100%; padding:0.5rem; border-radius:var(--r-sm); margin-top:0.5rem; font-size:0.8rem; cursor:pointer; font-weight:600; font-family:var(--font-body); transition:var(--transition-smooth);">
+                    Reset Face Recognition Data
+                </button>
+                <div id="biometricFeedback" class="auth-feedback" style="display:none; margin-top:0.5rem; font-size:0.8rem;"></div>
+            </div>
+            <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
+                    <h4 style="font-size: 0.85rem; color: var(--text-lo); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin:0;">Recent Search History</h4>
+                    <button id="clearHistoryBtn" style="background:transparent; border:none; color:var(--down); font-size:0.8rem; cursor:pointer; font-weight:600; font-family:var(--font-body);">Clear History</button>
+                </div>
+                <div style="max-height: 280px; overflow-y: auto;">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Ticker</th>
+                                <th>Company</th>
+                                <th>Score</th>
+                                <th>Rec</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align:center; color:var(--text-lo);">No search history recorded yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // DOM Elements
         const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -8420,188 +8603,6 @@
         checkSession();
     </script>
 
-    <!-- Auth Modal -->
-    <div class="modal-overlay" id="authModal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3 id="authModalTitle">Sign In to Axion</h3>
-                <button class="modal-close-btn" id="closeAuthModal" aria-label="Close modal">&times;</button>
-            </div>
-            <div class="auth-tabs" id="authTabsContainer">
-                <button class="auth-tab-btn active" id="tabLoginBtn">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                    Login
-                </button>
-                <button class="auth-tab-btn" id="tabRegisterBtn">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-                    Register
-                </button>
-                <button class="auth-tab-btn" id="tabBiometricBtn">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                    Face ID
-                </button>
-            </div>
-            <div class="auth-feedback" id="authFeedback"></div>
-            
-            <!-- Standard Login Form -->
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="loginUsername">Username or Email</label>
-                    <input type="text" id="loginUsername" class="form-input" placeholder="e.g. investor_john" required autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Password</label>
-                    <div style="position: relative;">
-                        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required autocomplete="current-password" style="padding-right: 2.5rem;">
-                        <button type="button" id="toggleLoginPasswordBtn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;" title="Toggle Password Visibility">👁️</button>
-                    </div>
-                </div>
-                <button type="submit" class="submit-btn">Sign In</button>
-            </form>
-
-            <!-- Register Form -->
-            <form id="registerForm" style="display:none;">
-                <div class="form-group">
-                    <label for="regUsername">Username</label>
-                    <input type="text" id="regUsername" class="form-input" placeholder="e.g. investor_john" required autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label for="regEmail">Email Address</label>
-                    <input type="email" id="regEmail" class="form-input" placeholder="john@example.com" required autocomplete="email">
-                </div>
-                <div class="form-group">
-                    <label for="regPassword">Password (Min 8 characters recommended)</label>
-                    <div style="position: relative;">
-                        <input type="password" id="regPassword" class="form-input" placeholder="••••••••" required minlength="6" autocomplete="new-password" style="padding-right: 2.5rem;">
-                        <button type="button" id="toggleRegPasswordBtn" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s;" title="Toggle Password Visibility">👁️</button>
-                    </div>
-                    <div id="passwordStrengthWrapper" style="display: none;">
-                        <div class="password-strength-bar-container">
-                            <div id="strengthBar1" class="password-strength-bar-segment"></div>
-                            <div id="strengthBar2" class="password-strength-bar-segment"></div>
-                            <div id="strengthBar3" class="password-strength-bar-segment"></div>
-                            <div id="strengthBar4" class="password-strength-bar-segment"></div>
-                        </div>
-                        <div id="strengthText" class="strength-text text-weak">Weak</div>
-                    </div>
-                </div>
-                <button type="submit" class="submit-btn">Create Account</button>
-            </form>
-
-            <!-- OpenCV / AI Face Recognition Login Form -->
-            <form id="biometricLoginForm" style="display:none;" onsubmit="return false;">
-                <div class="form-group">
-                    <label for="biometricUsername">Username or Email</label>
-                    <input type="text" id="biometricUsername" class="form-input" placeholder="e.g. investor_john" required autocomplete="username">
-                </div>
-                <div style="text-align:center; margin: 0.75rem 0;">
-                    <div class="face-camera-box">
-                        <video id="faceLoginVideo" autoplay playsinline muted></video>
-                        <canvas id="faceLoginCanvas" width="320" height="240" style="display:none;"></canvas>
-                        <div id="faceLoginOverlay" class="face-oval-guide"></div>
-                    </div>
-                    <div style="font-size:0.75rem; color:var(--text-lo); margin-top:0.4rem;">Position your face in the oval & click Scan Face below</div>
-                </div>
-                <div style="display:flex; gap:0.5rem;">
-                    <button type="button" id="startFaceLoginBtn" class="biometric-btn" style="flex:1; margin-top:0;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                        Scan Face & Sign In
-                    </button>
-                    <button type="button" id="uploadFaceLoginBtn" class="auth-btn" style="padding:0.75rem; border-radius:var(--r-sm); font-size:0.85rem; display:flex; align-items:center; gap:0.35rem;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        Upload Photo
-                    </button>
-                    <input type="file" id="faceLoginFileInput" accept="image/*" style="display:none;">
-                </div>
-            </form>
-
-            <!-- MFA Container -->
-            <div id="mfaContainer" class="mfa-container">
-                <div style="text-align: center; margin-bottom: 0.5rem;">
-                    <p style="color: var(--text-hi); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem;">Multi-Factor Authentication</p>
-                    <p style="color: var(--text-lo); font-size: 0.8rem;">Enter the 6-digit code sent to your registered email address:</p>
-                    <p id="mfaEmailHint" style="color: var(--accent); font-size: 0.85rem; font-weight: 600; margin-top: 0.25rem;"></p>
-                </div>
-                <div class="otp-input-group">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="0" autofocus>
-                    <input type="text" maxlength="1" class="otp-digit" data-index="1">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="2">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="3">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="4">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="5">
-                </div>
-                <div id="mfaFeedback" class="auth-feedback error" style="display:none; margin-bottom:1rem; text-align:center;"></div>
-                <button id="verifyMfaBtn" class="submit-btn">Verify & Sign In</button>
-                <button id="cancelMfaBtn" style="background:transparent; border:1px solid var(--border); color:var(--text-lo); margin-top:0.5rem;" class="submit-btn">Back to Login</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings & Search History Modal -->
-    <div class="modal-overlay" id="settingsModal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>Settings & Search History</h3>
-                <button class="modal-close-btn" id="closeSettingsModal" aria-label="Close modal">&times;</button>
-            </div>
-            <div style="margin-bottom: 1.5rem;">
-                <h4 style="font-size: 0.85rem; color: var(--text-lo); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">User Profile</h4>
-                <div id="userProfileInfo" style="padding: 0.75rem; background: var(--card); border: 1px solid var(--border); border-radius: var(--r-sm); font-size: 0.85rem; color: var(--text-lo); line-height: 1.6;">
-                    Not logged in (Guest Session)
-                </div>
-            </div>
-            <div id="biometricsProfileSection" style="margin-bottom: 1.5rem; display: none;">
-                <h4 style="font-size: 0.85rem; color: var(--text-lo); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Face Recognition (Biometrics)</h4>
-                <div id="biometricCredentialsList"></div>
-                <div id="faceRegCameraContainer" style="display:none; margin: 0.75rem 0; text-align:center;">
-                    <div class="face-camera-box" style="border-color: var(--up);">
-                        <video id="faceRegVideo" autoplay playsinline muted></video>
-                        <canvas id="faceRegCanvas" width="320" height="240" style="display:none;"></canvas>
-                        <div class="face-oval-guide" style="border-color: rgba(79, 209, 165, 0.75);"></div>
-                    </div>
-                </div>
-                <div style="display:flex; gap:0.5rem; margin-top:0.75rem;">
-                    <button id="registerBiometricBtn" class="biometric-btn" style="flex:1; margin-top:0;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.25rem;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                        Use Camera
-                    </button>
-                    <button id="uploadFaceRegBtn" type="button" class="auth-btn" style="padding:0.75rem; border-radius:var(--r-sm); font-size:0.85rem; display:flex; align-items:center; gap:0.35rem;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        Upload Photo
-                    </button>
-                    <input type="file" id="faceRegFileInput" accept="image/*" style="display:none;">
-                </div>
-                <button id="resetFaceBtn" style="display:none; background:transparent; border:1px solid var(--down); color:var(--down); width:100%; padding:0.5rem; border-radius:var(--r-sm); margin-top:0.5rem; font-size:0.8rem; cursor:pointer; font-weight:600; font-family:var(--font-body); transition:var(--transition-smooth);">
-                    Reset Face Recognition Data
-                </button>
-                <div id="biometricFeedback" class="auth-feedback" style="display:none; margin-top:0.5rem; font-size:0.8rem;"></div>
-            </div>
-            <div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
-                    <h4 style="font-size: 0.85rem; color: var(--text-lo); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin:0;">Recent Search History</h4>
-                    <button id="clearHistoryBtn" style="background:transparent; border:none; color:var(--down); font-size:0.8rem; cursor:pointer; font-weight:600; font-family:var(--font-body);">Clear History</button>
-                </div>
-                <div style="max-height: 280px; overflow-y: auto;">
-                    <table class="history-table">
-                        <thead>
-                            <tr>
-                                <th>Ticker</th>
-                                <th>Company</th>
-                                <th>Score</th>
-                                <th>Rec</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTableBody">
-                            <tr>
-                                <td colspan="5" style="text-align:center; color:var(--text-lo);">No search history recorded yet.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>
