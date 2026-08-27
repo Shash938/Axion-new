@@ -7946,6 +7946,27 @@
             });
         }
 
+        // Helper: Format backend error responses (handles Pydantic 422 arrays, string details, and error objects)
+        function formatAuthErrorMessage(data, fallback = 'An unexpected error occurred.') {
+            if (!data) return fallback;
+            if (typeof data === 'string') return data;
+            if (typeof data.detail === 'string') return data.detail;
+            if (Array.isArray(data.detail)) {
+                return data.detail.map(err => {
+                    const field = err.loc ? err.loc[err.loc.length - 1] : 'Field';
+                    const cleanField = field.charAt(0).toUpperCase() + field.slice(1);
+                    let msg = err.msg || 'Invalid value';
+                    msg = msg.replace(/^Value error,\s*/i, '');
+                    return `${cleanField}: ${msg}`;
+                }).join('. ');
+            }
+            if (typeof data.detail === 'object' && data.detail !== null) {
+                return data.detail.detail || data.detail.message || JSON.stringify(data.detail);
+            }
+            if (data.message) return data.message;
+            return fallback;
+        }
+
         // Check Existing Session
         async function checkSession() {
             const token = localStorage.getItem('axion_token');
@@ -8007,7 +8028,7 @@
                         loginForm.reset();
                     } else {
                         authFeedback.className = 'auth-feedback error';
-                        authFeedback.textContent = data.detail || 'Invalid login credentials.';
+                        authFeedback.textContent = formatAuthErrorMessage(data, 'Invalid login credentials.');
                         authFeedback.style.display = 'block';
                     }
                 } catch (err) {
@@ -8044,7 +8065,7 @@
                         registerForm.reset();
                     } else {
                         authFeedback.className = 'auth-feedback error';
-                        authFeedback.textContent = data.detail || 'Registration failed.';
+                        authFeedback.textContent = formatAuthErrorMessage(data, 'Registration failed.');
                         authFeedback.style.display = 'block';
                     }
                 } catch (err) {
@@ -8256,7 +8277,7 @@
                         if (loginForm) loginForm.reset();
                     } else {
                         authFeedback.className = 'auth-feedback error';
-                        authFeedback.textContent = data.detail || 'Face verification failed.';
+                        authFeedback.textContent = formatAuthErrorMessage(data, 'Face verification failed.');
                         authFeedback.style.display = 'block';
                     }
                 } catch (err) {
@@ -8308,7 +8329,7 @@
                             if (loginForm) loginForm.reset();
                         } else {
                             authFeedback.className = 'auth-feedback error';
-                            authFeedback.textContent = data.detail || 'Face match failed.';
+                            authFeedback.textContent = formatAuthErrorMessage(data, 'Face match failed.');
                             authFeedback.style.display = 'block';
                         }
                     } catch (err) {
@@ -8389,7 +8410,7 @@
                     } else {
                         if (feedback) {
                             feedback.className = 'auth-feedback error';
-                            feedback.textContent = data.detail || 'Face registration failed.';
+                            feedback.textContent = formatAuthErrorMessage(data, 'Face registration failed.');
                         }
                     }
                 } catch (err) {
@@ -8442,7 +8463,7 @@
                         } else {
                             if (feedback) {
                                 feedback.className = 'auth-feedback error';
-                                feedback.textContent = data.detail || 'Face registration failed.';
+                                feedback.textContent = formatAuthErrorMessage(data, 'Face registration failed.');
                             }
                         }
                     } catch (err) {
