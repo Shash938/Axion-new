@@ -8556,7 +8556,23 @@
                     </div>
                 `;
             } else {
-                userProfileInfo.innerHTML = `<div><em>Guest Session (Sign in to sync your search history and enable Face ID across devices)</em></div>`;
+                userProfileInfo.innerHTML = `
+                    <div style="text-align:center; padding:0.5rem 0;">
+                        <div style="font-weight:600; color:var(--text-hi); margin-bottom:0.25rem;">Guest Session</div>
+                        <div style="color:var(--text-lo); font-size:0.8rem; margin-bottom:0.75rem;">Sign in or create an account to enroll your Face ID biometrics and sync search history.</div>
+                        <button type="button" id="guestSignInBtn" class="auth-btn" style="padding:0.45rem 1rem; border-radius:var(--r-sm); font-size:0.85rem; margin:0 auto; display:inline-flex; align-items:center; gap:0.35rem;">
+                            Sign In / Create Account
+                        </button>
+                    </div>
+                `;
+                const guestBtn = document.getElementById('guestSignInBtn');
+                if (guestBtn) {
+                    guestBtn.addEventListener('click', () => {
+                        settingsModal.classList.remove('active');
+                        authModal.classList.add('active');
+                        switchAuthTab('login');
+                    });
+                }
             }
 
             const headers = {};
