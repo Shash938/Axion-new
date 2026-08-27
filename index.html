@@ -6278,49 +6278,6 @@
         </div>
     </aside>
 
-                <div style="display:flex; gap:0.5rem; margin-top:0.75rem;">
-                    <button id="registerBiometricBtn" class="biometric-btn" style="flex:1; margin-top:0;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.25rem;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                        Use Camera
-                    </button>
-                    <button id="uploadFaceRegBtn" type="button" class="auth-btn" style="padding:0.75rem; border-radius:var(--r-sm); font-size:0.85rem; display:flex; align-items:center; gap:0.35rem;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        Upload Photo
-                    </button>
-                    <input type="file" id="faceRegFileInput" accept="image/*" style="display:none;">
-                </div>
-                <button id="resetFaceBtn" style="display:none; background:transparent; border:1px solid var(--down); color:var(--down); width:100%; padding:0.5rem; border-radius:var(--r-sm); margin-top:0.5rem; font-size:0.8rem; cursor:pointer; font-weight:600; font-family:var(--font-body); transition:var(--transition-smooth);">
-                    Reset Face Recognition Data
-                </button>
-                <div id="biometricFeedback" class="auth-feedback" style="display:none; margin-top:0.5rem; font-size:0.8rem;"></div>
-            </div>
-            <div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
-                    <h4 style="font-size: 0.85rem; color: var(--text-lo); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin:0;">Recent Search History</h4>
-                    <button id="clearHistoryBtn" style="background:transparent; border:none; color:var(--down); font-size:0.8rem; cursor:pointer; font-weight:600; font-family:var(--font-body);">Clear History</button>
-                </div>
-                <div style="max-height: 280px; overflow-y: auto;">
-                    <table class="history-table">
-                        <thead>
-                            <tr>
-                                <th>Ticker</th>
-                                <th>Company</th>
-                                <th>Score</th>
-                                <th>Rec</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTableBody">
-                            <tr>
-                                <td colspan="5" style="text-align:center; color:var(--text-lo);">No search history recorded yet.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         const BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
             ? ''
