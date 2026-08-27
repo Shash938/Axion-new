@@ -2,8 +2,8 @@
 routers/face_auth.py — Face Recognition Authentication Router
 =============================================================
 Endpoints for registering and authenticating via webcam face recognition
-using a multi-layered OpenCV pipeline (DNN detection, structural validation,
-HOG+LBP encoding, cosine matching, anti-spoofing).
+using OpenCV. Replaces the WebAuthn/passkey approach with actual
+computer-vision-based face matching.
 
 Endpoints:
     POST /api/v1/auth/face/register   — Register face (requires auth + webcam image)
@@ -22,7 +22,6 @@ from pydantic import BaseModel
 from security.auth import get_current_user
 from security.face_recognition_service import (
     compute_face_encoding,
-    detect_face_detailed,
     detect_face_in_image,
     find_matching_user,
 )
@@ -72,36 +71,24 @@ def register_face(
 ):
     """
     Captures a face encoding from the provided webcam image and stores it
-    for the authenticated user. Uses the multi-layered validation pipeline
-    to ensure only genuine face images are accepted.
+    for the authenticated user. The user can register multiple angles/lighting
+    for better accuracy.
     """
     user_id = current_user["id"]
 
-    # Run full face detection + structural validation with detailed feedback
-    detection = detect_face_detailed(payload.image)
-
-    if not detection["face_detected"]:
+    # Check if face is present in the image
+    if not detect_face_in_image(payload.image):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=detection["validation"]["reason"],
+            detail="No face detected in the image. Please ensure your face is clearly visible and well-lit.",
         )
 
-    if not detection["validation"]["valid"]:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=detection["validation"]["reason"],
-        )
-
-    # Compute multi-feature face encoding (HOG + LBP)
+    # Compute face encoding
     encoding = compute_face_encoding(payload.image)
     if encoding is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=(
-                "Could not extract face features. The image may have failed "
-                "anti-spoof checks (flat surface detected) or structural validation. "
-                "Please try again with your face clearly visible and well-lit."
-            ),
+            detail="Could not extract face features. Please try again with better lighting.",
         )
 
     # Store encoding
@@ -112,19 +99,12 @@ def register_face(
     all_encodings = get_face_encodings_by_user(user_id)
     count = len(all_encodings)
 
-    logger.info(
-        "Face registered for user %s (id=%d), total encodings: %d, quality=%s",
-        current_user["username"],
-        user_id,
-        count,
-        detection.get("quality", {}),
-    )
+    logger.info("Face registered for user %s (id=%d), total encodings: %d", current_user["username"], user_id, count)
     return {
         "status": "registered",
         "message": f"Face registered successfully! You now have {count} face sample(s) stored.",
         "encoding_id": record_id,
         "total_samples": count,
-        "quality_metrics": detection.get("quality", {}),
     }
 
 
@@ -139,8 +119,7 @@ def register_face(
 def login_with_face(payload: FaceLoginRequest):
     """
     Authenticates a user by comparing their webcam face against stored encodings.
-    Uses DNN detection, structural validation, edge-based features, and
-    cosine similarity with a strict 0.75 threshold.
+    Requires a username to narrow the search (or match against all users).
     """
     # 1. Verify the username exists
     user = get_user_by_username_or_email(payload.username)
@@ -158,19 +137,11 @@ def login_with_face(payload: FaceLoginRequest):
             detail="No face data registered for this account. Please register your face first via Settings.",
         )
 
-    # 3. Run full face detection + validation with detailed feedback
-    detection = detect_face_detailed(payload.image)
-
-    if not detection["face_detected"]:
+    # 3. Detect face in the login image
+    if not detect_face_in_image(payload.image):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=detection["validation"]["reason"],
-        )
-
-    if not detection["validation"]["valid"]:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=detection["validation"]["reason"],
+            detail="No face detected in the image. Please position your face clearly in front of the camera.",
         )
 
     # 4. Compute encoding from the login image
@@ -178,38 +149,13 @@ def login_with_face(payload: FaceLoginRequest):
     if probe_encoding is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=(
-                "Could not extract face features. The image failed validation checks. "
-                "Please ensure your face is clearly visible, well-lit, and not obstructed."
-            ),
+            detail="Could not extract face features. Please try again.",
         )
 
     # 5. Compare against this user's stored encodings
     match_result = find_matching_user(probe_encoding, user_encodings)
 
     if match_result is None:
-        # Check if all stored encodings were incompatible (old format)
-        import json as _json
-        import numpy as _np
-        incompatible = 0
-        for stored in user_encodings:
-            try:
-                db_enc = _json.loads(stored["encoding"])
-                if len(db_enc) != len(probe_encoding):
-                    incompatible += 1
-            except Exception:
-                incompatible += 1
-
-        if incompatible == len(user_encodings):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=(
-                    "Your stored face data uses an outdated format and is incompatible "
-                    "with the improved recognition system. Please go to Settings and "
-                    "re-register your face for better security."
-                ),
-            )
-
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Face does not match. Authentication failed. Please try again or use password login.",
@@ -229,10 +175,9 @@ def login_with_face(payload: FaceLoginRequest):
     )
 
     logger.info(
-        "Face login successful for user=%s (similarity=%.4f, quality=%s)",
+        "Face login successful for user=%s (similarity=%.4f)",
         user["username"],
         similarity,
-        detection.get("quality", {}),
     )
     return {
         "access_token": token,

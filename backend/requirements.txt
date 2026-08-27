@@ -1,39 +1,16 @@
 # ==============================================================================
-# AI Investment Advisor — Backend Dependencies
+# AI Investment Advisor — Production Dependencies
 # ==============================================================================
-# Use `pip install -r requirements.txt` to install.
-# Intentionally uses compatible-release (~=) pins so pip can resolve
-# pre-built wheels on all platforms (Windows, macOS, Linux).
-# Lock exact versions for production using `pip freeze > requirements.lock`.
-# ==============================================================================
-
-# --- Web Framework ---
-fastapi~=0.111.0
-uvicorn[standard]~=0.29.0
-
-# --- Data Validation & Settings ---
-pydantic~=2.7.1
-pydantic-settings~=2.2.1
-python-dotenv~=1.0.1
-
-# --- Financial Data ---
-yfinance~=0.2.40
-curl_cffi~=0.15.0
-
-# --- Data Processing ---
-pandas~=2.2.0
-numpy>=1.24.0,<2.0.0
-
-# --- HTTP Client ---
-httpx~=0.27.0
-
-# --- Computer Vision (Face Recognition) ---
-opencv-contrib-python>=4.8.0
-scikit-image>=0.21.0
-
-# --- Utilities ---
-python-multipart~=0.0.9
-
-# --- Testing ---
-pytest~=8.2.0
-pytest-asyncio~=0.23.6
+fastapi>=0.100.0
+uvicorn>=0.20.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+yfinance>=0.2.0
+pandas>=1.5.0
+numpy>=1.21.0
+httpx>=0.24.0
+python-multipart>=0.0.6
+opencv-python-headless>=4.8.0
+pytest>=7.0.0
+pytest-asyncio>=0.21.0

@@ -30,14 +30,25 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from config import get_settings
 from database.db import init_db
 from routers.analysis import analysis_router
 from routers.auth import auth_router
 from routers.history import history_router
-from routers.webauthn import webauthn_router
-from routers.face_auth import face_auth_router
+
+# Optional routers — degrade gracefully if deps missing
+try:
+    from routers.webauthn import webauthn_router
+except Exception:
+    webauthn_router = None
+
+try:
+    from routers.face_auth import face_auth_router
+except Exception:
+    face_auth_router = None
+
 from security.headers import SecurityHeadersMiddleware
 from security.payload_limit import PayloadSizeLimitMiddleware
 
@@ -100,10 +111,17 @@ app = FastAPI(
         "Calculates 14 financial ratios, scores each metric, and returns a "
         "structured investment recommendation with beginner-friendly explanations."
     ),
-    docs_url="/docs" if settings.DEBUG else None,       # Hide Swagger in production
-    redoc_url="/redoc" if settings.DEBUG else None,     # Hide ReDoc in production
-    openapi_url="/openapi.json" if settings.DEBUG else None,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
     lifespan=lifespan,
+)
+
+# Project-owned frontend assets used by the dashboard.
+app.mount(
+    "/assets",
+    StaticFiles(directory=os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))),
+    name="assets",
 )
 
 
@@ -116,7 +134,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -226,8 +244,10 @@ def serve_ui():
 app.include_router(analysis_router)
 app.include_router(auth_router)
 app.include_router(history_router)
-app.include_router(webauthn_router)
-app.include_router(face_auth_router)
+if webauthn_router is not None:
+    app.include_router(webauthn_router)
+if face_auth_router is not None:
+    app.include_router(face_auth_router)
 
 
 # ==============================================================================

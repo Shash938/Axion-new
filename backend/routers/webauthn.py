@@ -12,14 +12,20 @@ import base64
 import logging
 from typing import Optional
 
-import webauthn
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel
-from webauthn.helpers.structs import (
-    AuthenticatorSelectionCriteria,
-    ResidentKeyRequirement,
-    UserVerificationRequirement,
-)
+
+try:
+    import webauthn
+    from webauthn.helpers.structs import (
+        AuthenticatorSelectionCriteria,
+        ResidentKeyRequirement,
+        UserVerificationRequirement,
+    )
+    HAS_WEBAUTHN = True
+except ImportError:
+    HAS_WEBAUTHN = False
+    webauthn = None
 
 from config import get_settings
 from database.db import (
@@ -89,6 +95,12 @@ def register_begin(request: Request, current_user: dict = Depends(get_current_us
     Returns PublicKeyCredentialCreationOptions for the browser's
     navigator.credentials.create() call.
     """
+    if not HAS_WEBAUTHN:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="WebAuthn biometric library is not installed on server.",
+        )
+
     settings = get_settings()
     rp_id, origin = _get_webauthn_rp_and_origin(request)
     existing_creds = get_webauthn_credentials_by_user(current_user["id"])

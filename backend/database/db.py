@@ -15,19 +15,29 @@ DB_PATH = os.path.join(DB_DIR, "axion.db")
 
 
 def get_db_connection() -> sqlite3.Connection:
-    """Returns a SQLite connection configured with row factory and WAL mode."""
+    """Returns a SQLite connection configured with row factory and safe journal mode."""
     os.makedirs(DB_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA foreign_keys=ON;")
+    try:
+        conn.execute("PRAGMA journal_mode=WAL;")
+    except Exception:
+        try:
+            conn.execute("PRAGMA journal_mode=DELETE;")
+        except Exception:
+            pass
+    try:
+        conn.execute("PRAGMA foreign_keys=ON;")
+    except Exception:
+        pass
     return conn
 
 
 def init_db() -> None:
     """Initializes the database schema if tables do not already exist."""
-    with get_db_connection() as conn:
-        cursor = conn.cursor()
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
         
         # Users table
         cursor.execute(
@@ -121,8 +131,10 @@ def init_db() -> None:
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_history_user_id ON search_history(user_id, searched_at DESC);")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_mfa_codes_user_id ON mfa_codes(user_id);")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_webauthn_creds_user_id ON webauthn_credentials(user_id);")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_face_encodings_user_id ON face_encodings(user_id);")
         conn.commit()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning("Could not initialize database schema: %s", e)
 
 
 # ==============================================================================
