@@ -4673,43 +4673,407 @@
             background: var(--card);
         }
 
-        </style>
+        
+        /* ==========================================================================
+           AXION SIDEBAR & APP SHELL (Matching Reference Design)
+           ========================================================================== */
+        .app-shell {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg);
+            position: relative;
+        }
+
+        /* Fixed / Sticky Left Sidebar */
+        .app-sidebar {
+            width: 240px;
+            flex-shrink: 0;
+            background: #110D1A;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
+            padding: 1.25rem 0.85rem;
+            user-select: none;
+        }
+
+        /* Sidebar Logo */
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0 0.5rem 1.5rem 0.5rem;
+            text-decoration: none;
+        }
+
+        .sidebar-brand-badge {
+            width: 32px;
+            height: 32px;
+            background: #C9A9E9;
+            color: #110D1A;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            letter-spacing: -0.02em;
+            box-shadow: 0 2px 8px rgba(201, 169, 233, 0.3);
+        }
+
+        .sidebar-brand-text {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #FFFFFF;
+            letter-spacing: -0.01em;
+        }
+
+        /* Sidebar Section Groups */
+        .sidebar-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-group-title {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #5A536B;
+            padding: 0 0.75rem 0.5rem 0.75rem;
+        }
+
+        .sidebar-nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .sidebar-nav-link {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.55rem 0.75rem;
+            border-radius: var(--r-sm);
+            color: #8C84A0;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            background: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-family: var(--font-body);
+        }
+
+        .sidebar-nav-link:hover {
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .sidebar-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .sidebar-nav-link svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.75;
+            flex-shrink: 0;
+        }
+
+        /* Active Advisor Link */
+        .sidebar-nav-link.active {
+            background: rgba(201, 169, 233, 0.08);
+            border-color: rgba(201, 169, 233, 0.28);
+            color: #FFFFFF;
+        }
+
+        .sidebar-nav-link.active svg {
+            color: #C9A9E9;
+            opacity: 1;
+        }
+
+        /* Badges on right side */
+        .badge-live {
+            background: rgba(79, 209, 165, 0.12);
+            border: 1px solid rgba(79, 209, 165, 0.3);
+            color: #4FD1A5;
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 0.15rem 0.45rem;
+            border-radius: 999px;
+            letter-spacing: 0.04em;
+            font-family: var(--font-mono);
+        }
+
+        .badge-soon {
+            color: #4E475E;
+            font-size: 0.62rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            letter-spacing: 0.02em;
+        }
+
+        .badge-count {
+            background: rgba(79, 209, 165, 0.1);
+            border: 1px solid rgba(79, 209, 165, 0.25);
+            color: #4FD1A5;
+            font-size: 0.65rem;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+        }
+
+        /* App Main Content Area */
+        .app-main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(14, 11, 20, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .top-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            font-family: var(--font-body);
+        }
+
+        .top-breadcrumb-active {
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        .top-breadcrumb-sep {
+            color: #4E475E;
+            font-weight: 400;
+        }
+
+        .top-breadcrumb-sub {
+            color: #7E7594;
+            font-weight: 500;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .top-recents-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.4rem 0.85rem;
+            border-radius: var(--r-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font-body);
+            transition: var(--transition-smooth);
+        }
+
+        .top-recents-btn:hover {
+            border-color: var(--accent);
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        @media (max-width: 900px) {
+            .app-sidebar {
+                display: none;
+            }
+            .top-navbar {
+                padding: 0 1rem;
+            }
+        }
+
+    </style>
 </head>
 
 <body>
     <div class="grid-bg"></div>
-    <header>
-        <div class="logo-container">
-            <div class="logo-icon">AG</div>
-            <div class="logo-text">
-                <h1>Axion</h1>
-                <p>AI Investment Advisor</p>
+        <div class="app-shell">
+        <!-- Left Sidebar Matching Exact Reference Screenshot -->
+        <aside class="app-sidebar" id="appSidebar">
+            <a href="/" class="sidebar-brand">
+                <div class="sidebar-brand-badge">AG</div>
+                <div class="sidebar-brand-text">Axion</div>
+            </a>
+
+            <!-- Modules Section -->
+            <div class="sidebar-group">
+                <div class="sidebar-group-title">MODULES</div>
+                <ul class="sidebar-nav-menu">
+                    <li>
+                        <button type="button" class="sidebar-nav-link active" id="navAdvisorBtn">
+                            <div class="sidebar-nav-left">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="22" y1="12" x2="18" y2="12"></line>
+                                    <line x1="6" y1="12" x2="2" y2="12"></line>
+                                    <line x1="12" y1="6" x2="12" y2="2"></line>
+                                    <line x1="12" y1="22" x2="12" y2="18"></line>
+                                </svg>
+                                <span>Advisor</span>
+                            </div>
+                            <span class="badge-live">LIVE</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="sidebar-nav-link" disabled style="opacity:0.6; cursor:not-allowed;">
+                            <div class="sidebar-nav-left">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                                </svg>
+                                <span>Assisted Trad...</span>
+                            </div>
+                            <span class="badge-soon">SOON</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="sidebar-nav-link" disabled style="opacity:0.6; cursor:not-allowed;">
+                            <div class="sidebar-nav-left">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                                    <circle cx="12" cy="5" r="2"></circle>
+                                    <path d="M12 7v4"></path>
+                                    <line x1="8" y1="16" x2="8" y2="16"></line>
+                                    <line x1="16" y1="16" x2="16" y2="16"></line>
+                                </svg>
+                                <span>Auto Bot</span>
+                            </div>
+                            <span class="badge-soon">SOON</span>
+                        </button>
+                    </li>
+                </ul>
             </div>
-        </div>
-        <div class="header-actions">
-            <div id="userBadge" style="display:none;" class="user-badge">
-                <span id="usernameDisplay">User</span>
-                <button id="logoutBtn" class="logout-btn">Sign Out</button>
+
+            <!-- Tools Section -->
+            <div class="sidebar-group">
+                <div class="sidebar-group-title">TOOLS</div>
+                <ul class="sidebar-nav-menu">
+                    <li>
+                        <button type="button" class="sidebar-nav-link" id="navRecentAnalysesBtn">
+                            <div class="sidebar-nav-left">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                <span>Recent Analyses</span>
+                            </div>
+                            <span class="badge-count" id="sidebarHistoryCount">2</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="sidebar-nav-link" disabled style="opacity:0.6; cursor:not-allowed;">
+                            <div class="sidebar-nav-left">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                <span>Watchlist</span>
+                            </div>
+                            <span class="badge-soon">SOON</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="sidebar-nav-link" id="navSettingsBtn">
+                            <div class="sidebar-nav-left">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                </svg>
+                                <span>Settings</span>
+                            </div>
+                        </button>
+                    </li>
+                </ul>
             </div>
-            <button class="auth-btn" id="authBtn">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                Sign In
-            </button>
-            <button class="settings-btn" id="settingsBtn" title="Settings, Face ID & History" aria-label="Settings and Search History">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-            </button>
-            <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
-                <!-- SVG Moon Icon -->
-                <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-            </button>
-        </div>
-    </header>
+        </aside>
+
+        <!-- Main Viewport Area -->
+        <div class="app-main">
+            <!-- Top Navbar Matching Reference Screenshot -->
+            <header class="top-navbar">
+                <div class="top-breadcrumb">
+                    <span class="top-breadcrumb-active">Advisor</span>
+                    <span class="top-breadcrumb-sep">/</span>
+                    <span class="top-breadcrumb-sub">Fundamental Analysis</span>
+                </div>
+                <div class="top-actions">
+                    <button type="button" class="top-recents-btn" id="topRecentsBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>Recents</span>
+                    </button>
+                    <div id="userBadge" style="display:none;" class="user-badge">
+                        <span id="usernameDisplay">User</span>
+                        <button id="logoutBtn" class="logout-btn">Sign Out</button>
+                    </div>
+                    <button class="auth-btn" id="authBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        Sign In
+                    </button>
+                    <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
+                        <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                    <button class="settings-btn" id="settingsBtn" title="Settings, Face ID & History" aria-label="Settings and Search History">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </header>
 
     <div class="container">
         <!-- Search Section -->
@@ -5402,6 +5766,9 @@
             </button>
         </div>
     </div>
+
+    </div> <!-- /.app-main -->
+    </div> <!-- /.app-shell -->
 
     <!-- Comparison Modal Overlay (Phase 3.3) -->
     <div class="comparison-modal-overlay" id="comparisonModalOverlay" role="dialog" aria-modal="true" aria-labelledby="comparisonModalTitle">
@@ -8619,6 +8986,8 @@
                 if (res.ok) {
                     const data = await res.json();
                     const items = data.history || [];
+                    const sidebarHistoryCount = document.getElementById('sidebarHistoryCount');
+                    if (sidebarHistoryCount) sidebarHistoryCount.textContent = items.length;
                     if (items.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-lo); padding:1rem 0;">No search history recorded yet.</td></tr>`;
                     } else {
@@ -8669,6 +9038,37 @@
             });
         }
 
+
+        
+        // Sidebar Navigation Button Bindings
+        const navAdvisorBtn = document.getElementById('navAdvisorBtn');
+        if (navAdvisorBtn) {
+            navAdvisorBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (tickerInput) tickerInput.focus();
+            });
+        }
+
+        const navRecentAnalysesBtn = document.getElementById('navRecentAnalysesBtn');
+        if (navRecentAnalysesBtn) {
+            navRecentAnalysesBtn.addEventListener('click', () => {
+                if (settingsBtn) settingsBtn.click();
+            });
+        }
+
+        const navSettingsBtn = document.getElementById('navSettingsBtn');
+        if (navSettingsBtn) {
+            navSettingsBtn.addEventListener('click', () => {
+                if (settingsBtn) settingsBtn.click();
+            });
+        }
+
+        const topRecentsBtn = document.getElementById('topRecentsBtn');
+        if (topRecentsBtn) {
+            topRecentsBtn.addEventListener('click', () => {
+                if (settingsBtn) settingsBtn.click();
+            });
+        }
 
         // Initialize Session on Load
         document.addEventListener('DOMContentLoaded', () => {
