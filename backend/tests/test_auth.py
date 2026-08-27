@@ -166,3 +166,80 @@ def test_webauthn_flow():
         assert "user" in options
         assert options["user"]["name"] == username
 
+
+def test_face_recognition_flow():
+    import base64
+    import numpy as np
+    import cv2
+
+    username = "faceuser"
+    email = "faceuser@example.com"
+    password = "FaceUserPassword123!"
+
+    # 1. Register user
+    reg_resp = client.post(
+        "/api/v1/auth/register",
+        json={"username": username, "email": email, "password": password},
+    )
+    assert reg_resp.status_code == 201
+    token = reg_resp.json()["access_token"]
+
+    # Generate a dummy synthetic face image (120x120)
+    img = np.zeros((120, 120, 3), dtype=np.uint8)
+    cv2.circle(img, (60, 60), 40, (200, 200, 200), -1)
+    _, buf = cv2.imencode(".jpg", img)
+    b64_image = "data:image/jpeg;base64," + base64.b64encode(buf).decode()
+
+    # 2. Check initial face status (should be false)
+    status_resp = client.get(
+        "/api/v1/auth/face/status",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert status_resp.status_code == 200
+    assert status_resp.json()["has_face"] is False
+
+    # 3. Register face
+    reg_face_resp = client.post(
+        "/api/v1/auth/face/register",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"image": b64_image},
+    )
+    assert reg_face_resp.status_code == 201
+    assert reg_face_resp.json()["status"] == "registered"
+
+    # 4. Check face status (should now be true)
+    status_resp2 = client.get(
+        "/api/v1/auth/face/status",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert status_resp2.status_code == 200
+    assert status_resp2.json()["has_face"] is True
+    assert status_resp2.json()["sample_count"] >= 1
+
+    # 5. Login with face
+    login_face_resp = client.post(
+        "/api/v1/auth/face/login",
+        json={"username": username, "image": b64_image},
+    )
+    assert login_face_resp.status_code == 200
+    login_data = login_face_resp.json()
+    assert "access_token" in login_data
+    assert login_data["user"]["username"] == username
+
+    # 6. Reset face data
+    reset_resp = client.delete(
+        "/api/v1/auth/face/reset",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert reset_resp.status_code == 200
+    assert reset_resp.json()["status"] == "cleared"
+
+    # 7. Check face status after reset (should be false)
+    status_resp3 = client.get(
+        "/api/v1/auth/face/status",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert status_resp3.status_code == 200
+    assert status_resp3.json()["has_face"] is False
+
+

@@ -182,7 +182,7 @@ def login_with_face(payload: FaceLoginRequest):
     return {
         "access_token": token,
         "token_type": "bearer",
-        "user": user_response.dict(),
+        "user": user_response.model_dump() if hasattr(user_response, "model_dump") else user_response.dict(),
         "face_similarity": round(similarity, 4),
     }
 
